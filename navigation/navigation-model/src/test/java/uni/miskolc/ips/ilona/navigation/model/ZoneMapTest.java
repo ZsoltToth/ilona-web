@@ -56,8 +56,8 @@ public class ZoneMapTest {
 	     
 	     testMap= new ZoneMap(testZones, testAttributes);
 	     
-	     testMap.addPath(firstZone, secondZone);
-	     testMap.addPath(secondZone, thirdZone);
+	  testMap.addGateWay(firstZone, secondZone, Gateway.DOOR);
+     testMap.addGateWay(secondZone, thirdZone, Gateway.STAIRCASE);
 	     
 	}
 	
@@ -108,7 +108,7 @@ public class ZoneMapTest {
 	
 	@Test
 	public void addPathTest(){
-		testMap.addPath(firstZone, thirdZone);;
+		testMap.addGateWay(thirdZone, firstZone, Gateway.VIRTUALGATEWAY);;
 		assertTrue(testMap.getZoneGraph().containsEdge(thirdZone, firstZone));
 	}
 	
@@ -169,10 +169,5 @@ public class ZoneMapTest {
 	public void hasAttributeFalseTest(){
 		assertFalse(testMap.hasAttribute(firstZone, "notAnAttribute"));
 	}
-	
-	@Test
-	public void addAttributeNewZoneTest(){
-		testMap.addAttribute(testZone, "test");
-		assertTrue(testMap.hasAttribute(testZone, "test"));
-	}
+
 }

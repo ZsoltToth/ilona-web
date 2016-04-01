@@ -12,17 +12,18 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.DijkstraShortestPath;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.ClassBasedEdgeFactory;
+import org.jgrapht.graph.DefaultDirectedGraph;
 
 import uni.miskolc.ips.ilona.measurement.model.position.Zone;
 
 /**
  * The ZoneMap class defines graph related methods.
  * 
- * @author teket
+ * @author kun
  */
 
 public class ZoneMap {
@@ -36,12 +37,12 @@ public class ZoneMap {
 	 * 
 	 */
 	private Map<Zone, Set<String>> attributes;
-	private Graph<Zone, DefaultEdge> zoneGraph;
+	private DirectedGraph<Zone, Gateway> zoneGraph;
 
 	public ZoneMap(Collection<Zone> zones, Map<Zone, Set<String>> attributes) {
 
 		this.attributes = attributes;
-		this.zoneGraph = new SimpleGraph<Zone, DefaultEdge>(DefaultEdge.class);
+		this.zoneGraph = new DefaultDirectedGraph<Zone, Gateway>(new ClassBasedEdgeFactory<Zone, Gateway>(Gateway.class));
 
 		for (Zone zone : zones) {
 
@@ -66,11 +67,11 @@ public class ZoneMap {
 		this.attributes = attributes;
 	}
 
-	public Graph<Zone, DefaultEdge> getZoneGraph() {
+	public Graph<Zone, Gateway> getZoneGraph() {
 		return zoneGraph;
 	}
 
-	public void setZoneGraph(Graph<Zone, DefaultEdge> zoneGraph) {
+	public void setZoneGraph(DirectedGraph<Zone, Gateway> zoneGraph) {
 		this.zoneGraph = zoneGraph;
 	}
 
@@ -81,8 +82,9 @@ public class ZoneMap {
 		LOG.info(zone.getName() + " has been added.");
 	}
 
-	public void addPath(Zone sourceZone, Zone targetZone) {
-		zoneGraph.addEdge(sourceZone, targetZone);
+	public void addGateWay(Zone sourceZone, Zone targetZone, String gateWayType) {
+		
+		zoneGraph.addEdge(sourceZone, targetZone, new Gateway<Zone>(gateWayType, sourceZone, targetZone));
 		LOG.info("Path between " + sourceZone.getName() + " and " + targetZone.getName() + " added.");
 	}
 
@@ -158,7 +160,7 @@ public class ZoneMap {
 
 	public int howFarItIs(Zone sourceZone, Zone targetZone) throws NoPathAvailibleException {
 		if (isConnected(sourceZone, targetZone)) {
-			List<DefaultEdge> result = DijkstraShortestPath.findPathBetween(zoneGraph, sourceZone, targetZone);
+			List<Gateway> result = DijkstraShortestPath.findPathBetween(zoneGraph, sourceZone, targetZone);
 			LOG.info("The distance between " + sourceZone.getName() + " and " + targetZone.getName() + " is "
 					+ Integer.toString(result.size()));
 			return result.size();
