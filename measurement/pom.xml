@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>uni.miskolc.ips.ilona</groupId>
+	<artifactId>measurement</artifactId>
+	<version>0.1.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>ILONA - Measurement Subsystem</name>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.2</version>
+					<configuration>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<modules>
+		<module>measurement-model</module>
+		<module>measurement-persist</module>
+		<module>measurement-persist-mysql</module>
+		<module>measurement-service</module>
+		<module>measurement-service-impl</module>
+		<module>measurement-controller</module>
+		<module>measurement-util</module>
+	</modules>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>snapshots</name>
+			<url>http://safranek.iit.uni-miskolc.hu:8081/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<scm>
+		<url>https://jerry.iit.uni-miskolc.hu/svntzs/ips</url>
+	</scm>
+</project>
