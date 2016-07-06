@@ -41,13 +41,23 @@
 		</dependency>
 		<dependency>
 			<groupId>uni.miskolc.ips.ilona</groupId>
-			<artifactId>measurement-persist-mysql</artifactId>
+			<artifactId>measurement-service-impl</artifactId>
 			<version>0.1.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>uni.miskolc.ips.ilona</groupId>
-			<artifactId>measurement-service-impl</artifactId>
+			<artifactId>measurement-persist-mysql</artifactId>
 			<version>0.1.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>4.3.1.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>4.3.1.RELEASE</version>
 		</dependency>
 	</dependencies>
 	<build>

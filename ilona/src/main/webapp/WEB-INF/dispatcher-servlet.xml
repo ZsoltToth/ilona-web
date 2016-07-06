@@ -26,4 +26,6 @@ http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 			<value>.jsp</value>
 		</property>
 	</bean>
+	
+	
 </beans>
