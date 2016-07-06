@@ -10,7 +10,13 @@ import uni.miskolc.ips.ilona.navigation.persist.exceptions.SavingFailedException
 import uni.miskolc.ips.ilona.navigation.persist.exceptions.WrongFormatException;
 import uni.miskolc.ips.ilona.navigation.persist.exceptions.ZoneNotFoundException;
 
-public interface CRUDInterface {
+/**
+ * Data Access Object
+ * 
+ * @author teket
+ *
+ */
+public interface ZoneMapDAO {
 
 	public void createMap(ZoneMap map)
 			throws MapAlreadyExistsException, RedundantMapException, ConnectionFailedException, SavingFailedException;
