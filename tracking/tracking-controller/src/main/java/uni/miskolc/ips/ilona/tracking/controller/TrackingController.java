@@ -27,13 +27,13 @@ import uni.miskolc.ips.ilona.tracking.service.exceptions.UnenabledUserException;
  *
  */
 @Controller
-@RequestMapping(value = "/tracking")
+//@RequestMapping(value = "/tracking")
 public class TrackingController {
 
 	private static Logger logger = LogManager.getLogger(TrackingController.class);
 
-	@Autowired
-	private TrackingLoginService trackingLoginService;
+	//@Autowired
+	//private TrackingLoginService trackingLoginService;
 
 	/**
 	 * This method gives back the index page of the tracking modul. Login or
@@ -41,12 +41,15 @@ public class TrackingController {
 	 * 
 	 * @return The tracking index jsp page.
 	 */
-	@RequestMapping(value = "/index", method=RequestMethod.GET)
+	@RequestMapping(value = "/trackingIndex", method=RequestMethod.GET)
 	public ModelAndView loadingStartpage() {
 		logger.info("Tracking index page request.");
-		ModelAndView back = new ModelAndView("tracking_index");
-		back.addObject("message", "");
-		return back;
+		//ModelAndView back = new ModelAndView("trackingIndex");
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("message", "uzenet");
+		//back.addObject("message", "Üzenetátadva!");
+		mav.setViewName("trackingIndex");
+		return mav;
 	}
 
 	/**
@@ -61,7 +64,12 @@ public class TrackingController {
 		mav.addObject("message", "");
 		return mav;
 	}
-
+	
+	@RequestMapping(value = "/trackingMain", method = RequestMethod.GET)
+	public ModelAndView loginProcess() {
+		return new ModelAndView("trackingLoggedInMain");
+	}
+/*
 	@RequestMapping(value = "/getUser/{userID}", method = RequestMethod.GET)
 	@ResponseBody
 	public UserData getUser(@RequestParam(value="userID", required=true)String userID) {
@@ -108,5 +116,6 @@ public class TrackingController {
 		mav.addObject("message", "Sikeres regisztracio");
 		return mav;
 	}
+	*/
 
 }

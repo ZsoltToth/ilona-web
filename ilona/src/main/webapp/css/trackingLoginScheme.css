@@ -1,0 +1,30 @@
+h1 {
+	text-align: center;
+	color: aqua;
+	background-color: blue;
+}
+
+h2 {
+	text-align: center;
+}
+
+input[type=text] {
+	width: 50%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;      
+}
+
+input[type=password] {
+	width: 50%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+#username {
+	width: 50%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}

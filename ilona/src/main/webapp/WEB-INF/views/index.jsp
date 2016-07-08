@@ -60,6 +60,10 @@ $(document).ready(function(){
 		event.preventDefault();
 		$.get($(this).attr('href'),function(data){$('#page-wrapper').html(data);});
 	});
+	$('#trackingMainpage').click(function(event){
+		event.preventDefault();
+		$.get($(this).attr('href'),function(data){$('#page-wrapper').html(data);});
+	});
 	
 });
 </script>
@@ -177,7 +181,9 @@ $(document).ready(function(){
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
-                        
+                         <li>
+                            <a href="trackingIndex" id="trackingMainpage" ><i class="fa fa-dashboard fa-fw"></i> Tracking </a>
+                        </li>
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->

@@ -66,6 +66,10 @@
 		<constructor-arg ref="measurementDAO" />
 	</bean>
 
+	<!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" /> <property 
+		name="url" value="url=jdbc:mysql://localhost/ilona" /> <property name="username" 
+		value="root" /> <property name="password" value="ilona" /> </bean> -->
 	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 
 		<constructor-arg ref="positionDAO" /> <constructor-arg ref="measurementDAO" 
 		/> </bean> -->
