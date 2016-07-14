@@ -2,13 +2,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:security="http://www.springframework.org/schema/security"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/aop
-        http://www.springframework.org/schema/aop/spring-aop.xsd">
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-4.1.xsd">
 
 	<context:property-placeholder
 		properties-ref="systemProperties" />
@@ -23,7 +25,9 @@
 			</props>
 		</property>
 	</bean>
-	<!-- DAO Beans -->
+
+
+	<!-- DATABASE DAO Beans -->
 	<bean id="zoneDAO"
 		class="uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLZoneDAO">
 		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
@@ -34,7 +38,6 @@
 		<constructor-arg name="password" value="${database.password}" />
 	</bean>
 
-
 	<bean id="positionDAO"
 		class="uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLPositionDAO">
 		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
@@ -44,6 +47,7 @@
 		<constructor-arg name="user" value="${database.user}" />
 		<constructor-arg name="password" value="${database.password}" />
 	</bean>
+
 	<bean id="measurementDAO"
 		class="uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLMeasurementDAO">
 		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
@@ -66,10 +70,36 @@
 		<constructor-arg ref="measurementDAO" />
 	</bean>
 
-	<!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> 
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" /> <property 
-		name="url" value="url=jdbc:mysql://localhost/ilona" /> <property name="username" 
-		value="root" /> <property name="password" value="ilona" /> </bean> -->
+	<!-- Tracking Database beans -->
+
+	<bean id="trackingDAO"
+		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySQLTrackingDAO">
+		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
+		<constructor-arg name="host" value="${database.host}" />
+		<constructor-arg name="port" value="${database.port}" />
+		<constructor-arg name="database" value="${database.db}" />
+		<constructor-arg name="user" value="${database.user}" />
+		<constructor-arg name="password" value="${database.password}" />
+	</bean>
+
+	<bean id="customLogout" class="security.CustomlogoutSuccerHandler">
+		
+	</bean>
+	<!-- Spring security configuration -->
+
+	<bean id="jsonConverter"
+		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="prefixJson" value="false" />
+		<property name="supportedMediaTypes" value="application/json" />
+	</bean>
+
+	<bean id="passwordEncoder" autowire="byName"
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+		<constructor-arg name="strength" value="10"></constructor-arg>
+	</bean>
+
+	<!-- url="hera.iit.uni-miskolc.hu" <security:ldap-server root="dc=iit,dc=uni-miskolc,dc=hu" 
+		id="ldapserver" url="ldap://hera.iit.uni-miskolc.hu"/> -->
 	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 
 		<constructor-arg ref="positionDAO" /> <constructor-arg ref="measurementDAO" 
 		/> </bean> -->

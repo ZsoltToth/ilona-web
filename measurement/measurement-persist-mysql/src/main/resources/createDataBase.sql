@@ -1,4 +1,4 @@
-create database Ilona;
+create if not exists database Ilona;
 
 create user ilona identified by 'ilona';
 

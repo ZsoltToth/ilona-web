@@ -25,12 +25,18 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>uni.miskolc.ips.ilona</groupId>
 			<artifactId>measurement-service</artifactId>
 			<version>0.1.2-SNAPSHOT</version>
 		</dependency>
-
+		<dependency>
+			<groupId>uni.miskolc.ips.ilona</groupId>
+			<artifactId>tracking-model</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
 		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>

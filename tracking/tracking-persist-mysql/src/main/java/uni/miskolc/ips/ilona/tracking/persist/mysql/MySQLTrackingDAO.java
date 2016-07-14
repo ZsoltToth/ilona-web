@@ -15,21 +15,33 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.persist.TrackingLoginDAO;
+import uni.miskolc.ips.ilona.tracking.persist.TrackingDAO;
 
-public class MySQLTrackingLoginDAO implements TrackingLoginDAO {
+public class MySQLTrackingDAO implements TrackingDAO {
 
 	/**
 	 * 
 	 */
-	private final Logger LOG = LogManager.getLogger(MySQLTrackingLoginDAO.class);
+	private final Logger LOG = LogManager.getLogger(MySQLTrackingDAO.class);
+	
 	/**
 	 * 
 	 */
 	private SqlSessionFactory sessionFactory;
-
-	public MySQLTrackingLoginDAO(final String configFilePath, final String host, final int port, final String database,
+	
+	/**
+	 * 
+	 * @param configFilePath
+	 * @param host
+	 * @param port
+	 * @param database
+	 * @param user
+	 * @param password
+	 * @throws FileNotFoundException
+	 */
+	public MySQLTrackingDAO(final String configFilePath, final String host, final int port, final String database,
 			final String user, final String password) throws FileNotFoundException {
 		File configFile = new File(configFilePath);
 		// new File("src/main/resources/mybatis-configuration.xml");
@@ -50,7 +62,7 @@ public class MySQLTrackingLoginDAO implements TrackingLoginDAO {
 	public void createUser(UserData user) {
 		SqlSession session = sessionFactory.openSession();
 		try {
-			TrackingLoginMapper mapper = session.getMapper(TrackingLoginMapper.class);
+			TrackingMapper mapper = session.getMapper(TrackingMapper.class);
 			mapper.createUser(user);
 			session.commit();
 		} finally {
@@ -59,11 +71,11 @@ public class MySQLTrackingLoginDAO implements TrackingLoginDAO {
 	}
 
 	@Override
-	public UserData getUser(String userID) {
-		UserData result = null;
+	public TrackingLoginUserData getUser(String userID) {
+		TrackingLoginUserData result = null;
 		SqlSession session = sessionFactory.openSession();
 		try {
-			TrackingLoginMapper mapper = session.getMapper(TrackingLoginMapper.class);
+			TrackingMapper mapper = session.getMapper(TrackingMapper.class);
 			result = mapper.getUser(userID);
 			// session.commit();
 		} finally {
@@ -76,7 +88,7 @@ public class MySQLTrackingLoginDAO implements TrackingLoginDAO {
 	public void updateUser(UserData user) {
 		SqlSession session = sessionFactory.openSession();
 		try {
-			TrackingLoginMapper mapper = session.getMapper(TrackingLoginMapper.class);
+			TrackingMapper mapper = session.getMapper(TrackingMapper.class);
 			mapper.updateUser(user);
 			session.commit();
 		} finally {
@@ -88,7 +100,7 @@ public class MySQLTrackingLoginDAO implements TrackingLoginDAO {
 	public void deleteUser(String userID) {
 		SqlSession session = sessionFactory.openSession();
 		try {
-			TrackingLoginMapper mapper = session.getMapper(TrackingLoginMapper.class);
+			TrackingMapper mapper = session.getMapper(TrackingMapper.class);
 			mapper.deleteUser(userID);
 			session.commit();
 		} finally {

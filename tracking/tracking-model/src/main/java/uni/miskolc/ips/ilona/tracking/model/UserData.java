@@ -1,20 +1,31 @@
 package uni.miskolc.ips.ilona.tracking.model;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 
  * @author Patrik
  *
  */
-public class UserData {
+public class UserData implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4360136533208118793L;
+	
 	private String userID;
 	private String password;
 	private boolean enabled;
 	private Date joinDate;
-	private String role;
+	private List<String> roles;
 
+	public UserData() {
+		
+	}
+	
 	/**
 	 * 
 	 * @param userID
@@ -23,13 +34,13 @@ public class UserData {
 	 * @param joinDate
 	 * @param role
 	 */
-	public UserData(String userID, String password, boolean enabled, Date joinDate, String role) {
+	public UserData(String userID, String password, boolean enabled, Date joinDate, List<String> roles) {
 		super();
 		this.userID = userID;
 		this.password = password;
 		this.enabled = enabled;
 		this.joinDate = joinDate;
-		this.role = role;
+		this.roles = roles;
 	}
 
 	public String getUserID() {
@@ -64,12 +75,12 @@ public class UserData {
 		this.joinDate = joinDate;
 	}
 
-	public String getRole() {
-		return role;
+	public List<String> getRoles() {
+		return roles;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
 	}
 
 	@Override
@@ -99,7 +110,7 @@ public class UserData {
 
 	@Override
 	public String toString() {
-		return "UserData [userID=" + userID + ", enabled=" + enabled + ", joinDate=" + joinDate + ", role=" + role
+		return "UserData [userID=" + userID + ", enabled=" + enabled + ", joinDate=" + joinDate + ", role=" + roles.toString()
 				+ "]";
 	}
 

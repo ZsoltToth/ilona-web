@@ -42,6 +42,11 @@
 			<artifactId>tracking-service</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>uni.miskolc.ips.ilona</groupId>
+			<artifactId>tracking-util</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		
 		<!-- Spring Dependencies -->
 		<dependency>

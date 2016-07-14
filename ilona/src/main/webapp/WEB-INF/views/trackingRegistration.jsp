@@ -1,13 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@page session="false" %>
+<%@page session="false"%>
+
 <!DOCTYPE html>
 <html>
 <head>
-<title>Bejelentkezett</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Tracking registration title?!</title>
 </head>
 <body>
-<h1>Szoveg adat ide!</h1>
+<h1>Tracking registration!</h1>
+
 </body>
 </html>

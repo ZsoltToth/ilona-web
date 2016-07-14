@@ -1,9 +1,12 @@
-create table if not exists TrackingRoles(
-	user_role_id int(10) not null auto_increment
-	username varchar(45) not null,
-	role varchar(10) not null,
-	
-	primary key (user_role_id)
+--Tracking user multy value table for the roles
+-- username: arbitrary username, maximum 20 characters
+-- ROLE format: ROLE_ROLENAME (everything is uppercase)
+create table if not exists TrackingUserRoles(
+	userid varchar(20),
+	role varchar(10),
+	primary key (userid,role),
+	foreign key (userid) references TrackingUsers(userid)
+    on delete cascade
 );
 
 CREATE TABLE if not exists user_roles (

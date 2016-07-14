@@ -1,7 +1,7 @@
 package uni.miskolc.ips.ilona.tracking.service.impl;
 
 import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.persist.TrackingLoginDAO;
+import uni.miskolc.ips.ilona.tracking.persist.TrackingDAO;
 import uni.miskolc.ips.ilona.tracking.service.TrackingLoginService;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DatabaseUnavailableException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedUserException;
@@ -9,15 +9,15 @@ import uni.miskolc.ips.ilona.tracking.service.exceptions.InvalidDataException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.NoSuchUserException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.UnenabledUserException;
 
-public class TrackingServiceImpBase implements TrackingLoginService {
+public class TrackingServiceImpBase {//implements TrackingLoginService {
 
-	private TrackingLoginDAO trackingLoginDAO;
+	private TrackingDAO trackingLoginDAO;
 
-	public TrackingServiceImpBase(TrackingLoginDAO trackingLoginDAO) {
+	public TrackingServiceImpBase(TrackingDAO trackingLoginDAO) {
 		super();
 		this.trackingLoginDAO = trackingLoginDAO;
 	}
-
+/*
 	@Override
 	public void createUser(UserData user)
 			throws DatabaseUnavailableException, InvalidDataException, DuplicatedUserException {
@@ -41,5 +41,5 @@ public class TrackingServiceImpBase implements TrackingLoginService {
 	public void deleteUser(String userID) throws DatabaseUnavailableException, NoSuchUserException {
 		this.trackingLoginDAO.deleteUser(userID);
 	}
-
+*/
 }

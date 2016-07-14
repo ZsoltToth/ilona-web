@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="uni.miskolc.ips.ilona.tracking.persist.mysql.TrackingMapper">
+
+	<resultMap type="LoginUserData" id="TrackingGetUserResult">
+		<id property="username" column="userid" javaType="String" jdbcType="VARCHAR" />
+		<result property="password" column="password" javaType="String"
+			jdbcType="VARCHAR" />
+		<result property="enabled" column="enabled" javaType="boolean"
+			jdbcType="INTEGER" typeHandler="BooleanToIntHander" />
+		<collection property="roles" ofType="String"
+			javaType="List" jdbcType="VARCHAR">
+				<id property="roles" column="role"/>
+			</collection>
+		<!-- <association property="roles" column="role" javaType="String"> <association 
+			property="roles" column="role" select="getRoles"/> </association> -->
+	</resultMap>
+
+	<resultMap type="list" id="lista">
+		<collection property="add"></collection>
+	</resultMap>
+
+	<select id="getRoles" resultMap="lista" parameterType="String">
+		Select
+		role from userRoles where userid = #{userid};
+	</select>
+
+	<select id="getUser" resultMap="TrackingGetUserResult"
+		parameterType="String">
+		Select t.userid, t.password, t.enabled, r.role
+		from
+		TrackingUsers t
+		inner join userRoles r on t.userid = r.userid
+		where
+		t.userid =
+		#{userID};
+	</select>
+
+	<insert id="createUser" parameterType="LoginUserData">
+		INSERT INTO TrackingUsers
+		VALUES(#{userID, jdbcType=VARCHAR});
+	</insert>
+
+	<delete id="deleteUser">
+		DELETE FROM TrackingUsers where TrackingUsers.userid
+		= #{userID};
+	</delete>
+
+</mapper>
