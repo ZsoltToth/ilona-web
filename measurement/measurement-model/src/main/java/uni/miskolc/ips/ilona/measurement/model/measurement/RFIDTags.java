@@ -116,6 +116,9 @@ public class RFIDTags {
 	@Override
 	public String toString() {
 		String result = "RFIDTags =";
+		if(tags==null){
+			return result;
+		}
 		int i = 1, j = 1;
 		for (byte[] each : tags) {
 			j = 1;

@@ -33,6 +33,7 @@ import uni.miskolc.ips.ilona.measurement.model.measurement.GPSCoordinate;
 import uni.miskolc.ips.ilona.measurement.model.measurement.Magnetometer;
 import uni.miskolc.ips.ilona.measurement.model.measurement.Measurement;
 import uni.miskolc.ips.ilona.measurement.model.measurement.MeasurementBuilder;
+import uni.miskolc.ips.ilona.measurement.model.measurement.RFIDTags;
 import uni.miskolc.ips.ilona.measurement.model.measurement.WiFiRSSI;
 import uni.miskolc.ips.ilona.measurement.model.position.Coordinate;
 import uni.miskolc.ips.ilona.measurement.model.position.Position;
@@ -42,6 +43,8 @@ import uni.miskolc.ips.ilona.measurement.persist.ZoneDAO;
 import uni.miskolc.ips.ilona.measurement.persist.exceptions.InsertionException;
 import uni.miskolc.ips.ilona.measurement.persist.exceptions.RecordNotFoundException;
 import uni.miskolc.ips.ilona.measurement.persist.mappers.MeasurementMapper;
+import uni.miskolc.ips.ilona.measurement.persist.mappers.PositionMapper;
+import uni.miskolc.ips.ilona.measurement.persist.mappers.ZoneMapper;
 import uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLMeasurementDAO;
 import uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLPositionDAO;
 import uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLZoneDAO;
@@ -84,49 +87,67 @@ public class MeasurementDAOIntegrationTest extends SetupIntegrationTest{
 				inputStream, props);
 		SqlSession session = sessionFactory.openSession();
 		try{
+			PositionMapper positionMapper = session.getMapper(PositionMapper.class);
+			MeasurementMapper measurementMapper = session.getMapper(MeasurementMapper.class);
+			ZoneMapper zoneMapper = session.getMapper(ZoneMapper.class);
+		//	System.out.println(mapper.selectPositionById("eb264eea-4106-46a3-9992-70f16f283a15"));
+			BluetoothTags bttags = new BluetoothTags();
+			bttags.setTags(measurementMapper.selectBTTagsForMeasurement("43c6270b-2d12-49f3-ac8f-0d09d55fcf61")); 
+		//	System.out.println(bttags+"\t"+bttags.getClass().getName());
 			
-			MeasurementMapper mapper = session.getMapper(MeasurementMapper.class);
-			System.out.println(mapper.selectPositionById("eb264eea-4106-46a3-9992-70f16f283a15"));
-			Set<String> bttags = mapper.selectBTTagsForMeasurement("43c6270b-2d12-49f3-ac8f-0d09d55fcf61"); 
-			System.out.println(bttags+"\t"+bttags.getClass().getName());
-			
-			Map<String, Double> rssi = mapper.selectWiFiRSSIForMeasurement("43c6270b-2d12-49f3-ac8f-0d09d55fcf61");
-			System.out.println(rssi);
-			System.out.println(rssi.getClass().getName());
-			System.out.println("RFID TAGS");
-			Set<byte[]> rfidTags = mapper.selectRFIDTagsForMeasurement("43c6270b-2d12-49f3-ac8f-0d09d55fcf61");
-			System.out.println("------------->"+rfidTags);
-			System.out.println("Class: ===>>>"+rfidTags.toArray().getClass());
-			System.out.println(rfidTags.toArray());
+			Map<String, Double> rssi = measurementMapper.selectWiFiRSSIForMeasurement("43c6270b-2d12-49f3-ac8f-0d09d55fcf61");
+	//		System.out.println(rssi);
+		//	System.out.println(rssi.getClass().getName());
+	//		System.out.println("RFID TAGS");
+			Set<byte[]> rfidTags = measurementMapper.selectRFIDTagsForMeasurement("43c6270b-2d12-49f3-ac8f-0d09d55fcf61");
+		//	System.out.println("------------->"+rfidTags);
+	//		System.out.println("Class: ===>>>"+rfidTags.toArray().getClass());
+	//		System.out.println(rfidTags.toArray());
 			for(byte[] tag : rfidTags){
 				String tagStr = "";
 				for(int i = 0; i < tag.length; i++){
 					tagStr += tag[i];
 				}
-				System.out.println(tagStr);
+	//			System.out.println(tagStr);
 			}
 			System.out.println("-------------");
 			
-			Collection<Measurement> measuerements = mapper.selectMeasurements();
+			Collection<Measurement> measuerements = measurementMapper.selectMeasurements();
 			for(Measurement meas : measuerements){
 				System.out.println(meas);
 			}
+	
 			
-			Measurement newMeas = new Measurement();
-			newMeas.setId(UUID.randomUUID());
-			newMeas.setTimestamp(new java.util.Date());
-			newMeas.setMagnetometer(new Magnetometer(4, 4, 4, 4));
-			newMeas.setGpsCoordinates(new GPSCoordinate(3, 2, 1));
-			mapper.insertMeasurement(newMeas);
+			MeasurementBuilder measurementBuilder = new MeasurementBuilder();
+			//Measurement newMeas = new Measurement();
+			//measurementBuilder.setTimestamp(new java.util.Date());
+			measurementBuilder.setMagnetometer(new Magnetometer(4, 4, 4, 4));
+			measurementBuilder.setGPSCoordinates(new GPSCoordinate(3, 2, 1));
+			
 			Map<String,Double> wifirssi = new HashMap<String,Double>();
 			wifirssi.put("testAP1", -1.0);
 			wifirssi.put("testAP2", -2.0);
 			wifirssi.put("testAP3", -3.0);
-			newMeas.setWifiRSSI(new WiFiRSSI(wifirssi));
-			newMeas.setBluetoothTags(new BluetoothTags(new HashSet<>(Arrays.asList("bt1", "bt2", "bt3"))));
+			measurementBuilder.setWifiRSSI(new WiFiRSSI(wifirssi));
+			measurementBuilder.setbluetoothTags(new BluetoothTags(new HashSet<>(Arrays.asList("bt1", "bt2", "bt3"))));
+			measurementBuilder.setPosition(new Position(new Zone("EZ")));
+			RFIDTags rfid = new RFIDTags(new HashSet<byte[]>());
+			rfid.addTag(new byte[] { (byte) 12 });;
+			measurementBuilder.setRFIDTags(rfid);
+			Measurement newMeas = measurementBuilder.build();
+			//mapper.insertBTDevice4Measurement(newMeas.getBluetoothTags().toString(), newMeas.getId().toString());
+			
+			/*for(String wifi : wifirssi.keySet()){
+				mapper.insertWiFiRSSI4Measurement(wifi, wifirssi.get(wifi),newMeas.getId().toString());
+			}*/
+			zoneMapper.insertZone(newMeas.getPosition().getZone());
+			measurementMapper.selectMeasurements();
+			positionMapper.insertPosition(newMeas.getPosition());
+			measurementMapper.insertMeasurement(newMeas);
+		
 			
 			session.commit();
-			System.out.println(newMeas);
+			
 			
 		}
 		finally{
@@ -193,20 +214,23 @@ public class MeasurementDAOIntegrationTest extends SetupIntegrationTest{
 	
 	@Test
 	public void testCreateMeasurement() throws InsertionException{
-		Measurement measurement = new Measurement();
-		UUID measId = UUID.randomUUID();
-		measurement.setId(measId);
-		measurement.setTimestamp(new java.util.Date());
-		measurement.setMagnetometer(new Magnetometer(4, 4, 4, 4));
-		measurement.setGpsCoordinates(new GPSCoordinate(3, 2, 1));
+		
+		MeasurementBuilder measurementBuilder = new MeasurementBuilder();
+		measurementBuilder.setMagnetometer(new Magnetometer(4, 4, 4, 4));
+		measurementBuilder.setGPSCoordinates(new GPSCoordinate(3, 2, 1));
+		
 		Map<String,Double> wifirssi = new HashMap<String,Double>();
 		wifirssi.put("testAP1", -1.0);
 		wifirssi.put("testAP2", -2.0);
 		wifirssi.put("testAP3", -3.0);
-		measurement.setWifiRSSI(new WiFiRSSI(wifirssi));
-		measurement.setBluetoothTags(new BluetoothTags(new HashSet<>(Arrays.asList("bt1", "bt2", "bt3"))));
-		measurement.setPosition(new Position(new Coordinate(4, 5, 6), new Zone("World End's Tavern")));
-		
+		measurementBuilder.setWifiRSSI(new WiFiRSSI(wifirssi));
+		measurementBuilder.setbluetoothTags(new BluetoothTags(new HashSet<>(Arrays.asList("bt1", "bt2", "bt3"))));
+		measurementBuilder.setPosition(new Position(new Zone("EZ")));
+		RFIDTags rfid = new RFIDTags(new HashSet<byte[]>());
+		rfid.addTag(new byte[] { (byte) 12 });;
+		measurementBuilder.setRFIDTags(rfid);
+		Measurement measurement = measurementBuilder.build();
+		System.out.println(measurement.getPosition());
 		dao.createMeasurement(measurement);
 		System.out.println(measurement);
 		
