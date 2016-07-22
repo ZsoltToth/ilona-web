@@ -1,7 +1,7 @@
 package uni.miskolc.ips.ilona.tracking.persist.exception;
 
 /**
- * Base class for the tracking exceptions.
+ * Base class for the tracking DAO exceptions.
  * @author Patryk
  *
  */

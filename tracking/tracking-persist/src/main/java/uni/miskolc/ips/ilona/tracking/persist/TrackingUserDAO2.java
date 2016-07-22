@@ -1,21 +1,25 @@
 package uni.miskolc.ips.ilona.tracking.persist;
 
+import java.util.Collection;
+
 import uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.persist.exception.TrackingUserAlreadyExists;
 import uni.miskolc.ips.ilona.tracking.persist.exception.TrackingUserNotFoundException;
 
 /**
- * 
+ * The common interface for user operations.
+ * Create / 
  * @author Patrik
  *
  */
-public interface TrackingDAO {
+public interface TrackingUserDAO2 {
 
 	
 	/**
 	 * 
-	 * @param user
+	 * @param user 
+	 * @exception TrackingUserAlreadyExists 
 	 */
 	public void createUser(UserData user) throws TrackingUserAlreadyExists;
 	
@@ -37,5 +41,11 @@ public interface TrackingDAO {
 	 * @param userID
 	 */
 	public void deleteUser(String userID) throws TrackingUserNotFoundException;
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Collection<String> getAllUsers();
 	
 }

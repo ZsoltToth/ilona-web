@@ -16,13 +16,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.version>4.12</junit.version>
-		<mybatis.version>3.3.0</mybatis.version>
+		<mybatis.version>3.4.1</mybatis.version>
 		<mysql.connector.version>5.1.6</mysql.connector.version>
 		<tracking.persist.version>0.0.1-SNAPSHOT</tracking.persist.version>
 		<log4j.version>2.5</log4j.version>
 	</properties>
 	<dependencies>
-	
+
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -30,7 +30,7 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Database dependencies -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -42,14 +42,20 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>${mysql.connector.version}</version>
 		</dependency>
-		
+
 		<!-- Ilona dependencies -->
 		<dependency>
 			<groupId>uni.miskolc.ips.ilona</groupId>
 			<artifactId>tracking-persist</artifactId>
 			<version>${tracking.persist.version}</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>uni.miskolc.ips.ilona</groupId>
+			<artifactId>tracking-controller</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
 		<!-- Logging dependencies -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>

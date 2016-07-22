@@ -10,10 +10,10 @@
 			jdbcType="VARCHAR" />
 		<result property="enabled" column="enabled" javaType="boolean"
 			jdbcType="INTEGER" typeHandler="BooleanToIntHander" />
-		<collection property="roles" ofType="String"
-			javaType="List" jdbcType="VARCHAR">
-				<id property="roles" column="role"/>
-			</collection>
+		<collection property="roles" ofType="String" javaType="List"
+			jdbcType="VARCHAR">
+			<id property="roles" column="role" />
+		</collection>
 		<!-- <association property="roles" column="role" javaType="String"> <association 
 			property="roles" column="role" select="getRoles"/> </association> -->
 	</resultMap>

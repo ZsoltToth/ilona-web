@@ -1,32 +1,27 @@
 package uni.miskolc.ips.ilona.tracking.controller;
 
-import java.awt.PageAttributes.MediaType;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData;
-import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.model.Usermodel;
-import uni.miskolc.ips.ilona.tracking.service.TrackingLoginService;
-import uni.miskolc.ips.ilona.tracking.service.exceptions.DatabaseUnavailableException;
-import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedUserException;
-import uni.miskolc.ips.ilona.tracking.service.exceptions.InvalidDataException;
-import uni.miskolc.ips.ilona.tracking.service.exceptions.NoSuchUserException;
-import uni.miskolc.ips.ilona.tracking.service.exceptions.UnenabledUserException;
+import uni.miskolc.ips.ilona.tracking.model.UserDetails;
+import uni.miskolc.ips.ilona.tracking.persist.TrackingUserDAO;
+import uni.miskolc.ips.ilona.tracking.persist.exception.TrackingUserNotFoundException;
+import java.util.*;
 
 /**
  * Tracking module
@@ -40,6 +35,11 @@ public class TrackingController {
 
 	private static Logger logger = LogManager.getLogger(TrackingController.class);
 
+	@Autowired
+	TrackingUserDAO trackingUserDAO;
+
+	@Autowired
+	BCryptPasswordEncoder passwordencoder;
 	// @Autowired
 	// private TrackingLoginService trackingLoginService;
 
@@ -86,6 +86,37 @@ public class TrackingController {
 		return new ModelAndView("trackingMainpage");
 	}
 
+	@RequestMapping(value = "/logindecision", method = { RequestMethod.POST })
+	public ModelAndView trackingLoginDecisionHandler(@ModelAttribute("username") String username,
+			@ModelAttribute("password") String password) {
+
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("username", username);
+		mav.addObject("userid", password);
+		mav.setViewName("Tracking/UserMainPage");
+		try {
+
+			UserDetails userDetails = trackingUserDAO.getUser(username);
+			if (userDetails != null) {
+				for (String role : userDetails.getRoles()) {
+					if (role.equalsIgnoreCase("ROLE_ADMIN")) {
+						mav.setViewName("Tracking/AdminMainPage");
+					}
+				}
+			}
+
+		} catch (TrackingUserNotFoundException e) {
+
+		}
+
+		return mav;
+	}
+
+	@RequestMapping(value = "/login", method = { RequestMethod.GET })
+	public String createLoginPage() {
+		return "Tracking/TrackingLoginPage";
+	}
+
 	@RequestMapping(value = "/createuserpage", method = RequestMethod.GET)
 	public ModelAndView createuserpage() {
 		return new ModelAndView("CreateTrackingUser");
@@ -102,11 +133,25 @@ public class TrackingController {
 	 * "  password: " + password + "  enabled:" + enabled); return new
 	 * ModelAndView(""); }
 	 */
-
-	@RequestMapping(value = "/createuser", method = { RequestMethod.POST,
-			RequestMethod.GET }, consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
-	public ModelAndView userCreateProcess(@RequestBody Usermodel userdata) {
-		return new ModelAndView("");
+	@RequestMapping(value = "/createuser", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public List<UserDetails> userCreateProcess(@RequestParam(value = "roleadmin", required = false) String roleadmin,
+			Model model) {
+		System.out.println(roleadmin);
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("Probalgatasok");
+		List<UserDetails> userList = new ArrayList<UserDetails>();
+		try {
+			// trackingUserDAO.createUser(userdetails);
+			userList = trackingUserDAO.getAllUsers();
+			for (UserDetails user : userList) {
+				System.out.println(user.toString());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			mav.addObject("error", "Nem sikerült létrehozni az adott felhasználót!");
+		}
+		return userList;
 	}
 
 	@RequestMapping(value = "/logout", method = { RequestMethod.GET, RequestMethod.POST })
@@ -128,10 +173,26 @@ public class TrackingController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/probalgatasok", method = RequestMethod.GET)
-	public ModelAndView progaltasokToltese() {
+	@RequestMapping(value = "/probalgatasok", method = { RequestMethod.GET, RequestMethod.POST })
+	public ModelAndView progaltasokToltese(@ModelAttribute("roleadmin") String roleadmin,
+			@ModelAttribute("userid") String userid, Model model, HttpEntity<byte[]> httpEntity) {
+		System.out.println(userid);
+		System.out.println(httpEntity.getHeaders().toString());
+		boolean isEqual = "áááé".equals(userid);
+		System.out.println("\n Egyezes " + isEqual);
+		model.addAttribute("kijelzes", userid);
+
 		return new ModelAndView("Probalgatasok");
 	}
+
+	public void setTrackingUserDAO(TrackingUserDAO trackingUserDAO) {
+		this.trackingUserDAO = trackingUserDAO;
+	}
+
+	public void setPasswordencoder(BCryptPasswordEncoder passwordencoder) {
+		this.passwordencoder = passwordencoder;
+	}
+
 	/*
 	 * @RequestMapping(value = "/getUser/{userID}", method = RequestMethod.GET)
 	 * 

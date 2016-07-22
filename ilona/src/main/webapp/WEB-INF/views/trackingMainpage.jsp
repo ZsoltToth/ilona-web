@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>ILONA - Tracking admin page</title>
+<title>ILONA - Tracking Login Page</title>
 <meta charset="UTF-8">
 <meta name="description"
 	content="University of Miskolc ILONA Indoor Positioning System.">
@@ -24,11 +24,9 @@
 	<div class="col-lg-12">
 		<div class="panel panel-default"></div>
 	</div>
-	<h1>Szoveg adat ide!</h1>
+	<h1></h1>
 	<br />
-	<h1>! Tracking main page !</h1><br />
-	<h2>${authenticated}</h2>
-	<h2>${rolenumber}</h2>
+	<h1>Tracking Login Page</h1><br />
 	<c:url value='j_spring_security_logout' />
 	<form action="<c:url value='j_spring_security_logout'/>">
 		<input type="hidden" name="${_csrf.parameterName}"

@@ -17,9 +17,9 @@ import org.apache.logging.log4j.Logger;
 
 import uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.persist.TrackingDAO;
+import uni.miskolc.ips.ilona.tracking.persist.TrackingUserDAO2;
 
-public class MySQLTrackingDAO implements TrackingDAO {
+public class MySQLTrackingDAO implements TrackingUserDAO2 {
 
 	/**
 	 * 
@@ -106,6 +106,12 @@ public class MySQLTrackingDAO implements TrackingDAO {
 		} finally {
 			session.close();
 		}
+	}
+
+	@Override
+	public Collection<String> getAllUsers() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,7 +1,7 @@
 package uni.miskolc.ips.ilona.tracking.service.impl;
 
 import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.persist.TrackingDAO;
+import uni.miskolc.ips.ilona.tracking.persist.TrackingUserDAO2;
 import uni.miskolc.ips.ilona.tracking.service.TrackingLoginService;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DatabaseUnavailableException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedUserException;
@@ -11,9 +11,9 @@ import uni.miskolc.ips.ilona.tracking.service.exceptions.UnenabledUserException;
 
 public class TrackingServiceImpBase {//implements TrackingLoginService {
 
-	private TrackingDAO trackingLoginDAO;
+	private TrackingUserDAO2 trackingLoginDAO;
 
-	public TrackingServiceImpBase(TrackingDAO trackingLoginDAO) {
+	public TrackingServiceImpBase(TrackingUserDAO2 trackingLoginDAO) {
 		super();
 		this.trackingLoginDAO = trackingLoginDAO;
 	}

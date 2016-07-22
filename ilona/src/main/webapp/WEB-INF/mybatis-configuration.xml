@@ -32,7 +32,8 @@
 			type="uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData" />
 		<typeAlias alias="BooleanToIntHander"
 			type="uni.miskolc.ips.ilona.tracking.persist.mysql.BooleanEnabledTypeHandler" />
-
+		<typeAlias alias="UserDetails"
+			type="uni.miskolc.ips.ilona.tracking.model.UserDetails" />
 	</typeAliases>
 
 	<typeHandlers>
@@ -68,6 +69,8 @@
 			resource="uni/miskolc/ips/ilona/measurement/persist/mappers/MeasurementMapper.xml" />
 		<mapper
 			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/TrackingMapper.xml" />
+		<mapper
+			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/TrackingUserMapper.xml" />
 
 
 
