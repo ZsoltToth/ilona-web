@@ -110,6 +110,25 @@
 			<artifactId>spring-security-web</artifactId>
 			<version>${spring.security.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+<!-- 
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>bootstrap</artifactId>
+			<version>3.3.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+ -->
 	</dependencies>
 
 	<repositories>
@@ -130,9 +149,7 @@
 					<source>1.7</source>
 					<target>1.7</target>
 					<encoding>${project.build.sourceEncoding}</encoding>
-					<!-- 
-					<encoding>${project.build.sourceEncoding}</encoding>
-					 -->
+					<!-- <encoding>${project.build.sourceEncoding}</encoding> -->
 				</configuration>
 			</plugin>
 		</plugins>

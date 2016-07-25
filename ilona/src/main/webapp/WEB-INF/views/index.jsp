@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ page isELIgnored="false"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ page isELIgnored="true"%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,19 +15,23 @@
 <title>ILONA - Indoor Location and Navigation System</title>
 
 <!-- Bootstrap core CSS -->
-<link href="css/bootstrap.css" rel="stylesheet" />
+<link href="css/bootstrap.min.css" rel="stylesheet" />
+<!-- Custom styles for this template -->
+<!-- 
+<link href="css/layout.css" rel="stylesheet"/>
+-->
+<!-- Bootstrap core CSS -->
+<link href="css/bootstrap.css" rel="stylesheet"/>
 <!-- Custom styles for this template -->
 <!-- 
 <link href="css/layout.css" rel="stylesheet"/>
 -->
 <!-- Font-Awesome -->
-<link href="css/font-awesome.min.css" rel="stylesheet" />
+<link href="css/font-awesome.min.css" rel="stylesheet"/>
 <!-- Metis Menu -->
-<link href="css/metisMenu.min.css" rel="stylesheet" />
+<link href="css/metisMenu.min.css" rel="stylesheet"/>
 <!-- SB2 Admin css -->
-<link href="css/sb-admin-2.css" rel="stylesheet" />
-
-
+<link href="css/sb-admin-2.css" rel="stylesheet"/>
 
 <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -77,18 +84,17 @@
 				$('#page-wrapper').html(data);
 			});
 		});
+		/*
+			Tracking modul handler
+		 */
 		$('#trackingMainpage').click(function(event) {
 			event.preventDefault();
 			$.get($(this).attr('href'), function(data) {
 				$('#page-wrapper').html(data);
 			});
 		});
-		$('#probalgatasok').click(function(event) {
-			event.preventDefault();
-			$.get($(this).attr('href'), function(data) {
-				$('#page-wrapper').html(data);
-			});
-		});
+		 $('[data-toggle="tooltip"]').tooltip();
+		 $('[data-toggle="popover"]').popover(); 
 	});
 </script>
 
@@ -172,9 +178,11 @@
 										<li><a href="#">Third Level Item</a></li>
 									</ul> <!-- /.nav-third-level --></li>
 							</ul> <!-- /.nav-second-level --></li>
-						<li><a href="tracking/index" id="trackingMainpage"><i
-								class="fa fa-dashboard fa-fw"></i> Tracking </a></li>
-						<li><a href="tracking/probalgatasok" class="fa fa-dashboard fa-fw" id="probalgatasok">Proba</a></li>
+
+						<!-- Tracking menu element! fa fa-dashboard fa-fw-->
+						<li><a href="<c:url value='/tracking/mainpage'/>"
+							id="trackingMainpage"><i class="fa fa-code-fork ">
+									</i> Tracking </a></li>
 					</ul>
 				</div>
 				<!-- /.sidebar-collapse -->

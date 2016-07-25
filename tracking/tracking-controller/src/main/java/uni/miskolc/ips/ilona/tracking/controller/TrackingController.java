@@ -112,7 +112,7 @@ public class TrackingController {
 		return mav;
 	}
 
-	@RequestMapping(value = "/login", method = { RequestMethod.GET })
+	@RequestMapping(value = "/login1", method = { RequestMethod.GET })
 	public String createLoginPage() {
 		return "Tracking/TrackingLoginPage";
 	}

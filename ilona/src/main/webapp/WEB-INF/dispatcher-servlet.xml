@@ -19,11 +19,15 @@
 	<context:component-scan base-package="uni.miskolc.ips.ilona.measurement.controller" />
 	<context:component-scan base-package="uni.miskolc.ips.ilona.controller" />
 	<context:component-scan base-package="uni.miskolc.ips.ilona.tracking.controller" />
-	
+
 	<mvc:annotation-driven />
 	<mvc:default-servlet-handler />
+
+	<mvc:resources mapping="/resources/**" location="/resources/" />
 	<mvc:resources mapping="/css/**" location="/css/" />
 	<mvc:resources mapping="/js/**" location="/js/" />
+	<mvc:resources mapping="/fonts/**" location="/fonts/" />
+
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix">
