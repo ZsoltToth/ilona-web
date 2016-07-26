@@ -54,7 +54,7 @@ public class TrackingController {
 		logger.info("Tracking index page request.");
 		// ModelAndView back = new ModelAndView("trackingIndex");
 		ModelAndView mav = new ModelAndView();
-		mav.addObject("message", SecurityContextHolder.getContext().getAuthentication().getName());
+		//mav.addObject("message", SecurityContextHolder.getContext().getAuthentication().getName());
 		// back.addObject("message", "Üzenetátadva!");
 		mav.setViewName("trackingIndex");
 		return mav;
@@ -116,12 +116,12 @@ public class TrackingController {
 	public String createLoginPage() {
 		return "Tracking/TrackingLoginPage";
 	}
-
+/*
 	@RequestMapping(value = "/createuserpage", method = RequestMethod.GET)
 	public ModelAndView createuserpage() {
 		return new ModelAndView("CreateTrackingUser");
 	}
-
+*/
 	/*
 	 * @RequestMapping(value = "/createuser/{username}/{password}/{enabled}",
 	 * method = { RequestMethod.POST }) public ModelAndView
@@ -136,7 +136,8 @@ public class TrackingController {
 	@RequestMapping(value = "/createuser", method = { RequestMethod.GET, RequestMethod.POST })
 	@ResponseBody
 	public List<UserDetails> userCreateProcess(@RequestParam(value = "roleadmin", required = false) String roleadmin,
-			Model model) {
+			Model model, @ModelAttribute UserDetails user1) {
+		System.out.println(user1.toString());
 		System.out.println(roleadmin);
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("Probalgatasok");

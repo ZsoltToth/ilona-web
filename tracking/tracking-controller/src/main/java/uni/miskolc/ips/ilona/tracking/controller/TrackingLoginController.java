@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.model.UsernameAndPasswordLoginData;
+import uni.miskolc.ips.ilona.tracking.util.validate.ValidateUsernameAndPasswordLoginData;
+import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 @Controller
 @RequestMapping(value = "/tracking")
@@ -20,12 +22,25 @@ public class TrackingLoginController {
 	 * if the current user is not present in the system, the method will send back a login page.
 	 * @return
 	 */
-	@RequestMapping(value = "/baseAuthenticate", method = {RequestMethod.GET})
-	public ModelAndView authenticateWithUsernameAndPasswordWithForm(@ModelAttribute() UsernameAndPasswordLoginData logindata) {
+	@RequestMapping(value = "/baseAuthenticate", method = {RequestMethod.GET, RequestMethod.POST})
+	public ModelAndView authenticateWithUsernameAndPasswordWithForm(@ModelAttribute(name = "logindata") UsernameAndPasswordLoginData logindata) {
+		
+		ValidityStatusHolder statusHolder = ValidateUsernameAndPasswordLoginData.ValidateLoginData(logindata);
+		
+		/*
+		 * If the login is invalid
+		 */
+		if (statusHolder.isValid() == false) {
+			ModelAndView errorDiv = new ModelAndView("tracking/errorDisplayPagepart");
+			errorDiv.addObject("errors", statusHolder.getErrors());
+			return errorDiv;
+		}
+		/*
 		if (logindata.getUserid().equals("bela")) {
 			return new ModelAndView("tracking/adminMainpage");
 		}
+		*/
 		ModelAndView pageDecision = new ModelAndView();
-		return new ModelAndView("tracking/loginpage");
+		return new ModelAndView("tracking/adminMainpage");
 	}
 }

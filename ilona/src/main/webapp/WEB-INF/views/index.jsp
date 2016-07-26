@@ -87,7 +87,7 @@
 		/*
 			Tracking modul handler
 		 */
-		$('#trackingMainpage').click(function(event) {
+		$('#trackingMainContent').click(function(event) {
 			event.preventDefault();
 			$.get($(this).attr('href'), function(data) {
 				$('#page-wrapper').html(data);
@@ -180,8 +180,8 @@
 							</ul> <!-- /.nav-second-level --></li>
 
 						<!-- Tracking menu element! fa fa-dashboard fa-fw-->
-						<li><a href="<c:url value='/tracking/mainpage'/>"
-							id="trackingMainpage"><i class="fa fa-code-fork ">
+						<li><a href="<c:url value='/tracking/maincontent'/>"
+							id="trackingMainContent"><i class="fa fa-code-fork ">
 									</i> Tracking </a></li>
 					</ul>
 				</div>

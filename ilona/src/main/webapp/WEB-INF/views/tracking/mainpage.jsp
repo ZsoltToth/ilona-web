@@ -5,7 +5,7 @@
 <%@ taglib prefix="sec"
 	uri="http://www.springframework.org/security/tags"%>
 <%@page session="true"%>
-<%@ page isELIgnored="true"%>
+<%@ page isELIgnored="false"%>
 
 
 <!DOCTYPE html>
@@ -81,11 +81,11 @@
 			</div>
 			<ul class="nav navbar-nav">
 				<li class="active"><a id="navbarHome"
-					href="<c:url value='tracking/mainpage'></c:url>">Home</a></li>
+					href="<c:url value='tracking/maincontent'></c:url>">Home</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-left">
 				<li><a id="navbarSignupage" href="#"><span
-						class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+						class="glyphicon glyphicon-user"></span> Sign Up(Under construction!)</a></li>
 				<li><a id="navbarLoginpage"
 					href="<c:url value='tracking/login'></c:url>"><span
 						class="glyphicon glyphicon-log-in"></span> Login</a></li>
@@ -99,7 +99,7 @@
 	<div id="actual-content">
 		<img class="img-responsive"
 			src="<c:url value='/jpg/ilonaFrontpage.jpg'/>"
-			alt="Indoor positioning front image!">
+			alt="Indoor positioning front image!" width="80%" height="60%">
 	</div>
 </body>
 </html>

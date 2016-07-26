@@ -6,32 +6,60 @@
 <%@page session="true"%>
 <%@ page isELIgnored="false"%>
 
-<!DOCTYPE html>
-
-<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<!--  CSS part -->
-<link rel="stylesheet" href="css/bootstrap.css">
-<!-- Font-Awesome -->
-<link href="css/font-awesome.min.css" rel="stylesheet" />
-<!-- Metis Menu -->
-<link href="css/metisMenu.min.css" rel="stylesheet" />
-<!-- SB2 Admin css -->
-<link href="css/sb-admin-2.css" rel="stylesheet" />
 
-<!-- Javascript part -->
-<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/metisMenu.min.js"></script>
-<script type="text/javascript" src="js/sb-admin-2.js"></script>
+<!-- CSRF Protection token -->
+<meta name="_csrf" content="${_csrf.token}"/>
+	<!-- default header name is X-CSRF-TOKEN -->
+<meta name="_csrf_header" content="${_csrf.headerName}"/>
 
-<title>Tracking Admin Page</title>
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		$("#adminNavbarCreateuser").click(function(event){
+				event.preventDefault();
+				var token = $("meta[name='_csrf']").attr("content");
+				var header = $("meta[name='_csrf_header']").attr("content");
+				$.ajax({
+					async : true,
+					type : "POST",
+					beforeSend : function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+					
+					url : $("#adminNavbarCreateuser").attr(
+							'href'),
+					timeout : 10000,
+					error : function(xhr, status, error) {
+						$("#trackingLoginpageErroroutput").val(
+								status + " " + error).css(
+								"visibility", "visible");
+					},
+					success : function(result, status, xhr) {
+						$("#page-wrapper").html(result);
+					}
+				});
+		});
+	});
+	
+</script>
+
 </head>
 
-<body>
-	<h1>Admin page</h1>
-	<a href="/tracking/createuser"> Create user </a> <a href="/tracking/listusers"> ListUsers </a>
-	
-</body>
-</html>
+ <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="">Tracking Module - Admin main page</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="">Home</a></li>
+      <li><a id="adminNavbarCreateuser" href="<c:url value='tracking/createusercreationpage'></c:url>">Create user</a></li>
+      <li><a id="adminNavbarModifyuser" href="">Modify User</a></li>
+      <li><a id="adminNavbarListusers" href="tracking/listallusers">List users</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="#"><span class="fa fa-asterisk"></span> Settings</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+    </ul>
+  </div>
+</nav>

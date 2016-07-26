@@ -16,6 +16,7 @@
 	<!-- html access restrictions -->
 	<security:http auto-config="true">
 		<security:intercept-url pattern="/**" access="permitAll" />
+		<!-- 
 		<security:intercept-url pattern="/tracking/index"
 			access="permitAll" />
 		<security:intercept-url pattern="/tracking/registration"
@@ -26,6 +27,7 @@
 
 		<security:intercept-url pattern="/tracking/logindecision"
 			access="hasRole('ROLE_ADMIN')" />
+			 -->
 		<security:form-login login-page="/tracking/index"
 			authentication-failure-url="/tracking/index?error"
 			username-parameter="username" password-parameter="password" />
@@ -38,7 +40,7 @@
 			<security:concurrency-control
 				max-sessions="1" expired-url="/tracking/index"></security:concurrency-control>
 		</security:session-management>
-		<security:csrf />
+		<security:csrf/>
 	</security:http>
 
 	<bean id="customAuthenticationProvider" class="security.TrackingAuthenticationProvider">
