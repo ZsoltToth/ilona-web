@@ -38,5 +38,17 @@
 			<artifactId>measurement-service</artifactId>
 			<version>0.1.2-SNAPSHOT</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.4</version>
+		</dependency>
+		<dependency>
+			<groupId>nz.ac.waikato.cms.moa</groupId>
+			<artifactId>weka-package</artifactId>
+			<version>2016.04</version>
+		</dependency>
+
 	</dependencies>
 </project>

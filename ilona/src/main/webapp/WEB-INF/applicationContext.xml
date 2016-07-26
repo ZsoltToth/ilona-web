@@ -10,6 +10,7 @@
         http://www.springframework.org/schema/aop
         http://www.springframework.org/schema/aop/spring-aop.xsd">
 
+
 	<context:property-placeholder
 		properties-ref="systemProperties" />
 
@@ -65,14 +66,17 @@
 		<!--<constructor-arg ref="positionDAO" /> -->
 		<constructor-arg ref="measurementDAO" />
 	</bean>
+	<bean id="positioningService"
+		class="uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork.NeuralNetworkPositioning">
+		<constructor-arg name="zoneService" ref="zoneManagerService" />
+		<constructor-arg name="serializedMultilayerPerceptron" value="/home/ilona/neuralnetwork.ser"/>
+	</bean>
 
 	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 
 		<constructor-arg ref="positionDAO" /> <constructor-arg ref="measurementDAO" 
 		/> </bean> -->
 	<!-- Positioning Sevice -->
-	<!-- <bean id="positioningService" class="uni.miskolc.ips.symbolic.service.impl.PositioningServiceImpl"> 
-		<constructor-arg ref="zoneDAO" /> <constructor-arg ref="measurementDAO" /> 
-		</bean> -->
+
 	<!-- <bean id="measurementDistanceCalculator" class="uni.miskolc.ips.ilona.service.impl.knn.VectorUnionMeasurementDistanceCalculator"> 
 		<constructor-arg value="0.0" /> </bean> -->
 	<!-- <bean id="positioningService" class="uni.miskolc.ips.ilona.service.impl.PositioningServiceImpl"> 
