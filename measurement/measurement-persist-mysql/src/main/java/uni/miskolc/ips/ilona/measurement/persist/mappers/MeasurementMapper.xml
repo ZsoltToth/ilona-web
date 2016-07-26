@@ -7,16 +7,17 @@
 
 
 	<sql id="selectParameters">
-		FROM Measurement m inner join Position p on m.posId =p.posId inner join
-		Zone z on z.zoneId = p.zoneId;
+		FROM Measurement m inner join Position p on m.posId =p.posId inner
+		join
+		Zone z on z.zoneId = p.zoneId <!-- inner join WIFIRSSI on WIFIRSSI.measId 
+			= m.measId; -->
 	</sql>
 
 
-
 	<resultMap type="Coordinate" id="CoordinateResultMap">
-		<result property="x" column="coord_X" />
-		<result property="y" column="coord_Y" />
-		<result property="z" column="coord_Z" />
+		<id property="x" column="coord_X" />
+		<id property="y" column="coord_Y" />
+		<id property="z" column="coord_Z" />
 	</resultMap>
 
 	<resultMap type="Zone" id="ZoneResultMap">
@@ -34,18 +35,25 @@
 		<association property="zone" resultMap="ZoneResultMap" />
 	</resultMap>
 
-	<!-- <resultMap type="WiFiRSSI" id="WiFiResultMap"> <result property="ssid" 
-		column="ssid" /> <result property="rssi" column="rssi" /> </resultMap> -->
 
-	<resultMap id="WiFiResultMap" type="map">
-		<result property="ssid" column="ssid" />
-		<result property="rssi" column="rssi" />
+
+	<!-- <resultMap type="WiFiRSSI" id="RSSI" autoMapping="true"> <association 
+		property="rssiValues" column="measId" javaType="java.util.ArrayList" select="selectWiFiRSSIForMeasurement"> 
+		<id column="measId"/> <id column="ssid" property="ssid"/> <id column="rssi" 
+		property="rssi"/> </association> </resultMap> -->
+
+
+
+	<resultMap type="HashMap" id="RSSI" autoMapping="true">
+		<collection property="rssiValues" resultMap="mappedValues"
+			ofType="Hashmap" />
 	</resultMap>
 
-
-
-
-
+	<resultMap type="HashMap" id="mappedValues">
+		<id column="measId" />
+		<id column="ssid" property="ssid" />
+		<id column="rssi" property="rssi" />
+	</resultMap>
 
 
 	<resultMap type="Measurement" id="MeasurementResultMap">
@@ -75,23 +83,8 @@
 			column="btDeviceId" select="selectBTTagsForMeasurement" />
 
 
-		<!-- <association property="wifiRSSI" javaType="WiFiRSSI"> <association 
-			property="rssiValues" resultMap="WiFiResultMap"/> </association> -->
-
-
-
-		<!-- <association property="wifiRSSI" javaType="WiFiRSSI"> -->
-		<association property="wifiRSSI" javaType="WiFiRSSI">
-			<association property="rssiValues" resultMap="WiFiResultMap" />
-		</association>
-		<!-- </association> -->
-
-
-		<association property="rfidtags" javaType="RFIDTags"
-			column="rfidTag" select="selectRFIDTagsForMeasurement" />
-
-
 	</resultMap>
+
 
 
 	<!-- Selects -->
@@ -111,10 +104,11 @@
 	</select>
 
 
-	<select id="selectWiFiRSSIForMeasurement" resultMap="WiFiResultMap"
+	<select id="selectWiFiRSSIForMeasurement" resultMap="mappedValues"
 		parameterType="String">
-		select ssid, rssi from WIFIRSSI where measId =
+		select ssid, rssi , measId from WIFIRSSI where measId =
 		#{measId};
+
 	</select>
 
 
@@ -156,14 +150,6 @@
 
 	</insert>
 
-	<insert id="insertPosition">
-		insert into Position values (#{position.id,typeHandler=UUIDTypeHandler,
-		jdbcType=VARCHAR},#{position.coordinate.x},#{position.coordinate.y},#{position.coordinate.z},#{position.zone.id},
-		#{position.zone.name});
-
-
-	</insert>
-
 
 
 	<insert id="insertWiFiRSSI4Measurement">
@@ -182,6 +168,16 @@
 		);
 	</insert>
 
+	<insert id="insertRFID4Measurement">
+		insert into
+		RFIDTags values (
+		#{rfid},
+		#{measId}
+		);
+	</insert>
+
+
+
 	<!-- <insert id="insertPosition"> insert into Position values( #{UUID, typeHandler=UUIDTypeHandler, 
 		jdbcType=VARCHAR}, #{coordinate.x}, #{coordinate.y}, #{coordinate.z}, #{zone.id, 
 		typeHandler=UUIDTypeHandler, jdbcType=VARCHAR} ); </insert> <update id="updatePosition"> 
@@ -195,8 +191,8 @@
 		delete from Measurement where measId = #{measId};
 	</delete>
 
-	<delete id="deleteMeasurementByTimestamp" parameterType="Date">
-		delete
-		from Measurement where measTimestamp = #{stamp};
-	</delete>
+	<!--<delete id="deleteMeasurementByTimestamp" parameterType="String"> 
+	delete from Measurement where measTimestamp like #{stamp};
+	</delete> -->
 </mapper>
+

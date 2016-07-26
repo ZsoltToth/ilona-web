@@ -16,7 +16,10 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import uni.miskolc.ips.ilona.measurement.model.measurement.BluetoothTags;
 import uni.miskolc.ips.ilona.measurement.model.measurement.Measurement;
+import uni.miskolc.ips.ilona.measurement.model.measurement.RFIDTags;
+import uni.miskolc.ips.ilona.measurement.model.measurement.WiFiRSSI;
 import uni.miskolc.ips.ilona.measurement.model.position.Position;
 import uni.miskolc.ips.ilona.measurement.persist.MeasurementDAO;
 import uni.miskolc.ips.ilona.measurement.persist.PositionDAO;
@@ -106,11 +109,15 @@ public class MySQLMeasurementDAO implements MeasurementDAO {
 				}
 			}
 			if (measurement.getWifiRSSI() != null) {
-				// TODO Refactor
+				for (Map.Entry<String, Double> rssiEntry : measurement.getWifiRSSI().getRssiValues().entrySet()) {
+					mapper.insertWiFiRSSI4Measurement(rssiEntry.getKey(), rssiEntry.getValue(), measId);
+				}
 			}
-			for (Map.Entry<String, Double> rssiEntry : measurement.getWifiRSSI().getRssiValues().entrySet()) {
-				mapper.insertWiFiRSSI4Measurement(rssiEntry.getKey(), rssiEntry.getValue(), measId);
+			if(measurement.getRfidtags() != null) {
+				for(byte[] b : measurement.getRfidtags().getTags())
+				mapper.insertRFID4Measurement(b, measId);
 			}
+		
 			session.commit();
 		} finally {
 			session.close();
@@ -127,6 +134,12 @@ public class MySQLMeasurementDAO implements MeasurementDAO {
 		try {
 			MeasurementMapper mapper = session.getMapper(MeasurementMapper.class);
 			result = new ArrayList<Measurement>(mapper.selectMeasurements());
+			for(Measurement m : result){
+				String id = m.getId().toString();
+				m.setWifiRSSI(new WiFiRSSI(mapper.selectWiFiRSSIForMeasurement(id)));
+				m.setBluetoothTags(new BluetoothTags(mapper.selectBTTagsForMeasurement(id)));
+				m.setRfidtags(new RFIDTags(mapper.selectRFIDTagsForMeasurement(id)));
+			}
 		} finally {
 			session.close();
 		}
@@ -156,7 +169,7 @@ public class MySQLMeasurementDAO implements MeasurementDAO {
 		SqlSession session = sessionFactory.openSession();
 		try {
 			MeasurementMapper mapper = session.getMapper(MeasurementMapper.class);
-			// mapper.deleteMeasurementByTimeStamp(timestamp.toString());
+			mapper.deleteMeasurementByTimeStamp(timestamp);
 		} finally {
 			session.commit();
 			session.close();
