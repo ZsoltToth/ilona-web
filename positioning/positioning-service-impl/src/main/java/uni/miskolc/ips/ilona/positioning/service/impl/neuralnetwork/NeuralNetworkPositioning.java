@@ -1,5 +1,6 @@
 package uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,6 +15,8 @@ import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork.*;
+import uni.miskolc.ips.ilona.measurement.model.measurement.BluetoothTags;
 import uni.miskolc.ips.ilona.measurement.model.measurement.Magnetometer;
 import uni.miskolc.ips.ilona.measurement.model.measurement.Measurement;
 import uni.miskolc.ips.ilona.measurement.model.position.Position;
@@ -31,8 +34,7 @@ import weka.core.Instances;
 public class NeuralNetworkPositioning implements PositioningService {
 	private NeuralNetwork neuralNetwork;
 	private ZoneService zoneService;
-	private static final Logger LOG = LogManager.getLogger(
-			NeuralNetworkPositioning.class);
+	private static final Logger LOG = LogManager.getLogger(NeuralNetworkPositioning.class);
 
 	public NeuralNetworkPositioning(ZoneService zoneService, String serializedMultilayerPerceptron) {
 		super();
@@ -71,7 +73,8 @@ public class NeuralNetworkPositioning implements PositioningService {
 			i.printStackTrace();// ezt is logolni
 			result = null;
 		} catch (ClassNotFoundException c) {
-			System.out.println("NeuralNetwork class not found"); // logra kiírni
+			LOG.info("Serialised Neural Network not found on " + serializedPath + " "); // logra
+																									// kiírni
 			c.printStackTrace();
 			result = null;
 		}
@@ -81,14 +84,14 @@ public class NeuralNetworkPositioning implements PositioningService {
 	}
 
 	private Instance convertMeasurementToInstance(Measurement meas) {
-		ArrayList<Attribute> header= getHeader(neuralNetwork.getMultilayerPerceptron());	
-		
+		ArrayList<Attribute> header = getHeader(neuralNetwork.getMultilayerPerceptron());
+
 		Instance instance = new DenseInstance(header.size());
 		List<Attribute> attributes = new ArrayList<Attribute>();
 		for (int i = 0; i < header.size(); i++) {
 			attributes.add(new Attribute(header.get(i).name()));
 		}
-		LOG.info("The attributes are "+attributes.toString());
+		LOG.info("The attributes are " + attributes.toString());
 		for (int i = 0; i < attributes.size(); i++) {
 			if (attributes.get(i).name().equals("measx")) {
 				instance.setValue(i, meas.getMagnetometer().getxAxis());
@@ -98,20 +101,24 @@ public class NeuralNetworkPositioning implements PositioningService {
 				instance.setValue(i, meas.getMagnetometer().getzAxis());
 			} else if (attributes.get(i).name().contains(":")) {
 				instance.setValue(i, measurementSeeBluetooth(meas, attributes.get(i).name()));
-			}else if(attributes.get(i).name().equals(attributes.get(attributes.size()-1))){
-					instance.setValue(i, -1);
-			}else {
+			} else if (attributes.get(i).name().equals(attributes.get(attributes.size() - 1))) {
+				instance.setValue(i, -1);
+			} else {
 				instance.setValue(i, measurementHowSeeWiFi(meas, attributes.get(i).name()));
 			}
 
 		}
-		LOG.info("The created instance is "+instance);
+		LOG.info("The created instance is " + instance);
 		return instance;
 	}
 
 	private int measurementSeeBluetooth(Measurement meas, String bluetooth) {
-		if (meas.getBluetoothTags().getTags().contains(bluetooth)) {
-			return 1;
+		String hardwareAddress = getBluetoothHardwareAddress(bluetooth);
+		Set<String> measurementBluetoothTags = meas.getBluetoothTags().getTags();
+		for (String bl : measurementBluetoothTags) {
+			if (bl.toUpperCase().contains(hardwareAddress.toUpperCase())) {
+				return 1;
+			}
 		}
 		return 0;
 	}
@@ -121,6 +128,20 @@ public class NeuralNetworkPositioning implements PositioningService {
 			return meas.getWifiRSSI().getRSSI(wifi);
 		}
 		return -100;
+	}
+
+	private String getBluetoothHardwareAddress(String bluetooth) {
+		String[] bluetoothAddress = bluetooth.split(":");
+		StringBuilder builder = new StringBuilder();
+		builder.append(bluetoothAddress[0].substring(bluetoothAddress[0].length() - 2, bluetoothAddress[0].length()));
+		builder.append(":");
+		for (int i = 1; i < bluetoothAddress.length; i++) {
+			builder.append(bluetoothAddress[i]);
+			builder.append(":");
+		}
+		builder.setLength(builder.length() - 1);
+		String result = builder.toString();
+		return result;
 	}
 
 	/*
