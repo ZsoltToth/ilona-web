@@ -1,36 +1,26 @@
 package security;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData;
-import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.model.UserDetails;
-import uni.miskolc.ips.ilona.tracking.persist.TrackingUserDAO;
-import uni.miskolc.ips.ilona.tracking.persist.TrackingUserDAO2;
-import uni.miskolc.ips.ilona.tracking.persist.exception.TrackingUserNotFoundException;
 
 public class TrackingAuthenticationProvider implements AuthenticationProvider {
 
+	/*
 	@Autowired
 	private TrackingUserDAO2 trackingDAO;
 
 	@Autowired
 	private TrackingUserDAO trackingUserDao;
-
+	 */
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
@@ -41,12 +31,12 @@ public class TrackingAuthenticationProvider implements AuthenticationProvider {
 		String userpassword = authentication.getCredentials().toString();
 		Collection<GrantedAuthority> grantedAuths = null;
 		UserDetails userDetails = null;
-
+		/*
 		try {
 			userDetails = trackingUserDao.getUser(username);
 
 			if (userDetails == null) {
-				throw new TrackingUserNotFoundException();
+				throw new UserNotFoundException();
 			}
 
 			
@@ -61,13 +51,13 @@ public class TrackingAuthenticationProvider implements AuthenticationProvider {
 				grantedAuths.add(new SimpleGrantedAuthority(role));
 			}
 
-		} catch (TrackingUserNotFoundException e) {
+		} catch (UserNotFoundException e) {
 			return null;
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+		*/
 		return new UsernamePasswordAuthenticationToken(username, userpassword, grantedAuths);
 		/*
 		 * String name = authentication.getName(); try { TrackingLoginUserData
@@ -99,16 +89,19 @@ public class TrackingAuthenticationProvider implements AuthenticationProvider {
 	 * 
 	 * @param trackingDAO
 	 */
+	/*
 	public void setTrackingDAO(TrackingUserDAO2 trackingDAO) {
 		this.trackingDAO = trackingDAO;
 	}
-
+	
+	public void setTrackingUserDao(TrackingUserDAO trackingUserDao) {
+		this.trackingUserDao = trackingUserDao;
+	}
+	*/
 	public void setPasswordEncoder(BCryptPasswordEncoder passwordEncoder) {
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	public void setTrackingUserDao(TrackingUserDAO trackingUserDao) {
-		this.trackingUserDao = trackingUserDao;
-	}
+	
 
 }

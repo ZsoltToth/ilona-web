@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.model.UserDetails;
+import uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas;
+import uni.miskolc.ips.ilona.tracking.persist.TrackingUserManagementAndTrackingServiceDAO;
 import uni.miskolc.ips.ilona.tracking.persist.TrackingUserDAO;
-import uni.miskolc.ips.ilona.tracking.persist.exception.TrackingUserNotFoundException;
+import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
 import java.util.*;
 
 /**
@@ -35,8 +37,11 @@ public class TrackingController {
 
 	private static Logger logger = LogManager.getLogger(TrackingController.class);
 
+	//@Autowired
+	private TrackingUserDAO trackingUserDAO;
+	
 	@Autowired
-	TrackingUserDAO trackingUserDAO;
+	private TrackingUserManagementAndTrackingServiceDAO trackingdao;
 
 	@Autowired
 	BCryptPasswordEncoder passwordencoder;
@@ -105,7 +110,7 @@ public class TrackingController {
 				}
 			}
 
-		} catch (TrackingUserNotFoundException e) {
+		} catch (UserNotFoundException e) {
 
 		}
 
@@ -182,7 +187,14 @@ public class TrackingController {
 		boolean isEqual = "áááé".equals(userid);
 		System.out.println("\n Egyezes " + isEqual);
 		model.addAttribute("kijelzes", userid);
-
+		try {
+			DatabaseUserDatas data = trackingdao.getUser("user1");
+			if(data != null) {
+				System.out.println(data.toString());
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		return new ModelAndView("Probalgatasok");
 	}
 
@@ -194,6 +206,12 @@ public class TrackingController {
 		this.passwordencoder = passwordencoder;
 	}
 
+	public void setTrackingdao(TrackingUserManagementAndTrackingServiceDAO trackingdao) {
+		this.trackingdao = trackingdao;
+	}
+
+	
+	
 	/*
 	 * @RequestMapping(value = "/getUser/{userID}", method = RequestMethod.GET)
 	 * 

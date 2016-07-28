@@ -28,12 +28,12 @@
 		<typeAlias alias="UUID" type="java.util.UUID" />
 		<typeAlias alias="UUIDTypeHandler"
 			type="uni.miskolc.ips.ilona.measurement.persist.mappers.typehandlers.UUIDTypeHandler" />
-		<typeAlias alias="LoginUserData"
-			type="uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData" />
 		<typeAlias alias="BooleanToIntHander"
-			type="uni.miskolc.ips.ilona.tracking.persist.mysql.BooleanEnabledTypeHandler" />
+			type="uni.miskolc.ips.ilona.tracking.persist.mysql.typehandlers.BooleanToFromTinyintTypeHandler" />
 		<typeAlias alias="UserDetails"
 			type="uni.miskolc.ips.ilona.tracking.model.UserDetails" />
+		<typeAlias alias="TrackingUserDatas"
+			type="uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas" />
 	</typeAliases>
 
 	<typeHandlers>
@@ -68,9 +68,7 @@
 		<mapper
 			resource="uni/miskolc/ips/ilona/measurement/persist/mappers/MeasurementMapper.xml" />
 		<mapper
-			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/TrackingMapper.xml" />
-		<mapper
-			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/TrackingUserMapper.xml" />
+			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/mappers/TrackingUserManagementAndServiceMapper.xml" />
 
 
 

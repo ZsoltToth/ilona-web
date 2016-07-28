@@ -17,7 +17,7 @@
 
 	<context:property-placeholder
 		properties-ref="systemProperties" />
-		
+
 	<mvc:resources mapping="/css/**" location="/css/" />
 	<mvc:resources mapping="/js/**" location="/js/" />
 	<mvc:resources mapping="/fonts/**" location="/fonts/" />
@@ -58,7 +58,7 @@
 			</props>
 		</property>
 	</bean>
-
+<!-- 
 	<bean id="TrackingUserDAO"
 		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySqlAndMybatisTrackingUserDAOImplementation">
 		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
@@ -68,7 +68,7 @@
 		<constructor-arg name="user" value="${database.user}" />
 		<constructor-arg name="password" value="${database.password}" />
 	</bean>
-
+ -->
 	<!-- DATABASE DAO Beans -->
 	<bean id="zoneDAO"
 		class="uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLZoneDAO">
@@ -113,9 +113,19 @@
 	</bean>
 
 	<!-- Tracking Database beans -->
-
+	<!-- 
 	<bean id="trackingDAO"
 		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySQLTrackingDAO">
+		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
+		<constructor-arg name="host" value="${database.host}" />
+		<constructor-arg name="port" value="${database.port}" />
+		<constructor-arg name="database" value="${database.db}" />
+		<constructor-arg name="user" value="${database.user}" />
+		<constructor-arg name="password" value="${database.password}" />
+	</bean>
+ -->
+	<bean id="trackingDAO2"
+		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation">
 		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
 		<constructor-arg name="host" value="${database.host}" />
 		<constructor-arg name="port" value="${database.port}" />

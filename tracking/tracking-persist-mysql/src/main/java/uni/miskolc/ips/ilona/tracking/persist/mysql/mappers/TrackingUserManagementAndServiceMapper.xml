@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="uni.miskolc.ips.ilona.tracking.persist.mysql.mappers.TrackingUserManagementAndServiceMapper">
+
+	<resultMap type="TrackingUserDatas" id="GetUserDatas">
+		<id property="userid" column="userid" javaType="String" jdbcType="VARCHAR" />
+		<result property="username" column="username" javaType="String"
+			jdbcType="VARCHAR" />
+
+		<result property="password" column="password" javaType="String"
+			jdbcType="VARCHAR" />
+
+		<result property="email" column="email" javaType="String"
+			jdbcType="VARCHAR" />
+
+		<result property="enabled" column="enabled" javaType="boolean"
+			jdbcType="INTEGER" typeHandler="BooleanToIntHander" />
+
+		<result property="nonExpired" column="nonexpired" javaType="java.util.Date"
+			jdbcType="TIMESTAMP" />
+
+		<result property="loginAttempts" column="loginAttempts"
+			javaType="int" jdbcType="INTEGER" />
+
+		<result property="firstBadLoginAttempt" column="firstbadloginattempt"
+			javaType="java.util.Date" jdbcType="TIMESTAMP" />
+
+		<result property="credentialsNonExpired" column="credentialsnonexpired"
+			javaType="java.util.Date" jdbcType="TIMESTAMP" />
+
+		<collection property="roles" ofType="String" javaType="List"
+			jdbcType="VARCHAR">
+			<id property="roles" column="userrole" />
+		</collection>
+	</resultMap>
+
+	<select id="getUser" resultMap="GetUserDatas" parameterType="String">
+
+		select tu.userid, tu.username, tu.password, tu.email, tu.enabled,
+		tu.nonexpired, tu.loginattempts, tu.firstbadloginattempt, 
+		tu.credentialsnonexpired, roles.userrole from TrackingUsers tu inner join TrackingUserRoles roles on
+		tu.userid = roles.userid where tu.userid = #{userid}; 
+
+
+	</select>
+
+</mapper>

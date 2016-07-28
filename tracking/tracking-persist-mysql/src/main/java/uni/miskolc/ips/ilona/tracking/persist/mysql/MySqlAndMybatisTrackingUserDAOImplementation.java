@@ -4,11 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
-
-import javax.xml.ws.RespectBinding;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -17,11 +14,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
-import uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData;
 import uni.miskolc.ips.ilona.tracking.model.UserDetails;
 import uni.miskolc.ips.ilona.tracking.persist.TrackingUserDAO;
-import uni.miskolc.ips.ilona.tracking.persist.exception.TrackingUserAlreadyExists;
-import uni.miskolc.ips.ilona.tracking.persist.exception.TrackingUserNotFoundException;
+import uni.miskolc.ips.ilona.tracking.persist.exception.UserAlreadyExists;
+import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
 
 /**
  * 
@@ -66,7 +62,7 @@ public class MySqlAndMybatisTrackingUserDAOImplementation implements TrackingUse
 	}
 
 	@Override
-	public void createUser(UserDetails user) throws TrackingUserAlreadyExists {
+	public void createUser(UserDetails user) throws UserAlreadyExists {
 		SqlSession session = sessionFactory.openSession();
 		try {
 			TrackingUserMapper usermapper = session.getMapper(TrackingUserMapper.class);
@@ -81,7 +77,7 @@ public class MySqlAndMybatisTrackingUserDAOImplementation implements TrackingUse
 	}
 
 	@Override
-	public UserDetails getUser(String userid) throws TrackingUserNotFoundException {
+	public UserDetails getUser(String userid) throws UserNotFoundException {
 
 		SqlSession session = sessionFactory.openSession();
 		UserDetails userdetails = null;
@@ -95,13 +91,27 @@ public class MySqlAndMybatisTrackingUserDAOImplementation implements TrackingUse
 	}
 
 	@Override
-	public void updateUser(UserDetails user) throws TrackingUserNotFoundException {
+	public void updateUser(UserDetails user) throws UserNotFoundException {
+		SqlSession session = sessionFactory.openSession();
+		try {
 
+		} catch (Exception e) {
+
+		} finally {
+			session.close();
+		}
 	}
 
 	@Override
-	public void deleteUser(String userID) throws TrackingUserNotFoundException {
+	public void deleteUser(String userID) throws UserNotFoundException {
+		SqlSession session = sessionFactory.openSession();
+		try {
 
+		} catch (Exception e) {
+
+		} finally {
+			session.close();
+		}
 	}
 
 	@Override

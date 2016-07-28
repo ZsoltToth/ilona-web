@@ -22,7 +22,11 @@ public class BooleanEnabledTypeHandler extends BaseTypeHandler<Boolean> {
 
 	@Override
 	public Boolean getNullableResult(ResultSet rs, String columnName) throws SQLException {
-		int value = rs.getInt(columnName);
+		
+		Integer value = rs.getInt(columnName);
+		if(rs.wasNull()) {
+			return false;
+		}
 		if (value == 1) {
 			return true;
 		} else {
@@ -32,7 +36,10 @@ public class BooleanEnabledTypeHandler extends BaseTypeHandler<Boolean> {
 
 	@Override
 	public Boolean getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-		int value = rs.getInt(columnIndex);
+		Integer value = rs.getInt(columnIndex);
+		if(rs.wasNull()) {
+			return false;
+		}
 		if (value == 1) {
 			return true;
 		} else {
@@ -42,7 +49,10 @@ public class BooleanEnabledTypeHandler extends BaseTypeHandler<Boolean> {
 
 	@Override
 	public Boolean getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {		
-		int value = cs.getInt(columnIndex);
+		Integer value = cs.getInt(columnIndex);
+		if(cs.wasNull()) {
+			return false;
+		}
 		if (value == 1) {
 			return true;
 		} else {

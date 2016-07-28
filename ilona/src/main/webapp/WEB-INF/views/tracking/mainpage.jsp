@@ -81,13 +81,13 @@
 			</div>
 			<ul class="nav navbar-nav">
 				<li class="active"><a id="navbarHome"
-					href="<c:url value='tracking/maincontent'></c:url>">Home</a></li>
+					href="<c:url value='/tracking/maincontent'></c:url>">Home</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-left">
 				<li><a id="navbarSignupage" href="#"><span
 						class="glyphicon glyphicon-user"></span> Sign Up(Under construction!)</a></li>
 				<li><a id="navbarLoginpage"
-					href="<c:url value='tracking/login'></c:url>"><span
+					href="<c:url value='/tracking/login'></c:url>"><span
 						class="glyphicon glyphicon-log-in"></span> Login</a></li>
 			</ul>
 		</div>
