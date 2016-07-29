@@ -38,14 +38,83 @@
 		</collection>
 	</resultMap>
 
+	<resultMap type="DatabaseDevice" id="getDeviceDatas">
+		<id column="deviceid" property="deviceid" javaType="String"
+			jdbcType="VARCHAR" />
+		<result property="userid" column="deviceowner" javaType="String"
+			jdbcType="VARCHAR" />
+		<result property="deviceName" column="devicename" javaType="String"
+			jdbcType="VARCHAR" />
+		<result property="deviceType" column="devicetype" javaType="String"
+			jdbcType="VARCHAR" />
+		<result property="deviceTypeName" column="devicetypename"
+			javaType="String" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<insert id="createUser" parameterType="TrackingUserDatas">
+		insert into Trackingusers
+		values(#{userid}, #{username}, #{email}, #{password}, #{enabled,
+		typeHandler = BooleanToIntHander}, );
+	</insert>
+
 	<select id="getUser" resultMap="GetUserDatas" parameterType="String">
 
 		select tu.userid, tu.username, tu.password, tu.email, tu.enabled,
-		tu.nonexpired, tu.loginattempts, tu.firstbadloginattempt, 
-		tu.credentialsnonexpired, roles.userrole from TrackingUsers tu inner join TrackingUserRoles roles on
-		tu.userid = roles.userid where tu.userid = #{userid}; 
-
+		tu.nonexpired, tu.loginattempts, tu.firstbadloginattempt,
+		tu.credentialsnonexpired, roles.userrole
+		from TrackingUsers tu
+		inner
+		join TrackingUserRoles roles on tu.userid = roles.userid
+		where
+		tu.userid = #{userid};
 
 	</select>
+
+	<select id="getAllUsers" resultMap="GetUserDatas">
+		select
+		tu.userid, tu.username,
+		tu.password, tu.email, tu.enabled,
+		tu.nonexpired, tu.loginattempts,
+		tu.firstbadloginattempt,
+		tu.credentialsnonexpired, roles.userrole
+		from
+		TrackingUsers tu
+		inner
+		join TrackingUserRoles roles on tu.userid =
+		roles.userid;
+	</select>
+
+	<delete id="deleteUser" parameterType="String">
+		delete from TrackingUsers
+		where userid = #{userid};
+	</delete>
+
+	<select id="getDevicesByUserid" resultMap="getDeviceDatas"
+		parameterType="String">
+		select dev.deviceowner, dev.deviceid, dev.devicename,
+		devicetypename,
+		dev.devicetype from TrackingDevices dev where
+		dev.deviceowner =
+		#{userid};
+	</select>
+
+	<select id="getAllDevices" resultMap="getDeviceDatas">
+		select dev.deviceowner,
+		dev.deviceid, dev.devicename, devicetypename,
+		dev.devicetype from
+		TrackingDevices dev;
+	</select>
+
+	<insert id="storeDevice" parameterType="DatabaseDevice">
+		insert
+		into TrackingDevices values(#{deviceid}, #{userid}, #{deviceName},
+		#{deviceTypeName}, #{deviceType});
+	</insert>
+
+	<delete id="deleteDeviceByDeviceid" parameterType="DatabaseDevice">
+		delete from
+		TrackingDevices where deviceowner = #{userid} and deviceid =
+		#{deviceid};
+	</delete>
 
 </mapper>

@@ -65,6 +65,17 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
+		<dependency>
+			<groupId>uni.miskolc.ips.ilona</groupId>
+			<artifactId>tracking-service</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>uni.miskolc.ips.ilona</groupId>
+			<artifactId>tracking-service-impl</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
 		<!-- Spring dependencies -->
 
 		<dependency>
@@ -116,19 +127,9 @@
 			<artifactId>spring-security-taglibs</artifactId>
 			<version>${spring.security.version}</version>
 		</dependency>
-<!-- 
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>bootstrap</artifactId>
-			<version>3.3.6</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery</artifactId>
-			<version>3.0.0</version>
-		</dependency>
- -->
+		<!-- <dependency> <groupId>org.webjars</groupId> <artifactId>bootstrap</artifactId> 
+			<version>3.3.6</version> </dependency> <dependency> <groupId>org.webjars</groupId> 
+			<artifactId>jquery</artifactId> <version>3.0.0</version> </dependency> -->
 	</dependencies>
 
 	<repositories>

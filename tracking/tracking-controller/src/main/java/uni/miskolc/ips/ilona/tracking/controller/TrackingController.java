@@ -37,9 +37,9 @@ public class TrackingController {
 
 	private static Logger logger = LogManager.getLogger(TrackingController.class);
 
-	//@Autowired
+	// @Autowired
 	private TrackingUserDAO trackingUserDAO;
-	
+
 	@Autowired
 	private TrackingUserManagementAndTrackingServiceDAO trackingdao;
 
@@ -59,7 +59,8 @@ public class TrackingController {
 		logger.info("Tracking index page request.");
 		// ModelAndView back = new ModelAndView("trackingIndex");
 		ModelAndView mav = new ModelAndView();
-		//mav.addObject("message", SecurityContextHolder.getContext().getAuthentication().getName());
+		// mav.addObject("message",
+		// SecurityContextHolder.getContext().getAuthentication().getName());
 		// back.addObject("message", "Üzenetátadva!");
 		mav.setViewName("trackingIndex");
 		return mav;
@@ -121,12 +122,12 @@ public class TrackingController {
 	public String createLoginPage() {
 		return "Tracking/TrackingLoginPage";
 	}
-/*
-	@RequestMapping(value = "/createuserpage", method = RequestMethod.GET)
-	public ModelAndView createuserpage() {
-		return new ModelAndView("CreateTrackingUser");
-	}
-*/
+
+	/*
+	 * @RequestMapping(value = "/createuserpage", method = RequestMethod.GET)
+	 * public ModelAndView createuserpage() { return new
+	 * ModelAndView("CreateTrackingUser"); }
+	 */
 	/*
 	 * @RequestMapping(value = "/createuser/{username}/{password}/{enabled}",
 	 * method = { RequestMethod.POST }) public ModelAndView
@@ -188,11 +189,15 @@ public class TrackingController {
 		System.out.println("\n Egyezes " + isEqual);
 		model.addAttribute("kijelzes", userid);
 		try {
-			DatabaseUserDatas data = trackingdao.getUser("user1");
-			if(data != null) {
+			Collection<DatabaseUserDatas> data = trackingdao.getAllUsers();
+			if (data != null) {
+				System.out.print(data.getClass().getName());
 				System.out.println(data.toString());
 			}
-		} catch(Exception e) {
+			if (data != null) {
+				System.out.println(data.toString());
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return new ModelAndView("Probalgatasok");
@@ -210,8 +215,6 @@ public class TrackingController {
 		this.trackingdao = trackingdao;
 	}
 
-	
-	
 	/*
 	 * @RequestMapping(value = "/getUser/{userID}", method = RequestMethod.GET)
 	 * 

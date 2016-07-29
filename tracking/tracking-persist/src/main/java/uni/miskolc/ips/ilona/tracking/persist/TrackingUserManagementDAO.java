@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas;
 import uni.miskolc.ips.ilona.tracking.persist.exception.DatabaseProblemException;
+import uni.miskolc.ips.ilona.tracking.persist.exception.OperationExecutionErrorException;
 import uni.miskolc.ips.ilona.tracking.persist.exception.UserAlreadyExists;
 import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
 
@@ -22,14 +23,9 @@ public interface TrackingUserManagementDAO {
 	 * 
 	 * @param userdata
 	 * @throws UserAlreadyExists
+	 * @throws OperationExecutionErrorException
 	 */
-	void createUser(DatabaseUserDatas userdata) throws UserAlreadyExists;
-
-	/**
-	 * 
-	 * @param users
-	 */
-	void createUsers(Collection<DatabaseUserDatas> users);
+	void createUser(DatabaseUserDatas userdata) throws UserAlreadyExists, OperationExecutionErrorException;
 
 	/**
 	 * 
@@ -37,46 +33,28 @@ public interface TrackingUserManagementDAO {
 	 * @return
 	 * @throws UserNotFoundException
 	 */
-	DatabaseUserDatas getUser(String userid) throws UserNotFoundException;
-
-	/**
-	 * 
-	 * @param users
-	 * @return
-	 */
-	Collection<DatabaseUserDatas> getUsers(Collection<String> users);
+	DatabaseUserDatas getUser(String userid) throws UserNotFoundException, OperationExecutionErrorException;
 
 	/**
 	 * 
 	 * @return
 	 * @throws DatabaseProblemException
 	 */
-	Collection<DatabaseUserDatas> getAllUsers() throws DatabaseProblemException;
+	Collection<DatabaseUserDatas> getAllUsers() throws DatabaseProblemException, OperationExecutionErrorException;
 
 	/**
 	 * 
 	 * @param userdata
 	 * @throws UserNotFoundException
 	 */
-	void updateUser(DatabaseUserDatas userdata) throws UserNotFoundException;
-
-	/**
-	 * 
-	 * @param userdatas
-	 */
-	void updateUsers(Collection<DatabaseUserDatas> userdatas);
+	void updateUser(DatabaseUserDatas userdata) throws UserNotFoundException, OperationExecutionErrorException;
 
 	/**
 	 * 
 	 * @param userid
 	 * @throws UserNotFoundException
 	 */
-	void deleteUser(String userid) throws UserNotFoundException;
+	void deleteUser(String userid) throws UserNotFoundException, OperationExecutionErrorException;
 
-	/**
-	 * 
-	 * @param userids
-	 */
-	void delelteUsers(Collection<String> userids);
 
 }

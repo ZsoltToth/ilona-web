@@ -1,5 +1,6 @@
 package uni.miskolc.ips.ilona.tracking.persist.mysql.mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 import uni.miskolc.ips.ilona.measurement.model.position.Position;
@@ -20,7 +21,7 @@ public interface TrackingUserManagementAndServiceMapper {
 	 * @param userdata
 	 * @throws UserAlreadyExists
 	 */
-	void createUser(DatabaseUserDatas userdata);
+	int createUser(DatabaseUserDatas userdata);
 
 	/**
 	 * 
@@ -35,58 +36,59 @@ public interface TrackingUserManagementAndServiceMapper {
 	 * @param userdata
 	 * @throws UserNotFoundException
 	 */
-	void updateUser(DatabaseUserDatas userdata);
+	int updateUser(DatabaseUserDatas userdata);
 
 	/**
 	 * 
 	 * @param userid
 	 * @throws UserNotFoundException
 	 */
-	void deleteUser(String userid);
+	int deleteUser(String userid);
 
 	/**
 	 * 
 	 * @return
 	 * @throws DatabaseProblemException
 	 */
-	List<DatabaseUserDatas> getAllUsers();
+	Collection<DatabaseUserDatas> getAllUsers();
+
+	/*
+	 * DEVICE CRUD
+	 */
 
 	/**
 	 * 
 	 * @param deviceData
 	 */
-	void storeDevice(DatabaseDeviceDatas deviceData);
+	int storeDevice(DatabaseDeviceDatas deviceData);
 
 	/**
 	 * 
 	 * @param deviceid
 	 */
-	void deleteDeviceByDeviceid(String deviceid);
+	int deleteDevice(DatabaseDeviceDatas device);
 
+	
+	int updateDevice(DatabaseDeviceDatas device);
 	/**
 	 * 
 	 * @param userid
 	 * @return
 	 */
-	DatabaseDeviceDatas getDeviceByUserid(String userid);
-
-	/**
-	 * 
-	 * @param userid
-	 * @return
-	 */
-	List<DatabaseDeviceDatas> getUserDevicesByUserid(String userid);
+	Collection<DatabaseDeviceDatas> getDevicesByUserid(String userid);
+	
+	Collection<DatabaseDeviceDatas> getAllDevices();
 
 	/**
 	 * 
 	 * @return
 	 */
-	Position getPositionByUUID();
+	//Position getPositionByUUID();
 
 	/**
 	 * 
 	 * @param deviceid
 	 * @return
 	 */
-	List<Position> getDevicesPositions(String deviceid);
+	//List<Position> getDevicesPositions(String deviceid);
 }

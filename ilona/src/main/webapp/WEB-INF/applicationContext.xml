@@ -123,8 +123,24 @@
 		<constructor-arg name="user" value="${database.user}" />
 		<constructor-arg name="password" value="${database.password}" />
 	</bean>
- -->
-	<bean id="trackingDAO2"
+ TrackingUserManagementAndTrackingServiceImpl trackingUserAndTrackingService-->
+ 
+ 	<bean id="trackingUserAndTrackingService" 
+ 		class="uni.miskolc.ips.ilona.tracking.service.impl.TrackingUserManagementAndTrackingServiceImpl" >
+ 		<constructor-arg ref="trackingUserAndTrackingDAO"></constructor-arg>
+ 	</bean>
+  
+ 	<bean id="trackingUserAndTrackingDAO"
+		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation">
+		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
+		<constructor-arg name="host" value="${database.host}" />
+		<constructor-arg name="port" value="${database.port}" />
+		<constructor-arg name="database" value="${database.db}" />
+		<constructor-arg name="user" value="${database.user}" />
+		<constructor-arg name="password" value="${database.password}" />
+	</bean>
+ <!--  -->
+	<bean id="trackingDAO2" primary="true"
 		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation">
 		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
 		<constructor-arg name="host" value="${database.host}" />

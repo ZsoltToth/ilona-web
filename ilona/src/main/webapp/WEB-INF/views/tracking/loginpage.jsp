@@ -39,7 +39,7 @@
 				},
 				url : $("#trackingLoginpageLoginform").attr('action'),
 				timeout : 10000,
-					error : function(xhr, status, error) {
+				error : function(xhr, status, error) {
 					$("#errorContent").html(xhr.responseText);
 				},
 				success : function(result, status, xhr) {

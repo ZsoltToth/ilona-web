@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.ibatis.session.SqlSession;
@@ -14,11 +14,11 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import uni.miskolc.ips.ilona.measurement.model.position.Position;
 import uni.miskolc.ips.ilona.tracking.model.database.DatabaseDeviceDatas;
 import uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas;
 import uni.miskolc.ips.ilona.tracking.persist.TrackingUserManagementAndTrackingServiceDAO;
 import uni.miskolc.ips.ilona.tracking.persist.exception.DatabaseProblemException;
+import uni.miskolc.ips.ilona.tracking.persist.exception.OperationExecutionErrorException;
 import uni.miskolc.ips.ilona.tracking.persist.exception.UserAlreadyExists;
 import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
 import uni.miskolc.ips.ilona.tracking.persist.mysql.mappers.TrackingUserManagementAndServiceMapper;
@@ -58,25 +58,31 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 	}
 
 	@Override
-	public void createUser(DatabaseUserDatas userdata) throws UserAlreadyExists {
-		// TODO Auto-generated method stub
-		
+	public void createUser(DatabaseUserDatas userdata) throws UserAlreadyExists, OperationExecutionErrorException {
+		SqlSession session = sessionFactory.openSession();
+		try {
+			TrackingUserManagementAndServiceMapper mapper = session
+					.getMapper(TrackingUserManagementAndServiceMapper.class);
+			mapper.createUser(userdata);
+			session.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+
 	}
 
 	@Override
-	public void createUsers(Collection<DatabaseUserDatas> users) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public DatabaseUserDatas getUser(String userid) throws UserNotFoundException {
+	public DatabaseUserDatas getUser(String userid) throws UserNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		DatabaseUserDatas data = null;
 		try {
 			TrackingUserManagementAndServiceMapper mapper = session
 					.getMapper(TrackingUserManagementAndServiceMapper.class);
 			data = mapper.getUser("user1");
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			session.close();
 		}
@@ -84,107 +90,131 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 	}
 
 	@Override
-	public Collection<DatabaseUserDatas> getUsers(Collection<String> users) {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<DatabaseUserDatas> getAllUsers()
+			throws DatabaseProblemException, OperationExecutionErrorException {
+		SqlSession session = sessionFactory.openSession();
+		Collection<DatabaseUserDatas> users = new ArrayList<DatabaseUserDatas>();
+		try {
+			TrackingUserManagementAndServiceMapper mapper = session
+					.getMapper(TrackingUserManagementAndServiceMapper.class);
+			users = mapper.getAllUsers();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return users;
 	}
 
 	@Override
-	public Collection<DatabaseUserDatas> getAllUsers() throws DatabaseProblemException {
-		// TODO Auto-generated method stub
-		return null;
+	public void updateUser(DatabaseUserDatas userdata) throws UserNotFoundException, OperationExecutionErrorException {
+		SqlSession session = sessionFactory.openSession();
+		try {
+			TrackingUserManagementAndServiceMapper mapper = session
+					.getMapper(TrackingUserManagementAndServiceMapper.class);
+			mapper.updateUser(userdata);
+			session.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
 	}
 
 	@Override
-	public void updateUser(DatabaseUserDatas userdata) throws UserNotFoundException {
-		// TODO Auto-generated method stub
-		
-	}
+	public void deleteUser(String userid) throws UserNotFoundException, OperationExecutionErrorException {
+		SqlSession session = sessionFactory.openSession();
+		try {
+			TrackingUserManagementAndServiceMapper mapper = session
+					.getMapper(TrackingUserManagementAndServiceMapper.class);
+			mapper.deleteUser(userid);
+			session.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
 
-	@Override
-	public void updateUsers(Collection<DatabaseUserDatas> userdatas) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void deleteUser(String userid) throws UserNotFoundException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void delelteUsers(Collection<String> userids) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void storeDevice(DatabaseDeviceDatas deviceData) {
-		// TODO Auto-generated method stub
-		
+		SqlSession session = sessionFactory.openSession();
+		try {
+			TrackingUserManagementAndServiceMapper mapper = session
+					.getMapper(TrackingUserManagementAndServiceMapper.class);
+			mapper.storeDevice(deviceData);
+			session.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+
 	}
 
 	@Override
-	public void storeDevices(Collection<DatabaseDeviceDatas> devices) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public DatabaseDeviceDatas getDeviceByUserid(String userid) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<DatabaseDeviceDatas> getUserDevicesByUserid(String userid) {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<DatabaseDeviceDatas> getDeviceByUserid(String userid) {
+		SqlSession session = sessionFactory.openSession();
+		Collection<DatabaseDeviceDatas> devices = new ArrayList<DatabaseDeviceDatas>();
+		try {
+			TrackingUserManagementAndServiceMapper mapper = session
+					.getMapper(TrackingUserManagementAndServiceMapper.class);
+			devices = mapper.getDevicesByUserid(userid);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return devices;
 	}
 
 	@Override
 	public Collection<DatabaseDeviceDatas> getAllDevices() {
-		// TODO Auto-generated method stub
-		return null;
+		SqlSession session = sessionFactory.openSession();
+		Collection<DatabaseDeviceDatas> devices = new ArrayList<DatabaseDeviceDatas>();
+		try {
+			TrackingUserManagementAndServiceMapper mapper = session
+					.getMapper(TrackingUserManagementAndServiceMapper.class);
+			devices = mapper.getAllDevices();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return devices;
 	}
 
 	@Override
 	public void updateDevice(DatabaseDeviceDatas device) {
-		// TODO Auto-generated method stub
-		
-	}
+		SqlSession session = sessionFactory.openSession();
+		try {
+			TrackingUserManagementAndServiceMapper mapper = session
+					.getMapper(TrackingUserManagementAndServiceMapper.class);
+			mapper.updateDevice(device);
+			session.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
 
-	@Override
-	public void updateDevices(Collection<DatabaseDeviceDatas> devices) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void deleteDevice(DatabaseDeviceDatas device) {
-		// TODO Auto-generated method stub
-		
-	}
+		SqlSession session = sessionFactory.openSession();
+		try {
+			TrackingUserManagementAndServiceMapper mapper = session
+					.getMapper(TrackingUserManagementAndServiceMapper.class);
+			mapper.deleteDevice(device);
+			session.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
 
-	@Override
-	public void deleteDevices(Collection<DatabaseDeviceDatas> devices) {
-		// TODO Auto-generated method stub
-		
 	}
-
-	@Override
-	public Position getPositionByUUID() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Position> getDevicesPositions(DatabaseDeviceDatas device) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
 
 }

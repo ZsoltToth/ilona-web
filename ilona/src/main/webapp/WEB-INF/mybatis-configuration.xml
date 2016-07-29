@@ -34,6 +34,8 @@
 			type="uni.miskolc.ips.ilona.tracking.model.UserDetails" />
 		<typeAlias alias="TrackingUserDatas"
 			type="uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas" />
+		<typeAlias alias="DatabaseDevice"
+			type="uni.miskolc.ips.ilona.tracking.model.database.DatabaseDeviceDatas" />
 	</typeAliases>
 
 	<typeHandlers>
