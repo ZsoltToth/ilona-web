@@ -65,6 +65,16 @@
 		<!--<constructor-arg ref="positionDAO" /> -->
 		<constructor-arg ref="measurementDAO" />
 	</bean>
+	
+	<bean id="ontologyDAO" class="uni.miskolc.ips.ilona.navigation.persist.ontology.OntologyDAOImpl">
+		<constructor-arg name="baseOntologyPath" value="ILONA.owl"/>
+		<constructor-arg name="navigationOntologyPath" value="ILONA.owl"/>
+	</bean>
+	
+	<bean id="ontologyGenerationService" class="uni.miskolc.ips.ilona.navigation.service.impl.OntologyGenerationServiceImpl">
+		<constructor-arg name="ontologyDAO" ref="ontologyDAO"/>
+		<constructor-arg name="zoneDAO" ref="zoneDAO"/>
+	</bean>
 
 	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 
 		<constructor-arg ref="positionDAO" /> <constructor-arg ref="measurementDAO" 
