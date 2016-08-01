@@ -104,8 +104,9 @@ public abstract class KNNPositioning implements PositioningService {
 
 		ArrayList<Neighbour> neighbours = getNeighbourList(measurements, measurement);
 		final ArrayList<Neighbour> kNearestNeighbours = getKNearestNeighbour(neighbours);
-
-		return getMajorVote(kNearestNeighbours);
+		Position result = getMajorVote(kNearestNeighbours);
+		LOG.info(String.format("The position of measurement "+ measurement.toString()+" is position "+result.getZone()));
+		return result;
 	}
 
 	/**

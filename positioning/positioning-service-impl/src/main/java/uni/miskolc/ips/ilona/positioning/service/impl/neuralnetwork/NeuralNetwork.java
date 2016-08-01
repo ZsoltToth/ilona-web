@@ -1,6 +1,5 @@
 package uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork;
 
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -8,11 +7,14 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import weka.classifiers.evaluation.Evaluation;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.core.Instances;
 
-public class NeuralNetwork implements Serializable{
+public class NeuralNetwork implements Serializable {
 
 	/**
 	 * 
@@ -23,6 +25,7 @@ public class NeuralNetwork implements Serializable{
 	private final int trainingTime;
 	private final String hiddenLayers;
 	private MultilayerPerceptron mlp;
+	private static final Logger LOG = LogManager.getLogger(NeuralNetwork.class);
 
 	public NeuralNetwork(double learningRate, double momentum, int trainingTime, String hiddenLayers,
 			String trainingfilepath) throws FileNotFoundException, IOException, Exception {
@@ -44,20 +47,15 @@ public class NeuralNetwork implements Serializable{
 		return result;
 	}
 
-	private MultilayerPerceptron buildMultilayerPerceptron(String trainingfilepath)
-			throws Exception {
-		Instances trainingInstances =readInstances(trainingfilepath);
+	private MultilayerPerceptron buildMultilayerPerceptron(String trainingfilepath) throws Exception {
+		Instances trainingInstances = readInstances(trainingfilepath);
 		trainingInstances.setClassIndex(trainingInstances.numAttributes() - 1);
 		MultilayerPerceptron mlp = new MultilayerPerceptron();
 		mlp.setLearningRate(learningRate);
 		mlp.setMomentum(momentum);
 		mlp.setTrainingTime(trainingTime);
 		mlp.setHiddenLayers(hiddenLayers);
-		try {
-			mlp.buildClassifier(trainingInstances);
-		} catch (Exception e) {
-
-		}
+		mlp.buildClassifier(trainingInstances);
 		return mlp;
 
 	}
@@ -84,11 +82,12 @@ public class NeuralNetwork implements Serializable{
 	public String getHiddenLayers() {
 		return hiddenLayers;
 	}
+
 	public MultilayerPerceptron getMultilayerPerceptron() {
 		return mlp;
 	}
-	
-	public void serializeNeuralNetwork(String targetPath) throws FileNotFoundException, IOException, Exception{
+
+	public void serializeNeuralNetwork(String targetPath) throws FileNotFoundException, IOException, Exception {
 
 		try {
 			FileOutputStream fileOut = new FileOutputStream(targetPath);
@@ -96,9 +95,9 @@ public class NeuralNetwork implements Serializable{
 			out.writeObject(this);
 			out.close();
 			fileOut.close();
-			System.out.printf("Serialized data is saved in "+targetPath);
+			System.out.printf("Serialized data is saved in " + targetPath);
 		} catch (IOException i) {
-			i.printStackTrace();
+			LOG.error("Problem occured while serialize neural network: "+i.getMessage());
 		}
 
 	}

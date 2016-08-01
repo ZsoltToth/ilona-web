@@ -1,13 +1,10 @@
 package uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -15,16 +12,11 @@ import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork.*;
-import uni.miskolc.ips.ilona.measurement.model.measurement.BluetoothTags;
-import uni.miskolc.ips.ilona.measurement.model.measurement.Magnetometer;
 import uni.miskolc.ips.ilona.measurement.model.measurement.Measurement;
 import uni.miskolc.ips.ilona.measurement.model.position.Position;
 import uni.miskolc.ips.ilona.measurement.model.position.Zone;
-import uni.miskolc.ips.ilona.measurement.service.PositionService;
 import uni.miskolc.ips.ilona.measurement.service.ZoneService;
 import uni.miskolc.ips.ilona.positioning.service.PositioningService;
-import weka.classifiers.Classifier;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -44,7 +36,6 @@ public class NeuralNetworkPositioning implements PositioningService {
 	}
 
 	public Position determinePosition(Measurement measurement) {
-
 		Position result;
 		MultilayerPerceptron mlp = neuralNetwork.getMultilayerPerceptron();
 		Instance instance = convertMeasurementToInstance(measurement);
@@ -70,12 +61,10 @@ public class NeuralNetworkPositioning implements PositioningService {
 			in.close();
 			fileIn.close();
 		} catch (IOException i) {
-			i.printStackTrace();// ezt is logolni
+			LOG.info(String.format("Error occured during deserialization: " + i.getMessage()));
 			result = null;
 		} catch (ClassNotFoundException c) {
-			LOG.info("Serialised Neural Network not found on " + serializedPath + " "); // logra
-																						// kiírni
-			c.printStackTrace();
+			LOG.error("Serialised Neural Network not found on " + serializedPath + " ");
 			result = null;
 		}
 
@@ -114,21 +103,23 @@ public class NeuralNetworkPositioning implements PositioningService {
 
 	private int measurementSeeBluetooth(Measurement meas, String bluetooth) {
 		String hardwareAddress = getBluetoothHardwareAddress(bluetooth);
-		if(meas.getBluetoothTags() != null){
-		Set<String> measurementBluetoothTags = meas.getBluetoothTags().getTags();
-		for (String bl : measurementBluetoothTags) {
-			if (bl.toUpperCase().contains(hardwareAddress.toUpperCase())) {
-				return 1;
+		if (meas.getBluetoothTags() != null) {
+			Set<String> measurementBluetoothTags = meas.getBluetoothTags().getTags();
+			for (String bl : measurementBluetoothTags) {
+				if (bl.toUpperCase().contains(hardwareAddress.toUpperCase())) {
+					return 1;
+				}
 			}
-		}}
+		}
 		return 0;
 	}
 
 	private double measurementHowSeeWiFi(Measurement meas, String wifi) {
-		if(meas.getWifiRSSI()!= null){
-		if (meas.getWifiRSSI().getRssiValues().containsKey(wifi)) {
-			return meas.getWifiRSSI().getRSSI(wifi);
-		}}
+		if (meas.getWifiRSSI() != null) {
+			if (meas.getWifiRSSI().getRssiValues().containsKey(wifi)) {
+				return meas.getWifiRSSI().getRSSI(wifi);
+			}
+		}
 		return -100;
 	}
 
@@ -145,23 +136,6 @@ public class NeuralNetworkPositioning implements PositioningService {
 		String result = builder.toString();
 		return result;
 	}
-
-	/*
-	 * private ArrayList<String> getClassValues(MultilayerPerceptron mlp){ try {
-	 * Field field = MultilayerPerceptron.class.getDeclaredField("m_instances");
-	 * field.setAccessible(true); Object value = field.get(mlp);
-	 * field.setAccessible(false); Instances header = (Instances) value;
-	 * 
-	 * ArrayList<Attribute> attributes = new ArrayList<Attribute>(); for (int i
-	 * = 0; i < header.numAttributes(); i++) {
-	 * attributes.add(header.attribute(i)); } int classIndex =
-	 * header.classIndex(); Enumeration<Object> values =
-	 * attributes.get(classIndex).enumerateValues(); ArrayList<String>
-	 * classValues = new ArrayList<String>(); while(values.hasMoreElements()){
-	 * classValues.add(values.nextElement().toString()); } return classValues; }
-	 * catch (NoSuchFieldException e) { throw new RuntimeException(e); } catch
-	 * (IllegalAccessException e) { throw new RuntimeException(e); } }
-	 */
 
 	private ArrayList<Attribute> getHeader(MultilayerPerceptron mlp) {
 		try {

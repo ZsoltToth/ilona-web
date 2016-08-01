@@ -72,7 +72,7 @@ public class NaiveBayesPositioningService implements PositioningService {
 
 			}
 		}
-		LOG.info(String.format("The Location of %s measurement is %s",
+		LOG.info(String.format("The position of %s measurement is %s",
 				measurement, bestFit.getZone()));
 
 		return bestFit;

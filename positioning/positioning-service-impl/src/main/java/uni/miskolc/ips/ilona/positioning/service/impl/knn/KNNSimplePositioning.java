@@ -4,8 +4,12 @@ import uni.miskolc.ips.ilona.measurement.model.measurement.MeasurementDistanceCa
 import uni.miskolc.ips.ilona.measurement.model.position.Position;
 import uni.miskolc.ips.ilona.measurement.model.position.Zone;
 import uni.miskolc.ips.ilona.measurement.service.MeasurementService;
+import uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork.NeuralNetworkPositioning;
 
 import java.util.ArrayList;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * 
@@ -14,6 +18,7 @@ import java.util.ArrayList;
  */
 public class KNNSimplePositioning extends KNNPositioning {
 
+	private static final Logger LOG = LogManager.getLogger(KNNSimplePositioning.class);
 	/**
 	 * The constructor of the KNNSimplePositioning class.
 	 * 
