@@ -22,17 +22,6 @@ public class WiFiRSSI {
 	}
 
 	
-	
-	public WiFiRSSI(List<Map<String, Double>> rssiValuesList) {
-		super();
-		this.rssiValues = new HashMap<String,Double>();
-		for (Map<String, Double> m : rssiValuesList){
-			String ssid =""+ m.get("ssid");
-			rssiValues.put(ssid, m.get("rssi"));
-		}
-	}
-	
-	
 	public void setRSSI(String ssid, double rssi) {
 		this.rssiValues.put(ssid, rssi);
 	}

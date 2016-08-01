@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -136,7 +138,13 @@ public class MySQLMeasurementDAO implements MeasurementDAO {
 			result = new ArrayList<Measurement>(mapper.selectMeasurements());
 			for(Measurement m : result){
 				String id = m.getId().toString();
-				m.setWifiRSSI(new WiFiRSSI(mapper.selectWiFiRSSIForMeasurement(id)));
+				Map<String, Double>  wifi = new HashMap<String,Double>();
+				List<Map<String,Double>> mysqlwifis = mapper.selectWiFiRSSIForMeasurement(id);
+				for (Map<String, Double> map : mysqlwifis){
+					String ssid =""+ map.get("ssid");
+					wifi.put(ssid, map.get("rssi"));
+				}
+				m.setWifiRSSI(new WiFiRSSI(wifi));
 				m.setBluetoothTags(new BluetoothTags(mapper.selectBTTagsForMeasurement(id)));
 				m.setRfidtags(new RFIDTags(mapper.selectRFIDTagsForMeasurement(id)));
 			}
