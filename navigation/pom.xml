@@ -18,6 +18,7 @@
   	<module>navigation-controller</module>
   	
   	<module>navigation-service</module>
+  	<module>navigation-persist-ontology</module>
   </modules>
   
   <build>
