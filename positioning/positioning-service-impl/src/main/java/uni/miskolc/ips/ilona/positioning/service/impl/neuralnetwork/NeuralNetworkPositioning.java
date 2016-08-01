@@ -74,7 +74,7 @@ public class NeuralNetworkPositioning implements PositioningService {
 			result = null;
 		} catch (ClassNotFoundException c) {
 			LOG.info("Serialised Neural Network not found on " + serializedPath + " "); // logra
-																									// kiírni
+																						// kiírni
 			c.printStackTrace();
 			result = null;
 		}
@@ -114,19 +114,21 @@ public class NeuralNetworkPositioning implements PositioningService {
 
 	private int measurementSeeBluetooth(Measurement meas, String bluetooth) {
 		String hardwareAddress = getBluetoothHardwareAddress(bluetooth);
+		if(meas.getBluetoothTags() != null){
 		Set<String> measurementBluetoothTags = meas.getBluetoothTags().getTags();
 		for (String bl : measurementBluetoothTags) {
 			if (bl.toUpperCase().contains(hardwareAddress.toUpperCase())) {
 				return 1;
 			}
-		}
+		}}
 		return 0;
 	}
 
 	private double measurementHowSeeWiFi(Measurement meas, String wifi) {
+		if(meas.getWifiRSSI()!= null){
 		if (meas.getWifiRSSI().getRssiValues().containsKey(wifi)) {
 			return meas.getWifiRSSI().getRSSI(wifi);
-		}
+		}}
 		return -100;
 	}
 
