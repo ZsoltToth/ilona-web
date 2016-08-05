@@ -1,5 +1,10 @@
 package uni.miskolc.ips.ilona.tracking.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,12 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import uni.miskolc.ips.ilona.tracking.model.DeviceData;
+import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.model.UserDetails;
-import uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas;
-import uni.miskolc.ips.ilona.tracking.persist.TrackingUserManagementAndTrackingServiceDAO;
-import uni.miskolc.ips.ilona.tracking.persist.TrackingUserDAO;
-import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
-import java.util.*;
+import uni.miskolc.ips.ilona.tracking.persist.UserAndDeviceDAO;
 
 /**
  * Tracking module
@@ -37,12 +38,9 @@ public class TrackingController {
 
 	private static Logger logger = LogManager.getLogger(TrackingController.class);
 
-	// @Autowired
-	private TrackingUserDAO trackingUserDAO;
-
 	@Autowired
-	private TrackingUserManagementAndTrackingServiceDAO trackingdao;
-
+	private UserAndDeviceDAO dao;
+	
 	@Autowired
 	BCryptPasswordEncoder passwordencoder;
 	// @Autowired
@@ -55,8 +53,8 @@ public class TrackingController {
 	 * @return The tracking index jsp page.
 	 */
 	@RequestMapping(value = "/index", method = { RequestMethod.GET, RequestMethod.POST })
-	public ModelAndView loadingStartpage() {
-		logger.info("Tracking index page request.");
+	public  ModelAndView loadingStartpage() {
+		//logger.error("Tracking index page request.");
 		// ModelAndView back = new ModelAndView("trackingIndex");
 		ModelAndView mav = new ModelAndView();
 		// mav.addObject("message",
@@ -73,7 +71,7 @@ public class TrackingController {
 	 */
 	@RequestMapping(value = "/registration", method = RequestMethod.GET)
 	public ModelAndView loadLoginPage() {
-		logger.info("Tracking login page request.");
+		logger.error("Tracking login page request.");
 		ModelAndView mav = new ModelAndView("trackingRegistration");
 		mav.addObject("message", "");
 		return mav;
@@ -92,7 +90,7 @@ public class TrackingController {
 		return new ModelAndView("trackingMainpage");
 	}
 
-	@RequestMapping(value = "/logindecision", method = { RequestMethod.POST })
+	@RequestMapping(value = "/logindecision", method = { RequestMethod.POST, RequestMethod.GET })
 	public ModelAndView trackingLoginDecisionHandler(@ModelAttribute("username") String username,
 			@ModelAttribute("password") String password) {
 
@@ -100,25 +98,11 @@ public class TrackingController {
 		mav.addObject("username", username);
 		mav.addObject("userid", password);
 		mav.setViewName("Tracking/UserMainPage");
-		try {
-
-			UserDetails userDetails = trackingUserDAO.getUser(username);
-			if (userDetails != null) {
-				for (String role : userDetails.getRoles()) {
-					if (role.equalsIgnoreCase("ROLE_ADMIN")) {
-						mav.setViewName("Tracking/AdminMainPage");
-					}
-				}
-			}
-
-		} catch (UserNotFoundException e) {
-
-		}
 
 		return mav;
 	}
 
-	@RequestMapping(value = "/login1", method = { RequestMethod.GET })
+	@RequestMapping(value = "/login1", method = { RequestMethod.GET, RequestMethod.POST })
 	public String createLoginPage() {
 		return "Tracking/TrackingLoginPage";
 	}
@@ -148,16 +132,7 @@ public class TrackingController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("Probalgatasok");
 		List<UserDetails> userList = new ArrayList<UserDetails>();
-		try {
-			// trackingUserDAO.createUser(userdetails);
-			userList = trackingUserDAO.getAllUsers();
-			for (UserDetails user : userList) {
-				System.out.println(user.toString());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			mav.addObject("error", "Nem sikerült létrehozni az adott felhasználót!");
-		}
+
 		return userList;
 	}
 
@@ -183,38 +158,55 @@ public class TrackingController {
 	@RequestMapping(value = "/probalgatasok", method = { RequestMethod.GET, RequestMethod.POST })
 	public ModelAndView progaltasokToltese(@ModelAttribute("roleadmin") String roleadmin,
 			@ModelAttribute("userid") String userid, Model model, HttpEntity<byte[]> httpEntity) {
+		logger.error("logolás történt 1 !!!");
 		System.out.println(userid);
 		System.out.println(httpEntity.getHeaders().toString());
 		boolean isEqual = "áááé".equals(userid);
 		System.out.println("\n Egyezes " + isEqual);
 		model.addAttribute("kijelzes", userid);
+		
+		UserData user = new UserData();
+		user.setUserid("user2");
+		user.setPassword("password1");
+		user.setUsername("usernameVÁÁÁLT");
+		user.setEmail("emailVALTÁÁÁ@dasdas.com");
+		user.setEnabled(true);
+		user.setLastLoginDate(new Date());
+		user.setCredentialNonExpiredUntil(new Date());
+		user.setNonLocked(true);
+		user.setLockedUntil(new Date());
+		Collection<String> roles = new ArrayList<>();
+		roles.add("ROLE_ADMIN");
+		roles.add("ROLE_USER");
+		user.setRoles(roles);
+		
+		DeviceData device = new DeviceData();
+		device.setDeviceid("dev1");
+		device.setDeviceName("Sajáteszköz");
+		device.setDeviceType("MOBILE");
+		device.setDeviceTypeName("SAMSUNG E3dwasda2");
 		try {
-			Collection<DatabaseUserDatas> data = trackingdao.getAllUsers();
-			if (data != null) {
-				System.out.print(data.getClass().getName());
-				System.out.println(data.toString());
-			}
-			if (data != null) {
-				System.out.println(data.toString());
-			}
+			dao.deleteDevice(device, user);
+			System.out.println(dao.getUser("user2"));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		
 		return new ModelAndView("Probalgatasok");
-	}
-
-	public void setTrackingUserDAO(TrackingUserDAO trackingUserDAO) {
-		this.trackingUserDAO = trackingUserDAO;
 	}
 
 	public void setPasswordencoder(BCryptPasswordEncoder passwordencoder) {
 		this.passwordencoder = passwordencoder;
 	}
 
-	public void setTrackingdao(TrackingUserManagementAndTrackingServiceDAO trackingdao) {
-		this.trackingdao = trackingdao;
+	public UserAndDeviceDAO getDao() {
+		return dao;
 	}
 
+	
+	
 	/*
 	 * @RequestMapping(value = "/getUser/{userID}", method = RequestMethod.GET)
 	 * 

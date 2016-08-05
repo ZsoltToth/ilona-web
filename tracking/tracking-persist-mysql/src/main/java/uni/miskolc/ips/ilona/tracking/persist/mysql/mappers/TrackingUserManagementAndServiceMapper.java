@@ -7,7 +7,7 @@ import uni.miskolc.ips.ilona.measurement.model.position.Position;
 import uni.miskolc.ips.ilona.tracking.model.database.DatabaseDeviceDatas;
 import uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas;
 import uni.miskolc.ips.ilona.tracking.persist.exception.DatabaseProblemException;
-import uni.miskolc.ips.ilona.tracking.persist.exception.UserAlreadyExists;
+import uni.miskolc.ips.ilona.tracking.persist.exception.UserAlreadyExistsException;
 import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
 
 public interface TrackingUserManagementAndServiceMapper {
@@ -19,7 +19,7 @@ public interface TrackingUserManagementAndServiceMapper {
 	/**
 	 * 
 	 * @param userdata
-	 * @throws UserAlreadyExists
+	 * @throws UserAlreadyExistsException
 	 */
 	int createUser(DatabaseUserDatas userdata);
 

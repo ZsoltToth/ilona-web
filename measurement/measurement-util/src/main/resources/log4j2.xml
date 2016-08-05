@@ -55,6 +55,12 @@
 			<AppenderRef ref="MODEL_LOG_FILE" />
 		</Logger>
 		
+		<Logger name="uni.miskolc.ips.ilona.tracking.controller" level="info">
+			<AppenderRef ref="STDOUT" />
+			<AppenderRef ref="ALL_LOGS_FILE" />
+			<AppenderRef ref="ControllerLogFile" />
+		</Logger>
+		
 		<Root level= "info" >
 			<AppenderRef ref="ALL_LOGS_FILE" level="error"/>
 			<AppenderRef ref="STDOUT" level="warn" />

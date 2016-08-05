@@ -7,8 +7,6 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Date;
 
-import uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData;
-
 /**
  * 
  * @author Patrik / A5USL0
@@ -255,9 +253,9 @@ public final class DatabaseUserDatas implements Comparable<DatabaseUserDatas> {
 		return true;
 	}
 
-	public TrackingLoginUserData createShallowCopy() {
+	public DatabaseUserDatas createShallowCopy() {
 		try {
-			return (TrackingLoginUserData) this.clone();
+			return (DatabaseUserDatas) this.clone();
 		} catch (CloneNotSupportedException e) {
 			return null;
 		}

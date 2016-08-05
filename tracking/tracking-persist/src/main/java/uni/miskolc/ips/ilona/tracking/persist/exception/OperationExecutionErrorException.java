@@ -14,8 +14,12 @@ public class OperationExecutionErrorException extends TrackingDAOException {
 	public OperationExecutionErrorException(String message) {
 		super(message);
 	}
+	
+	public OperationExecutionErrorException(Throwable cause) {
+		super(cause);
+	}
 
-	public OperationExecutionErrorException(String message, Throwable exception) {
-		super(exception, message);
+	public OperationExecutionErrorException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }

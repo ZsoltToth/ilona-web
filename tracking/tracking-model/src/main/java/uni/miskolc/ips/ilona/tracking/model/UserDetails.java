@@ -177,9 +177,9 @@ public class UserDetails implements Serializable, Cloneable {
 	 * 
 	 * @return The shallow copied verison of the current object.
 	 */
-	public TrackingLoginUserData createShallowCopy() {
+	public UserDetails createShallowCopy() {
 		try {
-			return (TrackingLoginUserData) this.clone();
+			return (UserDetails) this.clone();
 		} catch (CloneNotSupportedException e) {
 			return null;
 		}

@@ -16,10 +16,9 @@ import org.apache.logging.log4j.Logger;
 
 import uni.miskolc.ips.ilona.tracking.model.database.DatabaseDeviceDatas;
 import uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas;
-import uni.miskolc.ips.ilona.tracking.persist.TrackingUserManagementAndTrackingServiceDAO;
 import uni.miskolc.ips.ilona.tracking.persist.exception.DatabaseProblemException;
 import uni.miskolc.ips.ilona.tracking.persist.exception.OperationExecutionErrorException;
-import uni.miskolc.ips.ilona.tracking.persist.exception.UserAlreadyExists;
+import uni.miskolc.ips.ilona.tracking.persist.exception.UserAlreadyExistsException;
 import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
 import uni.miskolc.ips.ilona.tracking.persist.mysql.mappers.TrackingUserManagementAndServiceMapper;
 
@@ -28,8 +27,7 @@ import uni.miskolc.ips.ilona.tracking.persist.mysql.mappers.TrackingUserManageme
  * @author Patrik / A5USL0
  *
  */
-public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
-		implements TrackingUserManagementAndTrackingServiceDAO {
+public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation {
 
 	private static Logger logger = LogManager
 			.getLogger(MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation.class);
@@ -57,8 +55,8 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 		this.sessionFactory = (new SqlSessionFactoryBuilder()).build(inputStream, props);
 	}
 
-	@Override
-	public void createUser(DatabaseUserDatas userdata) throws UserAlreadyExists, OperationExecutionErrorException {
+	public void createUser(DatabaseUserDatas userdata)
+			throws UserAlreadyExistsException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		try {
 			TrackingUserManagementAndServiceMapper mapper = session
@@ -73,7 +71,6 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 
 	}
 
-	@Override
 	public DatabaseUserDatas getUser(String userid) throws UserNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		DatabaseUserDatas data = null;
@@ -89,7 +86,6 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 		return data;
 	}
 
-	@Override
 	public Collection<DatabaseUserDatas> getAllUsers()
 			throws DatabaseProblemException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
@@ -106,7 +102,6 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 		return users;
 	}
 
-	@Override
 	public void updateUser(DatabaseUserDatas userdata) throws UserNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		try {
@@ -121,7 +116,6 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 		}
 	}
 
-	@Override
 	public void deleteUser(String userid) throws UserNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		try {
@@ -137,7 +131,6 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 
 	}
 
-	@Override
 	public void storeDevice(DatabaseDeviceDatas deviceData) {
 		SqlSession session = sessionFactory.openSession();
 		try {
@@ -153,7 +146,6 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 
 	}
 
-	@Override
 	public Collection<DatabaseDeviceDatas> getDeviceByUserid(String userid) {
 		SqlSession session = sessionFactory.openSession();
 		Collection<DatabaseDeviceDatas> devices = new ArrayList<DatabaseDeviceDatas>();
@@ -169,7 +161,6 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 		return devices;
 	}
 
-	@Override
 	public Collection<DatabaseDeviceDatas> getAllDevices() {
 		SqlSession session = sessionFactory.openSession();
 		Collection<DatabaseDeviceDatas> devices = new ArrayList<DatabaseDeviceDatas>();
@@ -185,7 +176,6 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 		return devices;
 	}
 
-	@Override
 	public void updateDevice(DatabaseDeviceDatas device) {
 		SqlSession session = sessionFactory.openSession();
 		try {
@@ -201,7 +191,6 @@ public class MySqlAndMybatisTrackingUserAndTrackingServiceDAOImplementation
 
 	}
 
-	@Override
 	public void deleteDevice(DatabaseDeviceDatas device) {
 		SqlSession session = sessionFactory.openSession();
 		try {

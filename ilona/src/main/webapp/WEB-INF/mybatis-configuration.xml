@@ -30,12 +30,10 @@
 			type="uni.miskolc.ips.ilona.measurement.persist.mappers.typehandlers.UUIDTypeHandler" />
 		<typeAlias alias="BooleanToIntHander"
 			type="uni.miskolc.ips.ilona.tracking.persist.mysql.typehandlers.BooleanToFromTinyintTypeHandler" />
-		<typeAlias alias="UserDetails"
-			type="uni.miskolc.ips.ilona.tracking.model.UserDetails" />
-		<typeAlias alias="TrackingUserDatas"
-			type="uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas" />
-		<typeAlias alias="DatabaseDevice"
-			type="uni.miskolc.ips.ilona.tracking.model.database.DatabaseDeviceDatas" />
+		<typeAlias alias="UserData"
+			type="uni.miskolc.ips.ilona.tracking.model.UserData" />
+		<typeAlias alias="DeviceData"
+			type="uni.miskolc.ips.ilona.tracking.model.DeviceData" />
 	</typeAliases>
 
 	<typeHandlers>
@@ -70,7 +68,7 @@
 		<mapper
 			resource="uni/miskolc/ips/ilona/measurement/persist/mappers/MeasurementMapper.xml" />
 		<mapper
-			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/mappers/TrackingUserManagementAndServiceMapper.xml" />
+			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/mappers/UserAndDeviceMapper.xml" />
 
 
 

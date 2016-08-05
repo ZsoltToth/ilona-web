@@ -22,7 +22,7 @@ import uni.miskolc.ips.ilona.tracking.service.TrackingUserManagementAndTrackingS
 @RequestMapping(value = "/tracking")
 public class TrackingAdminpageController {
 
-	@Autowired
+	//@Autowired
 	TrackingUserManagementAndTrackingService service;
 	
 	

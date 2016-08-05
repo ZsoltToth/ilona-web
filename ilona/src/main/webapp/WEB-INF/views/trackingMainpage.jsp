@@ -7,6 +7,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <title>ILONA - Tracking Login Page</title>
+
+<!-- CSRF Protection token -->
+<meta name="_csrf" content="${_csrf.token}"/>
+	<!-- default header name is X-CSRF-TOKEN -->
+<meta name="_csrf_header" content="${_csrf.headerName}"/>
 <meta charset="UTF-8">
 <meta name="description"
 	content="University of Miskolc ILONA Indoor Positioning System.">

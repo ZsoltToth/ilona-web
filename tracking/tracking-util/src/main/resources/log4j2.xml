@@ -1,4 +1,5 @@
-<Configuration>
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="http://logging.apache.org/log4j/2.0/config">
 	<Appenders>
 		<Console name="STDOUT">
 			<PatternLayout
@@ -51,8 +52,8 @@
 			<AppenderRef ref="ServiceLogFile" />
 		</Logger>
 		<Root level="WARN">
-			<AppenderRef ref="ALL_LOGS_FILE" level="error" />
-			<AppenderRef ref="STDOUT" level="warn" />
+			<AppenderRef ref="ALL_LOGS_FILE" level="info" />
+			<AppenderRef ref="STDOUT" level="info" />
 		</Root>
 	</Loggers>
 </Configuration>

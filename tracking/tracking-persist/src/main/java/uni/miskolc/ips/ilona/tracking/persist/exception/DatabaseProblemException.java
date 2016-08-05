@@ -1,6 +1,6 @@
 package uni.miskolc.ips.ilona.tracking.persist.exception;
 
-public class DatabaseProblemException extends TrackingDAOException {
+public class DatabaseProblemException extends OperationExecutionErrorException {
 
 	/**
 	 * 
@@ -15,8 +15,12 @@ public class DatabaseProblemException extends TrackingDAOException {
 		super(message);
 	}
 	
-	public DatabaseProblemException(String message, Throwable exception) {
-		super(exception, message);
+	public DatabaseProblemException(Throwable cause) {
+		super(cause);
+	}
+	
+	public DatabaseProblemException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 }

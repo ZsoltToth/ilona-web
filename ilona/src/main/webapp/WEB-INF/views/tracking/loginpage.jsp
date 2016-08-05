@@ -7,10 +7,6 @@
 <%@page session="true"%>
 <%@ page isELIgnored="false"%>
 
-<!-- CSRF Protection token -->
-<meta name="_csrf" content="${_csrf.token}"/>
-	<!-- default header name is X-CSRF-TOKEN -->
-<meta name="_csrf_header" content="${_csrf.headerName}"/>
 
 <script type="text/javascript">
 	
@@ -25,13 +21,13 @@
 
 		$("#trackingLoginpageLoginbutton").click(function() {
 			$("#errorContent").html("");
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
+			//var token = $("meta[name='_csrf']").attr("content");
+			//var header = $("meta[name='_csrf_header']").attr("content");
 			$.ajax({
 				async : true,
 				type : "POST",
 				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
+					//xhr.setRequestHeader(header, token);
 				},
 				data : {
 					userid : $("#trackingLoginpageUseridInput").val(),

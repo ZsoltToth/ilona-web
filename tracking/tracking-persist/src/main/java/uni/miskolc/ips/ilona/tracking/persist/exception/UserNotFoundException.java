@@ -1,6 +1,6 @@
 package uni.miskolc.ips.ilona.tracking.persist.exception;
 
-public class UserNotFoundException extends TrackingDAOException {
+public class UserNotFoundException extends UserDAOException {
 
 	/**
 	 * 
@@ -8,14 +8,18 @@ public class UserNotFoundException extends TrackingDAOException {
 	private static final long serialVersionUID = -712157348319823447L;
 
 	public UserNotFoundException() {
-		
+
 	}
-	
+
 	public UserNotFoundException(String message) {
 		super(message);
 	}
-	
-	public UserNotFoundException(String message, Throwable exception) {
-		super(exception, message);
+
+	public UserNotFoundException(Throwable cause) {
+		super(cause);
+	}
+
+	public UserNotFoundException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }

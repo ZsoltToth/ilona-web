@@ -2,7 +2,10 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ page isELIgnored="true"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
+<%@ page session="true"%>
+<%@ page isELIgnored="false"%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -21,17 +24,17 @@
 <link href="css/layout.css" rel="stylesheet"/>
 -->
 <!-- Bootstrap core CSS -->
-<link href="css/bootstrap.css" rel="stylesheet"/>
+<link href="css/bootstrap.css" rel="stylesheet" />
 <!-- Custom styles for this template -->
 <!-- 
 <link href="css/layout.css" rel="stylesheet"/>
 -->
 <!-- Font-Awesome -->
-<link href="css/font-awesome.min.css" rel="stylesheet"/>
+<link href="css/font-awesome.min.css" rel="stylesheet" />
 <!-- Metis Menu -->
-<link href="css/metisMenu.min.css" rel="stylesheet"/>
+<link href="css/metisMenu.min.css" rel="stylesheet" />
 <!-- SB2 Admin css -->
-<link href="css/sb-admin-2.css" rel="stylesheet"/>
+<link href="css/sb-admin-2.css" rel="stylesheet" />
 
 <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -89,12 +92,35 @@
 		 */
 		$('#trackingMainContent').click(function(event) {
 			event.preventDefault();
-			$.get($(this).attr('href'), function(data) {
-				$('#page-wrapper').html(data);
+			//var token = $("meta[name='_csrf']").attr("content");
+			//var header = $("meta[name='_csrf_header']").attr("content");
+			//alert("működik eleje!");
+			$.ajax({
+				type : "GET",
+				async : true,
+				beforeSend : function(xhr) {
+					//xhr.setRequestHeader(header, token);
+				},
+				url : $("#trackingMainContent").attr("href"),
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					$("#page-wrapper").html(xhr.responseText);
+				}
 			});
+
+			/*
+			$.get($(this).attr('href'), function(data) {
+			$('#page-wrapper').html(data);
+			});
+			 */
+			
 		});
-		 $('[data-toggle="tooltip"]').tooltip();
-		 $('[data-toggle="popover"]').popover(); 
+		
+		
+		$('[data-toggle="tooltip"]').tooltip();
+		$('[data-toggle="popover"]').popover();
 	});
 </script>
 
@@ -180,9 +206,9 @@
 							</ul> <!-- /.nav-second-level --></li>
 
 						<!-- Tracking menu element! fa fa-dashboard fa-fw-->
-						<li><a href="<c:url value='/tracking/maincontent'/>"
-							id="trackingMainContent"><i class="fa fa-code-fork ">
-									</i> Tracking </a></li>
+						<li><a href="<c:url value='/tracking/maincontentdecision'/>"
+							id="trackingMainContent"><i class="fa fa-code-fork "> </i>
+								Tracking </a></li>
 					</ul>
 				</div>
 				<!-- /.sidebar-collapse -->

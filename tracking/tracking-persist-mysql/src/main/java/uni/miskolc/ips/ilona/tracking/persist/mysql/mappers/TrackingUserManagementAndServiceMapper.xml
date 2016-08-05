@@ -51,7 +51,7 @@
 			javaType="String" jdbcType="VARCHAR" />
 	</resultMap>
 
-	<insert id="createUser" parameterType="TrackingUserDatas">
+	<insert id="createUserBaseData" parameterType="TrackingUserDatas">
 		insert into Trackingusers
 		values(#{userid}, #{username}, #{email}, #{password}, #{enabled,
 		typeHandler = BooleanToIntHander}, );

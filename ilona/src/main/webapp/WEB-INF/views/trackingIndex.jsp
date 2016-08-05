@@ -2,27 +2,50 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@page session="false"%>
-<%@ page isELIgnored="false" %>
+<%@ page isELIgnored="false"%>
 
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-<title>ILONA Tracking login page</title>
-<meta charset="UTF-8">
-<meta name="description" content="University of Miskolc ILONA Indoor Positioning System.">
-<meta name="keywords" content="HTML,CSS,XML,JavaScript, jsp, springmvc">
-<meta name="author" content="Patryk / a5usl0">
-<link rel="stylesheet" href="css/bootstrap.css">
-</head>
-<body>
 
+<!-- CSRF Protection token -->
+<meta name="_csrf" content="${_csrf.token}" />
+<!-- default header name is X-CSRF-TOKEN -->
+<meta name="_csrf_header" content="${_csrf.headerName}" />
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#send").click(function(event) {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				type : "POST",
+				async : true,
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : {
+					username : $("#username11").val(),
+					password : $("#password11").val(),
+				},
+				url : "<c:url value='/login'/>",
+				success : function(result, status, xhr) {
+
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					alert("hiba!!" + error + status);
+				}
+			});
+		});
+	});
+</script>
+
+<div>
 	<h1>ILONA Tracking module login page</h1>
 	<br />
 	<h2>Logging or registering</h2>
 	<br />
-	<p th:text>${message}</p>
 	<c:url value="" var="loginUrl" />
-	<form action="<c:url value='/login'/>" method="post">
+	<form action="<c:url value='/login'/>" method="post" id="form1">
 		<c:if test="${param.error != null}">
 			<p>Invalid username and password.</p>
 		</c:if>
@@ -31,18 +54,19 @@
 		</c:if>
 		<p>
 			<label for="username">Username</label> <input type="text"
-				id="username" name="username" />
+				id="username11" name="username" />
 		</p>
 		<p>
 			<label for="password">Password</label> <input type="password"
-				id="password" name="password" />
+				id="password11" name="password" />
 		</p>
 		<input type="hidden" name="${_csrf.parameterName}"
 			value="${_csrf.token}" />
-		<button type="submit" class="btn">Log in</button>
+
 	</form>
+
+	<input type="button" id="send" class="btn" width="300" height="100">LOGIN
 	<p>
 		<a href="tracking/registration" target="_self">Registration</a>
 	</p>
-</body>
-</html>
+</div>

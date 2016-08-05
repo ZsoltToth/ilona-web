@@ -10,7 +10,29 @@ package uni.miskolc.ips.ilona.tracking.util;
  * @author Patrik / A5USl0
  *
  */
+@Szalbiztossag
 public class TrackingModuleCentralManager {
+	
+	/*
+	 * Ezt az egész osztályt több szálból is elérik, bár egy szerű doglokat tartalmaz
+	 * Szálbiztosság tétel.
+	 * 
+	 */
+	
+	// szálbiztosság!!
+	@Szalbiztossag
+	public static void setNonExpiredState() {
+		synchronized (TrackingModuleCentralManager.class) {
+			
+		}
+	}
+	
+	/*
+	 * user bejelentkezett és az admin megváltoztatta az adatait, akkor frissüljön a user is?
+	 * kéne egy lista, amibe bele lehet tenni az adatokat és onnan kivenné a user
+	 * dátum alapján a változtatás és így csak akkor frissíti, ha a bejelentkezés hamarabbi, mint a változtatás
+	 * Map<String,Date> => Map<userid, módosítás dátuma>
+	 */
 	
 	/*
 	 * Mióta nem jelenetkezett be valaki, account expired engedélyezése és tiltása

@@ -13,9 +13,9 @@
 <head>
 
 <!-- CSRF Protection token -->
-<meta name="_csrf" content="${_csrf.token}"/>
-	<!-- default header name is X-CSRF-TOKEN -->
-<meta name="_csrf_header" content="${_csrf.headerName}"/>
+<meta name="_csrf" content="${_csrf.token}" />
+<!-- default header name is X-CSRF-TOKEN -->
+<meta name="_csrf_header" content="${_csrf.headerName}" />
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Tracking module</title>
@@ -52,14 +52,36 @@
 
 <script type="text/javascript">
 
+	$(document).ready(function() {
+		
+	
+	
 	/*
 		Get the login page content in the place of the changing content.
 	 */
 	$('#navbarLoginpage').click(function(event) {
 		event.preventDefault();
-		$.get($(this).attr('href'), function(data, status) {
-			$('#actual-content').html(data);
-		});
+		//$.post($(this).attr('href'), function(data, status) {
+			//$('#actual-content').html(data);
+		//});
+
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				type : "POST",
+				async : true,
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				url : $("#navbarLoginpage").attr('href'),
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result + status);
+				},
+				error : function(xhr, status, error) {
+					$("#page-wrapper").html(xhr.responseText + error);
+				}
+			});
+
 	});
 
 	/*
@@ -67,13 +89,14 @@
 	 */
 	$('#navbarHome').click(function(event) {
 		event.preventDefault();
-		$.get($(this).attr('href'), function(data, status) {
+		$.post($(this).attr('href'), function(data, status) {
 			/*
 				The page-wrapper is in the index.jsp.
 				This is the id(div) of the actual page content.
 			 */
 			$('#page-wrapper').html(data);
 		});
+	});
 	});
 </script>
 

@@ -120,7 +120,7 @@
 					<h2>User sending</h2>
 
 					<form action="<c:url value='/tracking/probalgatasok'/>"
-						method="POST" id="createUserForm" accept-charset="ISO-8859-1">
+						method="POST" id="createUserForm" >
 						<input type="text" id="uncu" name="userid" width="300"
 							value="${userid}"> Userid <br /> <input type="text"
 							name="username" value="${username}"> Username <br /> <input

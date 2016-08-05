@@ -20,7 +20,11 @@ public class TrackingDAOException extends Exception {
 		super(message);
 	}
 	
-	public TrackingDAOException(Throwable exception, String message) {
-		super(message, exception);
+	public TrackingDAOException(Throwable cause) {
+		super(cause);
+	}
+	
+	public TrackingDAOException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }
