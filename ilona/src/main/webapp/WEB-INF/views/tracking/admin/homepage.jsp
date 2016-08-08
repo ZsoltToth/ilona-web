@@ -6,19 +6,21 @@
 <%@page session="true"%>
 <%@ page isELIgnored="false"%>
 
+<script type="text/javascript">
+	$('[data-toggle="tooltip"]').tooltip();
+	$('[data-toggle="popover"]').popover();
+</script>
 
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<jsp:directive.include file="adminNavbar.jsp" />
 
-</head>
 
 <div class="col-lg-12">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h3 class="panel-title">Admin Settings</h3>
+			<h3 class="panel-title">Admin main content heading!</h3>
 		</div>
 		<div class="panel-body">
-			
+			<h3 class="panel-title">Admin main content content!</h3>
 		</div>
 	</div>
 </div>

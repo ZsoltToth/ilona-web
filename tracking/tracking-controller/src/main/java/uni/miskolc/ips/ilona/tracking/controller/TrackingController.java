@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,6 @@ import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.model.UserDetails;
 import uni.miskolc.ips.ilona.tracking.persist.UserAndDeviceDAO;
-
 /**
  * Tracking module
  * 
@@ -123,7 +124,7 @@ public class TrackingController {
 	 * "  password: " + password + "  enabled:" + enabled); return new
 	 * ModelAndView(""); }
 	 */
-	@RequestMapping(value = "/createuser", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(value = "/createuser1", method = { RequestMethod.GET, RequestMethod.POST })
 	@ResponseBody
 	public List<UserDetails> userCreateProcess(@RequestParam(value = "roleadmin", required = false) String roleadmin,
 			Model model, @ModelAttribute UserDetails user1) {

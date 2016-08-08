@@ -16,13 +16,13 @@
 		$('#navbarLoginpage').click(function(event) {
 			event.preventDefault();
 			
-			//var token = $("meta[name='_csrf']").attr("content");
-			//var header = $("meta[name='_csrf_header']").attr("content");
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
 			$.ajax({
 				type : "POST",
 				async : true,
 				beforeSend : function(xhr) {
-					//xhr.setRequestHeader(header, token);
+					xhr.setRequestHeader(header, token);
 				},
 				url : $("#navbarLoginpage").attr('href'),
 				success : function(result, status, xhr) {
@@ -39,13 +39,13 @@
 		 */
 		$('#navbarHome').click(function(event) {
 			event.preventDefault();
-			//var token = $("meta[name='_csrf']").attr("content");
-			//var header = $("meta[name='_csrf_header']").attr("content");
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
 			$.ajax({
 				type : "POST",
 				async : true,
 				beforeSend : function(xhr) {
-					//xhr.setRequestHeader(header, token);
+					xhr.setRequestHeader(header, token);
 				},
 				url : $("#navbarHome").attr('href'),
 				success : function(result, status, xhr) {
@@ -59,14 +59,14 @@
 
 		$("#navbarSignuppage").click(function(event) {
 			event.preventDefault();
-			//var token = $("meta[name='_csrf']").attr("content");
-			//var header = $("meta[name='_csrf_header']").attr("content");
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
 			$.ajax({
 				type : "POST",
 				async : true,
 				url : $("#navbarSignuppage").attr("href"),
 				beforeSend : function(xhr) {
-					//xhr.setRequestHeader(header, token);
+					xhr.setRequestHeader(header, token);
 				},
 				success : function(result, status, xhr) {
 					$("#page-wrapper").html(result);

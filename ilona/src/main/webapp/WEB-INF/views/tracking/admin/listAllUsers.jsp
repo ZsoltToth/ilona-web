@@ -6,8 +6,6 @@
 <%@page session="true"%>
 <%@ page isELIgnored="false"%>
 
-<head>
-
 <!-- CSRF Protection token -->
 <meta name="_csrf" content="${_csrf.token}"/>
 <!-- default header name is X-CSRF-TOKEN -->
@@ -84,10 +82,9 @@
 		
 	});
 	
-	
-	
 </script>
-</head>
+
+<jsp:directive.include file="adminNavbar.jsp" />
 
 <div class="row">
 	<div class="col-lg-12">

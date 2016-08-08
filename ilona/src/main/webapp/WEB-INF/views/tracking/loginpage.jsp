@@ -7,10 +7,14 @@
 <%@page session="true"%>
 <%@ page isELIgnored="false"%>
 
+<!-- CSRF Protection token -->
+<meta name="_csrf" content="${_csrf.token}"/>
+	<!-- default header name is X-CSRF-TOKEN -->
+<meta name="_csrf_header" content="${_csrf.headerName}"/>
 
 <script type="text/javascript">
 	
-	$(document).ready(function() {
+	//$(document).ready(function() {
 		/*
 		 Popover and tooltip initialization in the page.
 		 This two inicialization must be here, because the architect of the page.
@@ -21,71 +25,34 @@
 
 		$("#trackingLoginpageLoginbutton").click(function() {
 			$("#errorContent").html("");
-			//var token = $("meta[name='_csrf']").attr("content");
-			//var header = $("meta[name='_csrf_header']").attr("content");
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
 			$.ajax({
 				async : true,
 				type : "POST",
 				beforeSend : function(xhr) {
-					//xhr.setRequestHeader(header, token);
+					xhr.setRequestHeader(header, token);
 				},
 				data : {
-					userid : $("#trackingLoginpageUseridInput").val(),
+					username : $("#trackingLoginpageUseridInput").val(),
 					password : $("#trackingLoginpagePasswordInput").val()
 				},
 				url : $("#trackingLoginpageLoginform").attr('action'),
 				timeout : 10000,
 				error : function(xhr, status, error) {
-					$("#errorContent").html(xhr.responseText);
+					$("#errorContent").html(xhr.responseText + status + error);
 				},
 				success : function(result, status, xhr) {
 					$("#page-wrapper").html(result);
 				}
 			});
 		});
-	});
+	//});
 
-	/*
-	 * Login form validation and request sending to the server and error handling.
-	 */
-
-	/*
-	 function sendDataa() {
-	 $.get(<c:url value="tracking/baseAuthenticate"></c:url>,
-	 {
-	 userid: ${"#loginUserid"}.val(),
-	 password: ${"#loginUserid"}.val()		
-	 }, function(data, status){
-	 $('#page-wrapper').html(data);
-	 });	
-	 };
-	 */
-	/*
-	$("#gomb").click(function(){
-		alert("dsdasdas");
-		$.get($("#loginForm").attr('value'),
-			{
-				userid: ${'#loginUserid'}.val(),
-				password: ${'#loginUserid'}.val()		
-			}, function(data){
-				$('#page-wrapper').html(data);
-			});
-	});
-	 */
-	/*
-	$("#loginForm").submit(function(event) {
-		event.preventDefault();
-		$.get($(this).attr('action'),
-				{
-					userid : ${'#loginUserid'}.val(),
-					password : ${'#loginUserid'}.val()		
-				}
-				,function(data) {
-			$('#actual-content').html(data);
-		});
-	});
-	 */
+	
 </script>
+
+<jsp:directive.include file="mainpageNavbar.jsp" />
 
 <div class="col-lg-12">
 	<div class="panel panel-default">
@@ -94,7 +61,7 @@
 		</div>
 		<div class="panel-body">
 			<form role="form" id="trackingLoginpageLoginform"
-				action="<c:url value='tracking/baseAuthenticate'></c:url>">
+				action="<c:url value='/tracking/processlogin'></c:url>">
 				
 				<label for="trackingLoginpageUseridInput">Userid:
 					<span data-toggle="popover"
@@ -147,10 +114,9 @@
 
 <div class="row">
 	<div class="col-lg-12" id="errorContent">
-
+		<p>${error}</p>
 	</div>
 </div>
-
 
 
 

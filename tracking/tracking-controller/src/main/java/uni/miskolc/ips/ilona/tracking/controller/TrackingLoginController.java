@@ -1,6 +1,5 @@
 package uni.miskolc.ips.ilona.tracking.controller;
 
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -8,7 +7,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.HttpServletBean;
 import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.controller.exception.LoginpageInvalidLoginException;
@@ -31,7 +29,7 @@ public class TrackingLoginController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/baseAuthenticate", method = { RequestMethod.GET, RequestMethod.POST })
+	@RequestMapping(value = "/login111", method = { RequestMethod.GET, RequestMethod.POST })
 	public ModelAndView authenticateWithUsernameAndPasswordWithForm(
 			@ModelAttribute(name = "logindata") UsernameAndPasswordLoginData logindata) {
 

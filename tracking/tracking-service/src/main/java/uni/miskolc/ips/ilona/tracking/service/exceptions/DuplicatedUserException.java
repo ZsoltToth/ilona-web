@@ -1,21 +1,26 @@
 package uni.miskolc.ips.ilona.tracking.service.exceptions;
 
-public class DuplicatedUserException extends LoginException {
+public class DuplicatedUserException extends UserServiceException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 949255637855967995L;
+	private static final long serialVersionUID = 1L;
 
 	public DuplicatedUserException() {
 		super();
 	}
-	
+
 	public DuplicatedUserException(String message) {
 		super(message);
 	}
-	
-	public DuplicatedUserException(String message, Exception ex) {
-		super(message, ex);
+
+	public DuplicatedUserException(Throwable cause) {
+		super(cause);
 	}
+
+	public DuplicatedUserException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

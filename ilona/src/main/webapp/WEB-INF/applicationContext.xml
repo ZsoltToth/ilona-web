@@ -118,6 +118,22 @@
  		<constructor-arg ref="trackingUserAndTrackingDAO"></constructor-arg>
  	</bean>
   -->
+  
+  	<!-- 
+  	<bean id="trackingCenterManager" 
+  		class="uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager"
+  		init-method="init">
+  		
+  	</bean>
+ 	--> 
+ 	 	
+  	<bean id="UserAndDeviceService" class="uni.miskolc.ips.ilona.tracking.service.impl.UserAndDeviceServiceImpl"
+  		depends-on="trackingUserAndDeviceDAO">
+  		<constructor-arg>
+  			<ref bean="trackingUserAndDeviceDAO"/>
+  		</constructor-arg>
+  	</bean>
+  	
  	<bean id="trackingUserAndDeviceDAO"
 		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySqlAndMybatisUserAndDeviceDAOImplementation">
 		<constructor-arg name="configFilePath" value="${mybatisConfig}" />

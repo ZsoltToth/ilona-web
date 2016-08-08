@@ -35,10 +35,14 @@
 		<intercept-url pattern="/tracking/getmainpagesignup" access="permitAll"/>
 		<intercept-url pattern="/tracking/getmainpagehome" access="permitAll"/>
 		<intercept-url pattern="/tracking/getloginpage" access="permitAll"/>
+		<intercept-url pattern="/tracking/createuser" access="permitAll"/>
 		<intercept-url pattern="/tracking/login" access="permitAll"/> 
 		<intercept-url pattern="/tracking/index" access="permitAll"/>
 		 
 		 <!-- ######################################################################### -->
+		 
+		<intercept-url pattern="/tracking/admin/**" access="hasRole('ROLE_ADMIN')"/>
+		<intercept-url pattern="/tracking/user/**" access="hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')"/>
 		
 		<intercept-url pattern="/tracking/**"
 			access="hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')" />
@@ -46,13 +50,17 @@
 		
 		<form-login login-page="/tracking/getloginpage"
 			default-target-url="/tracking/maincontentdecision"
-			always-use-default-target="true"
+			always-use-default-target="true"		
 			authentication-failure-url="/tracking/getloginpage?error=loginerror"
 			username-parameter="username"
-			password-parameter="password" />
-			
+			password-parameter="password"
+			login-processing-url="/tracking/processlogin"			
+		/>
+		
+		<!-- 
 		<access-denied-handler
 			error-page="/tracking/index?accesserror" />
+		-->
 			
 		<logout invalidate-session="true"
 			delete-cookies="JSESSIONID"

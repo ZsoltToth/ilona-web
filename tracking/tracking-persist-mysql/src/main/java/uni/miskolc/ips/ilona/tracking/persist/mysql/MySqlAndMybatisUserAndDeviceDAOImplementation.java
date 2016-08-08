@@ -26,7 +26,7 @@ import uni.miskolc.ips.ilona.tracking.persist.mysql.mappers.UserAndDeviceMapper;
 
 public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDeviceDAO {
 
-	SqlSessionFactory sessionFactory;
+	private SqlSessionFactory sessionFactory;
 
 	/*
 	 * !! SECURITY LAYER AMI AZ EGYES IGAZOLTATÁSOKAT VÉGEZNÉ MÉG MIELŐTT
@@ -63,7 +63,7 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 		try {
 			UserAndDeviceMapper mapper = session.getMapper(UserAndDeviceMapper.class);
 			mapper.createUserBaseData(user);
-			mapper.eraseUserRoles(user.getUserid());
+			//mapper.eraseUserRoles(user.getUserid());
 			mapper.createUserRoles(user);
 			// mapper.storeLoginAttempts(user); // még ránézni
 			session.commit();
@@ -88,7 +88,7 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			user.setRoles(mapper.getUserRoles(userid));
 
 			user.setBadLogins(mapper.readLoginAttempts(userid));
-			user.setDevices(mapper.getUserDevices(user));
+			//user.setDevices(mapper.getUserDevices(user));
 			// mapper.deleteLoginAttempts(userid, new Date());
 			// session.commit();
 			// Map<String, String> roles = mapper.getAllUsersRoles();
@@ -115,7 +115,7 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			for (UserData user : users) {
 				user.setRoles(mapper.getUserRoles(user.getUserid()));
 				user.setBadLogins(mapper.readLoginAttempts(user.getUserid()));
-				user.setDevices(mapper.getUserDevices(user));
+				//user.setDevices(mapper.getUserDevices(user));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

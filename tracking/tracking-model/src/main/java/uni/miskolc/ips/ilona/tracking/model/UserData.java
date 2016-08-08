@@ -47,7 +47,7 @@ public class UserData {
 	/**
 	 * ROLE_USER, ROLE_ADMIN stb.
 	 */
-	Collection<String> roles;
+	private Collection<String> roles;
 
 	/**
 	 * Utolsó belépési dátum => hosszú idő óta nem lépett be => lejárt account
@@ -73,12 +73,12 @@ public class UserData {
 	/**
 	 * Hibás bejelentkezések
 	 */
-	Collection<Date> badLogins;
+	private Collection<Date> badLogins;
 
 	/**
 	 * Eszközök az adott felhasználóhoz.
 	 */
-	Collection<DeviceData> devices;
+	private Collection<DeviceData> devices;
 
 	public UserData() {
 

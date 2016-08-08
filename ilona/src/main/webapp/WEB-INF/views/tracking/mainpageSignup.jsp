@@ -12,7 +12,7 @@
 	<!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
 
-<jsp:directive.include file="mainpageNavbar.jsp" />
+
 
 <script type="text/javascript">
 	/*
@@ -27,9 +27,9 @@
 		event.preventDefault();
 		$("#signupErrors").html("");
 		var hadError = 0;
-		
-		var userid = document.getElementById("useridInput");	
 		var errorText = "";
+		
+		var userid = document.getElementById("useridInput");			
 		if (userid.checkValidity() == false) {
 			errorText += "<p class='text-danger bg-primary'>Invalid userid!</p>";
 			
@@ -46,14 +46,17 @@
 		var password2 = document.getElementById("passwordInput2");
 		if (password1.checkValidity() == false) {
 			errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
+			hadError = 1;
 		}
 		if ( password1.value != password2.value) {
 			errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
+			hadError = 1;
 		}
 		
 		var email = document.getElementById("emailInput");
 		if(email.checkValidity()  == false) {
 			errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
+			hadError = 1;
 		}
 		
 		if (Boolean(hadError) == true) {
@@ -64,7 +67,7 @@
 			$.ajax({
 				type : "POST",
 				async : true,
-				url : "?",
+				url : "<c:url value='/tracking/registeruser'></c:url>",
 				beforeSend : function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
@@ -75,10 +78,10 @@
 					email : $("#emailInput").val(),
 				},
 				success : function(result, status, xhr) {
-					
+					$("#page-wrapper").html(result);
 				},
 				error : function(xhr, status, error) {
-					
+					$("#page-wrapper").html(xhr.responseText);
 				}
 			});
 		}	
@@ -88,6 +91,9 @@
 </script>
 
 <div class="col-lg-12">
+
+	<jsp:directive.include file="mainpageNavbar.jsp" />
+	
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3 class="panel-title">ILONA - Tracking module user sign up!</h3>
@@ -99,10 +105,8 @@
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
-						data-content="<b>The userid maximum length is 20 characters!</b><br><br><b>The minimum length is 5 characters</b>
-						<br><br>The userid must <b>start with</b> a letter <b>a-z or A-Z</b> <br><br> after that can contain the following symbols: a-z, A-Z, 0-9
-						<br><br> Example: good: a11gbs111s bad: 1das2, because it starts with a number!"
-						title="The userid pattern can contain the following elements:"
+						data-content="${useridRestriction}"
+						title="The userid can contain the following elements:"
 						class="fa  fa-info-circle">
 					</span>
 				</label>
@@ -113,17 +117,15 @@
 					required="required"
 					placeholder="Please type in your userid!"
 					maxlength="20"
-					pattern="[a-zA-Z][a-zA-Z0-9]{4,19}"
+					pattern="${useridPattern}"
 					name="userid"> <br />
 					
 				<label for="usernameInput">Username: <br /> For more information:
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
-						data-content="<b>The username maximum length is 20 characters!</b><br><br><b>The minimum length is 5 characters</b>
-						<br><br>The userid must <b>start with</b> a letter <b>a-z or A-Z</b> <br><br> after that can contain the following symbols: a-z, A-Z, 0-9
-						<br><br> and can contain special characters like á é ő ű ú ó ü ö"
-						title="The userid pattern can contain the following elements:"
+						data-content="${usernameRestriction}"
+						title="The username can contain the following elements:"
 						class="fa  fa-info-circle">
 					</span>
 				</label>
@@ -134,14 +136,14 @@
 					required="required"
 					placeholder="Please type in your username!"
 					maxlength="30"
-					name="userid" > <br />
+					pattern="${usernamePattern}"
+					name="username" > <br />
 					
 				<label for="passwordInput1">Password: <br /> For more information:
 					<span data-toggle="popover"
 						data-html="true" 
 						data-trigger="hover"
-						data-content="<b>The password maximum length is 30 characters!</b><br><br><b>The minimum length is 6 characters!</b>
-						<br><br>The password can contain the following elements: <br><br>a-z A-Z ? ! . - _ "
+						data-content="${passwordRestriction}"
 						title="The userid pattern can contain the following elements:"
 						class="fa  fa-info-circle">
 					</span>
@@ -153,7 +155,7 @@
 					required="required"
 					placeholder="Please type in your password!"
 					maxlength="30"
-					pattern="[a-zA-Z0-9,.-_?]{6,30}"
+					pattern="${passwordPattern}"
 					name="password"> <br />
 					
 				<input type="password"
@@ -169,12 +171,12 @@
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
-						data-content="The email address must be a valid address!"
+						data-content="${emailRestriction}"
 						class="fa  fa-info-circle">
 					</span>
 				</label>
 					
-				<input type="text"
+				<input type="email"
 					class="form-control"
 					id="emailInput"
 					required="required"
@@ -182,11 +184,18 @@
 					maxlength="100"
 					name="userid">
 
-			<button id="btnUserCreation" type="button" class="btn">Login</button>			
+			<button id="btnUserCreation" type="button" class="btn">Login</button>
+			
+						
 		</div>
+		
+		<div class="panel panel-default" id="signupErrors">
+		<c:if test="${errors != null }">
+			<c:forEach var="error" items="${errors}" >
+				<p class='text-danger bg-primary'>${error}</p> <br/>
+			</c:forEach>
+		</c:if>
+	</div>
 	</div>
 	
-	<div class="panel panel-default" id="signupErrors">
-	
-	</div>
 </div>
