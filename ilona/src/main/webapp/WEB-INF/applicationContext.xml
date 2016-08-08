@@ -44,6 +44,7 @@
 		<constructor-arg name="database" value="${database.db}" />
 		<constructor-arg name="user" value="${database.user}" />
 		<constructor-arg name="password" value="${database.password}" />
+		<constructor-arg ref="zoneDAO" />
 	</bean>
 	<bean id="measurementDAO"
 		class="uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLMeasurementDAO">
@@ -53,6 +54,7 @@
 		<constructor-arg name="database" value="${database.db}" />
 		<constructor-arg name="user" value="${database.user}" />
 		<constructor-arg name="password" value="${database.password}" />
+		<constructor-arg ref="positionDAO" />
 	</bean>
 
 	<!-- Measurement Services -->
