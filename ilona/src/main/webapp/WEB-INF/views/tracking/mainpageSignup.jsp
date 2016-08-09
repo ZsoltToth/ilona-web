@@ -116,7 +116,6 @@
 					id="useridInput"
 					required="required"
 					placeholder="Please type in your userid!"
-					maxlength="20"
 					pattern="${useridPattern}"
 					name="userid"> <br />
 					
@@ -135,7 +134,6 @@
 					id="usernameInput"
 					required="required"
 					placeholder="Please type in your username!"
-					maxlength="30"
 					pattern="${usernamePattern}"
 					name="username" > <br />
 					
@@ -154,7 +152,6 @@
 					id="passwordInput1"
 					required="required"
 					placeholder="Please type in your password!"
-					maxlength="30"
 					pattern="${passwordPattern}"
 					name="password"> <br />
 					
@@ -163,7 +160,6 @@
 					id="passwordInput2"
 					required="required"
 					placeholder="Please type in your password!"
-					maxlength="30"
 					pattern="[a-zA-Z0-9,.-_?]{6,30}"
 					name="password"> <br />
 					
@@ -181,10 +177,9 @@
 					id="emailInput"
 					required="required"
 					placeholder="Please type in your email address!"
-					maxlength="100"
-					name="userid">
+					name="userid"><br />
 
-			<button id="btnUserCreation" type="button" class="btn">Login</button>
+			<button id="btnUserCreation" type="button" class="btn">Register</button>
 			
 						
 		</div>

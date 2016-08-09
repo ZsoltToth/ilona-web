@@ -13,73 +13,50 @@
 
 <script type="text/javascript">
 	
-	$(document).ready(function(){
-			
-		$(".adminpageListUsersEdit").each(function(){
-			$(this).click(function(event){
-				event.preventDefault();
-				$.ajax({
-					type : "POST",
-					async : true,
-					beforeSend : function(xhr) {
-						xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
-							$("meta[name='_csrf']").attr("content"));
-					},
-					data : {
-						userid :  $(this).attr('href')
-					},
-					success : function(result, status, xhr) {
-						$("#adminMainpageContent").html(result);
-					},
-					error : function(xhr, status, error) {
-						$("#adminMainpageContent").html(error);
-					},
-					url : "<c:url value='/tracking/createusercreationpage'></c:url>"
-				
-				});
-			});
+	$(".deviceList").click(function(event){
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			type : "POST",
+			async : true,
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : $(this).attr('href')
+			},
+			url : "<c:url value='/tracking/admin/listusergetuserdevices'></c:url>",
+			success : function(result, status, xhr) {
+				$("#page-wrapper").html(result);
+			},
+			error : function(xhr, status, error) {
+				alert("error" + status + error);
+			}
 		});
-		
-		$(".adminpageListUsersDelete").each(function(){
-			$(this).click(function(event){
-				event.preventDefault();
-				$.ajax({
-					type : "POST",
-					async : true,
-					beforeSend : function(xhr) {
-						xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
-							$("meta[name='_csrf']").attr("content"));
-					},
-					data : {
-						userid :  $(this).attr('href')
-					},
-					success : function(result, status, xhr) {
-						$("#adminMainpageContent").html(result);
-						//$("#adminMainpageContent").html(result);
-						/*
-						$.ajax({
-							async : true,
-							type : "POST",
-							url :  "<c:url value='/tracking/listallusers'></c:url>",
-							beforeSend : function(xhr) {
-								xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
-									$("meta[name='_csrf']").attr("content"));
-							},
-							success : function(result, status, xhr) {
-								$("#adminMainpageContent").html(result);
-							}
-						});
-						*/
-					},
-					error : function(xhr, status, error) {
-						$("#adminMainpageContent").html(error + status + xhr.responseText);
-					},
-					url : "<c:url value='/tracking/deleteuserbyid'></c:url>"
-				
-				});
-			});
+	});
+	
+	$(".deleteuser").click(function(event){
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			type : "POST",
+			async : true,
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : $(this).attr('href')
+			},
+			url : "<c:url value='/tracking/admin/listuserdeleteuser'></c:url>",
+			success : function(result, status, xhr) {
+				$("#page-wrapper").html(result);
+			},
+			error : function(xhr, status, error) {
+				alert("error" + status + error);
+			}
 		});
-		
 	});
 	
 </script>
@@ -89,53 +66,41 @@
 <div class="row">
 	<div class="col-lg-12">
 		<div class="panel panel-default">
-			<div class="panel-heading">Available users in the ILONA System!</div>
-			<!-- /.panel-heading -->
+			<div class="panel-heading">
+			<input type="checkbox" checked="checked"> Show Admins (Red background!)
+			</div>
 			<div class="panel-body">
-				<div class="dataTable_wrapper">
-					<table width="100%"
+				<div class="table-responsive">
+					<table class="table"
 						class="table table-striped table-bordered table-hover"
 						id="dataTables-example">
 						<thead>
 							<tr>
 								<th>Userid</th>
 								<th>Username</th>
-								<th>Password ?! ránézni</th>
 								<th>Email</th>
-								<th>Enabled</th>
-								<th>Nonlocked</th>
-								<th>NonExpird</th>
-								<th>CredentialsNonExpired</th>
-								<td>Edit</td>
-								<th>Delete</th>
+								<th>List devices</th> 
+								<th>Edit account</th>
+								<th>Delete account</th>
 							</tr>
 						</thead>
 						<tbody>
 						
 							<c:forEach var="user" items="${users}">
 								<c:choose>
-									<c:when test="${user.isEnabled() == true}">
+									<c:when test="${user.adminRole == true}">
 										<tr class="odd gradeX danger">
 									</c:when>
 									<c:otherwise>
 										<tr class="odd gradeX">
 									</c:otherwise>
 								</c:choose>
-								
-									<td class="left">${user.getUserid()}</td>
-									<td class="left">${user.getUsername()}</td>
-									<td class="left">${user.getPassword()}</td>
-									<td class="left">${user.getEmail()}</td>
-									<td class="left">${user.getNonExpired()}</td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td class="center"><a href="${user.getUserid()}" class="adminpageListUsersEdit">
-										<span class="glyphicon glyphicon-edit "></span></a>
-									</td>
-									<td class="center"><a href="${user.getUserid()}" class="adminpageListUsersDelete">
-										<span class="glyphicon glyphicon-remove-sign"></span></a>
-									</td>								
+								<td>${user.userid}</td>
+								<td>${user.username}</td>
+								<td>${user.email}</td>
+								<td><a href="${user.userid}" class="deviceList">Devices <span class="fa fa-database"></span></a></td>
+								<td><a href="${user.userid}" class="modifyUser">Edit account <span class="fa fa-pencil-square "></span></a></td>
+								<td><a href="${user.userid}" class="deleteuser">Delete account <span class="glyphicon glyphicon-remove-sign "></span></a></td>	 						
 								</tr>
 							</c:forEach>						
 						</tbody>
@@ -143,9 +108,9 @@
 				</div>
 
 			</div>
-			<!-- /.panel-body -->
+
 		</div>
-		<!-- /.panel -->
+
 	</div>
-	<!-- /.col-lg-12 -->
+
 </div>

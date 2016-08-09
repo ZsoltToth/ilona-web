@@ -126,6 +126,17 @@
   		
   	</bean>
  	--> 
+ 	 
+ 	 <bean id="CustomUserSecurityService" class="uni.miskolc.ips.ilona.tracking.controller.security.CustomUserDetailsService">
+ 	 	<constructor-arg>
+ 	 		<ref bean="trackingUserAndDeviceDAO"/>
+ 	 	</constructor-arg>
+ 	 </bean>
+ 	 
+ 	 <bean id="CustomAuthProvider" class="uni.miskolc.ips.ilona.tracking.controller.security.CustomAuthenticationProvider">
+ 	 	<constructor-arg ref="CustomUserSecurityService"></constructor-arg>
+ 	 	<constructor-arg ref="passwordEncoder"></constructor-arg>
+ 	 </bean>
  	 	
   	<bean id="UserAndDeviceService" class="uni.miskolc.ips.ilona.tracking.service.impl.UserAndDeviceServiceImpl"
   		depends-on="trackingUserAndDeviceDAO">

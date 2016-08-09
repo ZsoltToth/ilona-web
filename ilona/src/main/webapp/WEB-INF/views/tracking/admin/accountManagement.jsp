@@ -120,7 +120,12 @@
 		<div class="panel-body">
 			<label for="adminUserid" id="adminUseridLabel">Userid: READONLY<span class="glyphicon glyphicon-exclamation-sign">
 			</span></label>
-			<input id="adminUserid" type="text" readonly="readonly" required="required" class="form-control" value="dasdsa"><br/>
+			<input id="adminUserid"
+				type="text" 
+				readonly="readonly" 
+				required="required"
+				class="form-control"
+				value="${useridValue}"><br/>
 			
 			<label for="adminUsername" id="adminUsernameLabel">Username:
 				<span data-toggle="popover"
@@ -135,7 +140,8 @@
 				id="adminUsername" 
 				class="form-control"
 				required="required"
-				pattern="${usernamePattern}"><br />
+				pattern="${usernamePattern}"
+				value="${usernameValue}"><br />
 
 			<label for="adminEmail" id="adminEmailLabel">Email address:
 				<span data-toggle="popover"
@@ -146,7 +152,11 @@
 					class="fa  fa-info-circle">
 				</span>
 			</label>
-			<input type="text" id="adminEmail" class="form-control" required="required"><br />
+			<input type="text"
+				id="adminEmail" 
+				class="form-control" 
+				required="required"
+				value="${emailValue}"><br />
 		
 			<input type="button" id="accountUpdateDetails" class="btn btn-primary" value="Update account!"><br/>
 					

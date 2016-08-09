@@ -38,7 +38,7 @@
 		from TrackingUsers tu where tu.userid = #{userid};
 	</select>
 
-	<select id="getAllUsersBaseData" resultType="map">
+	<select id="getAllUsersBaseData" resultMap="UserDataResult">
 		select
 		tu.userid,
 		tu.username, tu.email, tu.password, tu.enabled,

@@ -106,9 +106,12 @@ public class TrackingEntryPointController {
 		 */
 		if (authentication != null) {
 			logger.error("Anonymus authentication request!");
-			if (authentication.getName().equalsIgnoreCase("anonymousUser")) {
-				return new ModelAndView("tracking/mainpageHome");
-			}
+			
+			for(GrantedAuthority role : authentication.getAuthorities()) {
+				if(role.getAuthority().equals("ROLE_ANONYMOUS")) {
+					return new ModelAndView("tracking/mainpageHome");
+				}
+			}					
 		}
 
 		/**
@@ -166,6 +169,7 @@ public class TrackingEntryPointController {
 	@RequestMapping(value = "/registeruser", method = { RequestMethod.POST })
 	public ModelAndView registerUser(@ModelAttribute(name = "user") UserCreationDTO user)
 			throws InvalidUserRegistration {
+		ModelAndView mav = new ModelAndView("tracking/mainpageSignup");
 		ValidityStatusHolder errors = new ValidityStatusHolder();
 		errors = ValidateUserData.validateUserid(user.getUserid());
 		errors.appendValidityStatusHolder(ValidateUserData.validateUsername(user.getUsername()));
@@ -185,15 +189,17 @@ public class TrackingEntryPointController {
 						true, roles, new Date(), passwordExpired, new Date(), true, badLogins, devices);
 				this.userDeviceService.createUser(userDB);
 			} catch (Exception e) {
+				e.printStackTrace();
 				ValidityStatusHolder duplicatedUserError = new ValidityStatusHolder();
 				duplicatedUserError.addValidityError("A user with this userid is already exists!");
 				throw new InvalidUserRegistration("Duplicated user with userid: " + user.getUserid(),
 						duplicatedUserError);
 			}
+			mav.addObject("registrationSuccessful", "User Registration was successful!");
 		} else {
 			throw new InvalidUserRegistration("Invalid registration:", errors);
 		}
-		return new ModelAndView("tracking/loginpage");
+		return mav;
 	}
 	
 	

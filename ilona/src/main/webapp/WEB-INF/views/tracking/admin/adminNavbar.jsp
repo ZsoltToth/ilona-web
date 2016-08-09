@@ -132,6 +132,26 @@
 		});
 	});
 	
+	$("#adminNavbarLogout").click(function(event) {
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			async : true,
+			type : "POST",
+			url : $("#adminNavbarLogout").attr('href'),
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success : function(result, status, xhr) {
+				$("#page-wrapper").html(result);
+			},
+			error : function(xhr, status, error) {
+				alert("ADMIN - CREATE USER ERROR!");
+			}
+		});
+	});
+	
 </script>
 
 <nav class="navbar navbar-inverse" id="manipageNavbar">
@@ -168,7 +188,7 @@
 		</ul>
 		<ul class="nav navbar-nav navbar-right">
 			<li><a id="adminNavbarLogout"
-				href="<c:url value='/tracking/getloginpage'></c:url>"><span
+				href="<c:url value='/tracking/logout'></c:url>"><span
 					class="fa fa-power-off"></span> Logut</a></li>
 		</ul>
 	</div>

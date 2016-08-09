@@ -20,13 +20,14 @@
 		 This two inicialization must be here, because the architect of the page.
 		 If I put this in the main page, that initialization will not initialize the newest elements.
 	    */
-		$('[data-toggle="tooltip"]').tooltip();
-		$('[data-toggle="popover"]').popover();
 
 		$("#trackingLoginpageLoginbutton").click(function() {
 			$("#errorContent").html("");
 			var token = $("meta[name='_csrf']").attr("content");
 			var header = $("meta[name='_csrf_header']").attr("content");
+			
+			
+			
 			$.ajax({
 				async : true,
 				type : "POST",
@@ -37,7 +38,7 @@
 					username : $("#trackingLoginpageUseridInput").val(),
 					password : $("#trackingLoginpagePasswordInput").val()
 				},
-				url : $("#trackingLoginpageLoginform").attr('action'),
+				url : "<c:url value='/tracking/processlogin'></c:url>",
 				timeout : 10000,
 				error : function(xhr, status, error) {
 					$("#errorContent").html(xhr.responseText + status + error);
@@ -60,19 +61,9 @@
 			<h3 class="panel-title">ILONA - Tracking module login page!</h3>
 		</div>
 		<div class="panel-body">
-			<form role="form" id="trackingLoginpageLoginform"
-				action="<c:url value='/tracking/processlogin'></c:url>">
-				
+			
 				<label for="trackingLoginpageUseridInput">Userid:
-					<span data-toggle="popover"
-						data-html="true"
-						data-trigger="hover"
-						data-content="<b>The userid maximum length is 20 characters!</b><br><br><b>The minimum length is 5 characters</b>
-						<br><br>The userid must <b>start with</b> a letter <b>a-z or A-Z</b> <br><br> after that can contain the following symbols: a-z, A-Z, 0-9
-						<br><br> Example: good: a11gbs111s bad: 1das2, because it starts with a number!"
-						title="The userid pattern can contain the following elements:"
-						class="fa  fa-info-circle">
-					</span>
+
 				</label>
 					
 				<input type="text"
@@ -81,17 +72,10 @@
 					required="required"
 					placeholder="Please type in your userid!"
 					maxlength="20"
-					name="userid">
+					name="userid">  <br/>
 					
 				<label for="trackingLoginpagePasswordInput">Password:
-					<span data-toggle="popover"
-						data-html="true" 
-						data-trigger="hover"
-						data-content="<b>The password maximum length is 30 characters!</b><br><br><b>The minimum length is 6 characters!</b>
-						<br><br>The password can contain the following elements: <br><br>a-z A-Z ? ! . - _ "
-						title="The userid pattern can contain the following elements:"
-						class="fa  fa-info-circle">
-					</span>
+					
 				</label>
 				
 				<input type="password"
@@ -101,13 +85,13 @@
 					placeholder="Please type in your password!"
 					maxlength="30"
 					pattern="[a-zA-Z0-9,.-_?]{6,30}"
-					name="password">
-			</form>
+					name="password">  <br/>
+			
 			<button id="trackingLoginpageLoginbutton" type="button" class="btn">Login</button>			
 		</div>
 	</div>
 	
-	<div class="panel panel-default" id="trackingLoginpageErrorContent">
+	<div class="panel panel-body" id="trackingLoginpageErrorContent">
 	
 	</div>
 </div>

@@ -38,6 +38,8 @@
 		<intercept-url pattern="/tracking/createuser" access="permitAll"/>
 		<intercept-url pattern="/tracking/login" access="permitAll"/> 
 		<intercept-url pattern="/tracking/index" access="permitAll"/>
+		<intercept-url pattern="/tracking/logout" access="permitAll"/>
+		<intercept-url pattern="/tracking/registeruser" access="permitAll"/>
 		 
 		 <!-- ######################################################################### -->
 		 
@@ -64,7 +66,8 @@
 			
 		<logout invalidate-session="true"
 			delete-cookies="JSESSIONID"
-			logout-url="/tracking/logout" />
+			logout-url="/tracking/logout"
+			logout-success-url="/tracking/maincontentdecision" />
 			<!-- 
 		<session-management
 			session-fixation-protection="changeSessionId">
@@ -85,7 +88,11 @@
 		</session-management>
 	</http>
 	
-	<authentication-manager alias="authManager">	
+	<authentication-manager alias="authManager">
+	
+		<authentication-provider ref="CustomAuthProvider">			
+		</authentication-provider>
+		<!-- 
 		<authentication-provider >
 		
 			<user-service>
@@ -94,6 +101,7 @@
 			</user-service>
 			
 		</authentication-provider>
+	 -->
 	</authentication-manager>
 	
 	<!-- 

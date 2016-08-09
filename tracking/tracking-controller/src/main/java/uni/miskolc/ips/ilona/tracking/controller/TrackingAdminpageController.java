@@ -21,6 +21,7 @@ import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
+import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedUserException;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 /**
@@ -96,7 +97,13 @@ public class TrackingAdminpageController {
 					user.isEnabled(), userRoles, new Date(), credentialsValidUntil, new Date(), true, badLogins,
 					devices);
 
-			System.out.println(userFull.toString());
+			try {
+				userDeviceService.createUser(userFull);
+			} catch(DuplicatedUserException e) {
+				mav.addObject("validityErrors", "This userid is already preserved: " + user.getUserid());
+			} catch(Exception e) {
+				mav.addObject("validityErrors", "An error occured!");
+			}
 			mav.addObject("validityErrors", "User creation was successful!");
 		} else {
 
@@ -112,19 +119,6 @@ public class TrackingAdminpageController {
 	public ModelAndView createAdminpageCreateUserpage() {
 		ModelAndView createUserPage = new ModelAndView("tracking/adminCreateuser");
 		return createUserPage;
-	}
-
-	@RequestMapping(value = "/listallusers")
-	public ModelAndView createAdminpageListAlluserspage() {
-		ModelAndView userlistPage = new ModelAndView("tracking/admin/listAllUsers");
-		Collection<DatabaseUserDatas> users = new ArrayList<DatabaseUserDatas>();
-		try {
-
-		} catch (Exception e) {
-
-		}
-		userlistPage.addObject("users", users);
-		return userlistPage;
 	}
 
 	@RequestMapping(value = "/adminhomepage", method = { RequestMethod.GET, RequestMethod.POST })

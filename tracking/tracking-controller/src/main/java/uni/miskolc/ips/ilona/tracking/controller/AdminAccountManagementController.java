@@ -1,5 +1,7 @@
 package uni.miskolc.ips.ilona.tracking.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.controller.model.UserBaseDetailsDTO;
+import uni.miskolc.ips.ilona.tracking.controller.model.UserSecurityDetails;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
@@ -29,9 +32,17 @@ public class AdminAccountManagementController {
 		mav.addObject("useridPattern", WebpageInformationProvider.getUseridpattern());
 		mav.addObject("usernamePattern", WebpageInformationProvider.getUsernamepattern());
 		mav.addObject("passwordPattern", WebpageInformationProvider.getPasswordpattern());
+
+		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+
+		mav.addObject("useridValue", userDetails.getUserid());
+		mav.addObject("usernameValue", userDetails.getUsername());
+		mav.addObject("emailValue", userDetails.getEmail());
+		
 		return mav;
 	}
-	
+
 	@RequestMapping(value = "/accountchangepassword", method = { RequestMethod.POST })
 	public ModelAndView changeAccountPasswordHandler(@ModelAttribute() UserBaseDetailsDTO user) {
 		ModelAndView mav = new ModelAndView("tracking/admin/accountManagement");
@@ -47,7 +58,7 @@ public class AdminAccountManagementController {
 
 		return mav;
 	}
-	
+
 	@RequestMapping(value = "/accountchangedetails", method = { RequestMethod.POST })
 	public ModelAndView changeAccountDetailsHandler(@ModelAttribute() UserBaseDetailsDTO user) {
 		ModelAndView mav = new ModelAndView("tracking/admin/accountManagement");
@@ -61,7 +72,14 @@ public class AdminAccountManagementController {
 		} else {
 			mav.addObject("changeDetailsErrors", errors.getErrors());
 		}
+		
+		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
 
+		mav.addObject("useridValue", userDetails.getUserid());
+		mav.addObject("usernameValue", userDetails.getUsername());
+		mav.addObject("emailValue", userDetails.getEmail());
+		
 		return mav;
 	}
 }

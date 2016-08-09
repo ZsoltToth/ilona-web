@@ -55,6 +55,18 @@
 		if (Boolean(hadError) == true) {
 			$("#adminUserCreationError").html(errorText);
 		} else {
+			
+			var enabled1 = false;
+			var admin1 = false;
+			var UserEnabled = document.getElementById('creationIsUserEnabled');
+			var AdminRole = document.getElementById('creationIsAdmin');
+			if(UserEnabled.checked) {
+				enabled1 = true;
+			}
+			if(AdminRole.checkek) {
+				admin1 = true;
+			}
+			
 			$.ajax({
 				async : true,
 				type : "POST",
@@ -67,8 +79,8 @@
 					username : $("#creationUsername").val(),
 					email : $("#creationEmail").val(),
 					password : $("#creationPassword1").val(),
-					enabled : $("#creationIsUserEnabled").val(),
-					adminRole : $("#creationIsAdmin").val()
+					enabled : enabled1.toString(),
+					adminRole : admin1.toString()
 				},
 				success : function(result, status, xhr) {
 					$("#page-wrapper").html(result);
@@ -109,7 +121,6 @@
 					id="creationUserid"
 					required="required"
 					placeholder="Please type in the userid!"
-					maxlength="20"
 					pattern = "${useridPattern}"
 					name="userid"><br />
 					
@@ -129,7 +140,6 @@
 					id="creationUsername"
 					required="required"
 					placeholder="Please type in the username"
-					maxlength="20"
 					pattern="${usernamePattern}"
 					name="username"><br />	
 					
@@ -148,7 +158,6 @@
 					id="creationEmail"
 					required="required"
 					placeholder="Please type in the email address!"
-					maxlength="20"
 					name="email"><br />		
 					
 				<label for="creationPassword1">Password:
@@ -166,7 +175,6 @@
 					id="creationPassword1"
 					required="required"
 					placeholder="Please type in the password!"
-					maxlength="30"
 					pattern="${passwordPattern}"
 					name="password"> <br />
 					
@@ -175,7 +183,6 @@
 					id="creationPassword2"
 					required="required"
 					placeholder="Please type in the password!"
-					maxlength="30"
 					pattern="${passwordPattern}"
 					name="password"> <br />
 					
