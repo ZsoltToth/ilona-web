@@ -127,6 +127,18 @@
 			<artifactId>spring-security-taglibs</artifactId>
 			<version>${spring.security.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>4.3.1.RELEASE</version>
+		</dependency>
 		<!-- <dependency> <groupId>org.webjars</groupId> <artifactId>bootstrap</artifactId> 
 			<version>3.3.6</version> </dependency> <dependency> <groupId>org.webjars</groupId> 
 			<artifactId>jquery</artifactId> <version>3.0.0</version> </dependency> -->
@@ -158,6 +170,6 @@
 		</plugins>
 
 		<finalName>ilona</finalName>
-	
+
 	</build>
 </project>

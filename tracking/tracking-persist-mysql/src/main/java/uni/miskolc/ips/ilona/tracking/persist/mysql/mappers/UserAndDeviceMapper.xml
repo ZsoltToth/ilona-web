@@ -96,10 +96,12 @@
 	</insert>
 
 	<insert id="storeLoginAttempts" parameterType="UserData">
-		insert into TrackingLoginAttempts values
+		insert into TrackingLoginAttempts(userid,attempt) values
 		<foreach collection="badLogins" item="badlogin" separator=",">
-			(#{userid}, #{badlogin})
+			(#{userid},
+			 #{badlogin})
 		</foreach>
+		;
 	</insert>
 
 	<insert id="storeDevice">

@@ -6,6 +6,13 @@
 <%@ page session="true"%>
 <%@ page isELIgnored="false"%>
 
-<div>
+<!-- CSRF Protection token -->
+<meta name="_csrf" content="${_csrf.token}" />
+<!-- default header name is X-CSRF-TOKEN -->
+<meta name="_csrf_header" content="${_csrf.headerName}" />
 
+<jsp:directive.include file="userNavbar.jsp" />
+
+<div>
+	Ez jelenik meg!
 </div>

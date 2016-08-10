@@ -171,6 +171,21 @@
 		<constructor-arg name="strength" value="10"></constructor-arg>
 	</bean>
 
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <property name="host" value="smtp.gmail.com"/>
+        <property name="port" value="587"/>
+        <property name="username" value="ILONA.UNI.MISKOLC@gmail.com"/>
+        <property name="password" value="ilonapassword2016"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+                <prop key="mail.debug">true</prop>
+            </props>
+        </property>
+    </bean>
+
 	<!-- url="hera.iit.uni-miskolc.hu" <security:ldap-server root="dc=iit,dc=uni-miskolc,dc=hu" 
 		id="ldapserver" url="ldap://hera.iit.uni-miskolc.hu"/> -->
 	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 

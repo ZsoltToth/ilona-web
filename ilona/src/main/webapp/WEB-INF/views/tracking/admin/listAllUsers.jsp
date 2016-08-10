@@ -36,6 +36,29 @@
 		});
 	});
 	
+	$(".modifyUser").click(function(event){
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			type : "POST",
+			async : true,
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : $(this).attr('href')
+			},
+			url : "<c:url value='/tracking/admin/listusersmodifyuser'></c:url>",
+			success : function(result, status, xhr) {
+				$("#page-wrapper").html(result);
+			},
+			error : function(xhr, status, error) {
+				alert("error" + status + error);
+			}
+		});
+	});
+	
 	$(".deleteuser").click(function(event){
 		event.preventDefault();
 		var token = $("meta[name='_csrf']").attr("content");

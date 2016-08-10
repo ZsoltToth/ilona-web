@@ -92,7 +92,10 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			user.setRoles(mapper.getUserRoles(userid));
 
 			user.setBadLogins(mapper.readLoginAttempts(userid));
-
+			if(user.getBadLogins() == null) {
+				user.setBadLogins(new ArrayList<Date>());
+			}
+			
 		} catch (Exception e) {
 			if (e instanceof UserNotFoundException ) {
 				throw new UserNotFoundException("User not found by userid: " + userid);
@@ -137,7 +140,9 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			mapper.createUserRoles(user);
 			
 			mapper.deleteLoginAttempts(user.getUserid(), new Date());
-			mapper.storeLoginAttempts(user);
+			if (user.getBadLogins().size() != 0) {
+				mapper.storeLoginAttempts(user);
+			}		
 			session.commit();
 		} catch (UserNotFoundException e) {
 			throw new UserNotFoundException("This user is not exists: " + user.getUserid());

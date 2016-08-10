@@ -104,6 +104,14 @@ public class UserDeviceDataDTO {
 	public void setDeviceTypeName(String deviceTypeName) {
 		this.deviceTypeName = deviceTypeName;
 	}
+
+
+
+	@Override
+	public String toString() {
+		return "UserDeviceDataDTO [userid=" + userid + ", deviceid=" + deviceid + ", deviceName=" + deviceName
+				+ ", deviceType=" + deviceType + ", deviceTypeName=" + deviceTypeName + "]";
+	}
 	
 	
 }

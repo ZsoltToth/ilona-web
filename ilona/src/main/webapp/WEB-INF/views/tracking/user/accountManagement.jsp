@@ -16,63 +16,63 @@
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
 
-	$("#accountUpdateDetails").click(function(event){
+	$("#userAccManUpdateDetailsBTN").click(function(event){
 		event.preventDefault();
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
 		
-		$("#accountDetailsErrors").html("");
+		$("#userAccManUpdateDetailsErrorDIV").html("");
 		var hadError = 0;
 		var errorText = "";
 						
-		var username = document.getElementById("adminUsername");	
+		var username = document.getElementById("userAccManUsernameTXT");	
 		if (username.checkValidity() == false) {
 			errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
 			hadError = 1;
 		}
 				
-		var email = document.getElementById("adminEmail");
+		var email = document.getElementById("userAccManEmailTXT");
 		if(email.checkValidity()  == false) {
 			errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
 			hadError = 1;
 		}
 
 		if (Boolean(hadError) == true) {
-			$("#accountDetailsErrors").html(errorText);
+			$("#userAccManUpdateDetailsErrorDIV").html(errorText);
 		} else {
 			$.ajax({
 				type : "POST",
 				async : true,
-				url : "<c:url value='/tracking/admin/accountchangedetails'></c:url>",
+				url : "<c:url value='/tracking/user/accmanchangeuserdetails'></c:url>",
 				beforeSend : function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
 				data : {
-					userid : $("#adminUserid").val(),
-					username : $("#adminUsername").val(),
-					email : $("#adminEmail").val()
+					userid : $("#userAccManUseridTXT").val(),
+					username : $("#userAccManUsernameTXT").val(),
+					email : $("#userAccManEmailTXT").val()
 				},
 				success : function(result, status, xhr) {
 					$("#page-wrapper").html(result);
 				},
 				error : function(xhr, status, error) {
-					$("#accountDetailsErrors").html("<p class='text-danger bg-primary'>An error occured!</p>");	
+					$("#userAccManUpdateDetailsErrorDIV").html("<p class='text-danger bg-primary'>An error occured!</p>"+error);	
 				}
 			});
 		}
 		
 	});
 	
-	$("#accountPasswordChange").click(function(event){
+	$("#userAccManChangePasswordBTN").click(function(event){
 		event.preventDefault();
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
 		
-		$("#accountPasswordErrors").html("");
+		$("#userAccManChangePasswordErrorsDIV").html("");
 		var hadError = 0;
 		var errorText = "";
-		var password1 = document.getElementById("accountPassword1");
-		var password2 = document.getElementById("accountPassword2");
+		var password1 = document.getElementById("userAccManPassword1TXT");
+		var password2 = document.getElementById("userAccManPassword2TXT");
 		
 		if (password1.checkValidity() == false) {
 			errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
@@ -85,24 +85,24 @@
 		}
 		
 		if(Boolean(hadError) == true) {
-			$("#accountPasswordErrors").html(errorText);
+			$("#userAccManChangePasswordErrorsDIV").html(errorText);
 		} else {
 			$.ajax({
 				type : "POST",
 				async : true,
-				url : "<c:url value='/tracking/admin/accountchangepassword'></c:url>",
+				url : "<c:url value='/tracking/user/accmanchangepassword'></c:url>",
 				beforeSend : function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
 				data : {
-					userid : $("#adminUserid").val(),
-					password : $("#accountPassword1").val()
+					userid : $("#userAccManUseridTXT").val(),
+					password : $("#userAccManPassword1TXT").val()
 				},
 				success : function(result, status, xhr) {
 					$("#page-wrapper").html(result);
 				},
 				error : function(xhr, status, error) {
-					$("#accountPasswordErrors").html("<p class='text-danger bg-primary'>An error occured!</p>");
+					$("#userAccManChangePasswordErrorsDIV").html("<p class='text-danger bg-primary'>An error occured!</p>"+error);
 				}
 			});
 		}
@@ -110,25 +110,26 @@
 	});
 </script>
 
-<jsp:directive.include file="adminNavbar.jsp" />
+<jsp:directive.include file="userNavbar.jsp" />
+
 
 <div class="row">
 <div class="col-lg-12">
 	<div class="panel panel-primary">
 		<div class="panel-heading">
-			<h4><b>Account details change: ${successfulModification}</b></h4>
+			<h4><b>Account details change: ${successfulDetailsModification}${userDetailsChangeError}</b></h4>
 		</div>
 		<div class="panel-body">
-			<label for="adminUserid" id="adminUseridLabel">Userid: READONLY<span class="glyphicon glyphicon-exclamation-sign">
+			<label for="userAccManUseridTXT" id="userAccManUseridTXTLabel">Userid: READONLY<span class="glyphicon glyphicon-exclamation-sign">
 			</span></label>
-			<input id="adminUserid"
+			<input id="userAccManUseridTXT"
 				type="text" 
 				readonly="readonly" 
 				required="required"
 				class="form-control"
 				value="${useridValue}"><br/>
 			
-			<label for="adminUsername" id="adminUsernameLabel">Username:
+			<label for="userAccManUsernameTXT" id="userAccManUsernameTXTLabel">Username:
 				<span data-toggle="popover"
 					data-html="true"
 					data-trigger="hover"
@@ -138,13 +139,13 @@
 				</span>
 			</label>
 			<input type="text" 
-				id="adminUsername" 
+				id="userAccManUsernameTXT" 
 				class="form-control"
 				required="required"
 				pattern="${usernamePattern}"
 				value="${usernameValue}"><br />
 
-			<label for="adminEmail" id="adminEmailLabel">Email address:
+			<label for="userAccManEmailTXT" id="userAccManEmailTXTLabel">Email address:
 				<span data-toggle="popover"
 					data-html="true"
 					data-trigger="hover"
@@ -154,16 +155,16 @@
 				</span>
 			</label>
 			<input type="text"
-				id="adminEmail" 
+				id="userAccManEmailTXT" 
 				class="form-control" 
 				required="required"
 				value="${emailValue}"><br />
 		
-			<input type="button" id="accountUpdateDetails" class="btn btn-primary" value="Update account!"><br/>
+			<input type="button" id="userAccManUpdateDetailsBTN" class="btn btn-primary" value="Update account!"><br/>
 					
 		</div>
 		
-		<div class="panel-body" id="accountDetailsErrors">
+		<div class="panel-body" id="userAccManUpdateDetailsErrorDIV">
 			<c:forEach var="error" items="${changeDetailsErrors}">
 				<p class='text-danger bg-primary'>${error}</p>
 			</c:forEach>
@@ -172,12 +173,12 @@
 		
 	<div class="panel panel-danger">
 		<div class="panel-heading">
-			<h4><b>Account password change:</b></h4>
+			<h4><b>Account password change: ${successfulPasswordModification}</b></h4>
 			
 		</div>
 		
 		<div class="panel-body">
-			<label for="accountPassword1" id="accountPassword1Label">Password:
+			<label for="userAccManPassword1TXT" id="userAccManPassword1TXTLabel">Password:
 				<span data-toggle="popover"
 					data-html="true"
 					data-trigger="hover"
@@ -187,24 +188,24 @@
 				</span>
 			</label>
 			<input type="password"
-				id="accountPassword1"
+				id="userAccManPassword1TXT"
 				class="form-control"
 				required="required"
 				pattern="${passwordPattern}"
-				name="password1"
+				name="userAccManPassword1TXTName"
 				value=""><br />
 			
 			<input type="password"
-				id="accountPassword2"
+				id="userAccManPassword2TXT"
 				required="required"
 				class="form-control"
-				name="password2"
+				name="userAccManPassword2TXTName"
 				value=""><br />
 			
-			<input type="button" id="accountPasswordChange" class="btn btn-danger" value="Change password!">
+			<input type="button" id="userAccManChangePasswordBTN" class="btn btn-danger" value="Change password!">
 		</div>
 		
-		<div class="panel-body" id="accountPasswordErrors">
+		<div class="panel-body" id="userAccManChangePasswordErrorsDIV">
 			<c:forEach var="error" items="${passwordErrors}">
 				<p class='text-danger bg-primary'>${error}</p>
 			</c:forEach>
