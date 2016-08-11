@@ -12,6 +12,7 @@ public interface WayfindingService {
 		NO_ELEVATOR
 	}
 	
-	public List<Zone> generateRoute(Zone from, Zone to, Restriction[] restrictions);
+	public List<Zone> generateRoute(Zone from, Zone to) throws NoRouteAvailableException;
+	public List<Zone> generateRoute(Zone from, Zone to, Restriction[] restrictions) throws NoRouteAvailableException;
 
 }
