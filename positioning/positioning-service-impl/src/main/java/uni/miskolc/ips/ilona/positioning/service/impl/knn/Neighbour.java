@@ -8,7 +8,7 @@ import uni.miskolc.ips.ilona.measurement.model.measurement.Measurement;
  * @author ilona
  *
  */
-class Neighbour {
+public class Neighbour {
 	/**
 	 * The Neighbour measurement instance.
 	 */
@@ -26,7 +26,7 @@ class Neighbour {
 	 * @param distance
 	 *            The distance of the measurement to a reference measurement
 	 */
-	protected Neighbour(final Measurement measurement, final double distance) {
+	public Neighbour(final Measurement measurement, final double distance) {
 		super();
 		this.measurement = measurement;
 		this.distance = distance;

@@ -23,22 +23,47 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 
+
+/**
+ * The implementation of PositioningService interface to Positioning over a NeuralNetwork.
+ * @author tamas13
+ *
+ */
 public class NeuralNetworkPositioning implements PositioningService {
+	/**
+	 * The NeuralNetwork to estimate the Position.
+	 */
 	private NeuralNetwork neuralNetwork;
+	/**
+	 * A service to get the Zone instances from the database.
+	 */
 	private ZoneService zoneService;
+	/**
+	 * A log istance for the class.
+	 */
 	private static final Logger LOG = LogManager.getLogger(NeuralNetworkPositioning.class);
 
-	public NeuralNetworkPositioning(ZoneService zoneService, String serializedMultilayerPerceptron) {
+	/**
+	 * The constructor of NeuralNetworkPositioning class.
+	 * @param zoneService A service to get the Zone instances from the database.
+	 * @param serializedNeuralNetwork The path of serialized NeuralNetwork
+	 */
+	public NeuralNetworkPositioning(final ZoneService zoneService, final String serializedNeuralNetwork) {
 		super();
-		this.neuralNetwork = deserializeNeuralNetwork(serializedMultilayerPerceptron);
+		this.neuralNetwork = NeuralNetwork.deserialization(serializedNeuralNetwork);
 		this.zoneService = zoneService;
 
 	}
 
-	public Position determinePosition(Measurement measurement) {
+	/**
+	 * Determine Position of the given measurement based on the NeuralNetwork.
+	 * @param measurement The incoming measurement to estimate it's Position.
+	 * @return The Position estimated with the NeuralNetwork.
+	 */
+	public final Position determinePosition(final Measurement measurement) {
 		Position result;
 		MultilayerPerceptron mlp = neuralNetwork.getMultilayerPerceptron();
-		Instance instance = convertMeasurementToInstance(measurement);
+		Instance instance = neuralNetwork.convertMeasurementToInstance(measurement);
 		double cls;
 		try {
 			cls = mlp.classifyInstance(instance);
@@ -49,112 +74,10 @@ public class NeuralNetworkPositioning implements PositioningService {
 		}
 		LOG.info(String.format("The incoming measurement is " + measurement.toString()
 				+ ". The determined position for this is " + result.toString()));
+		if(measurement.getPosition().getZone()!=null)
+			LOG.warn(measurement.getPosition().getZone()+","+result.getZone());
 		return result;
 	}
 
-	private NeuralNetwork deserializeNeuralNetwork(String serializedPath) {
-		NeuralNetwork result;
-		try {
-			FileInputStream fileIn = new FileInputStream(serializedPath);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			result = (NeuralNetwork) in.readObject();
-			in.close();
-			fileIn.close();
-		} catch (IOException i) {
-			LOG.info(String.format("Error occured during deserialization: " + i.getMessage()));
-			result = null;
-		} catch (ClassNotFoundException c) {
-			LOG.error("Serialised Neural Network not found on " + serializedPath + " ");
-			result = null;
-		}
-
-		return result;
-
-	}
-
-	private Instance convertMeasurementToInstance(Measurement meas) {
-		ArrayList<Attribute> header = getHeader(neuralNetwork.getMultilayerPerceptron());
-
-		Instance instance = new DenseInstance(header.size());
-		List<Attribute> attributes = new ArrayList<Attribute>();
-		for (int i = 0; i < header.size(); i++) {
-			attributes.add(new Attribute(header.get(i).name()));
-		}
-		LOG.info("The attributes are " + attributes.toString());
-		for (int i = 0; i < attributes.size(); i++) {
-			if (attributes.get(i).name().equals("measx")) {
-				instance.setValue(i, meas.getMagnetometer().getxAxis());
-			} else if (attributes.get(i).name().equals("measy")) {
-				instance.setValue(i, meas.getMagnetometer().getyAxis());
-			} else if (attributes.get(i).name().equals("measz")) {
-				instance.setValue(i, meas.getMagnetometer().getzAxis());
-			} else if (attributes.get(i).name().contains(":")) {
-				instance.setValue(i, measurementSeeBluetooth(meas, attributes.get(i).name()));
-			} else if (attributes.get(i).name().equals(attributes.get(attributes.size() - 1))) {
-				instance.setValue(i, -1);
-			} else {
-				instance.setValue(i, measurementHowSeeWiFi(meas, attributes.get(i).name()));
-			}
-
-		}
-		LOG.info("The created instance is " + instance);
-		return instance;
-	}
-
-	private int measurementSeeBluetooth(Measurement meas, String bluetooth) {
-		String hardwareAddress = getBluetoothHardwareAddress(bluetooth);
-		if (meas.getBluetoothTags() != null) {
-			Set<String> measurementBluetoothTags = meas.getBluetoothTags().getTags();
-			for (String bl : measurementBluetoothTags) {
-				if (bl.toUpperCase().contains(hardwareAddress.toUpperCase())) {
-					return 1;
-				}
-			}
-		}
-		return 0;
-	}
-
-	private double measurementHowSeeWiFi(Measurement meas, String wifi) {
-		if (meas.getWifiRSSI() != null) {
-			if (meas.getWifiRSSI().getRssiValues().containsKey(wifi)) {
-				return meas.getWifiRSSI().getRSSI(wifi);
-			}
-		}
-		return -100;
-	}
-
-	private String getBluetoothHardwareAddress(String bluetooth) {
-		String[] bluetoothAddress = bluetooth.split(":");
-		StringBuilder builder = new StringBuilder();
-		builder.append(bluetoothAddress[0].substring(bluetoothAddress[0].length() - 2, bluetoothAddress[0].length()));
-		builder.append(":");
-		for (int i = 1; i < bluetoothAddress.length; i++) {
-			builder.append(bluetoothAddress[i]);
-			builder.append(":");
-		}
-		builder.setLength(builder.length() - 1);
-		String result = builder.toString();
-		return result;
-	}
-
-	private ArrayList<Attribute> getHeader(MultilayerPerceptron mlp) {
-		try {
-			Field field = MultilayerPerceptron.class.getDeclaredField("m_instances");
-			field.setAccessible(true);
-			Object value = field.get(mlp);
-			field.setAccessible(false);
-			Instances header = (Instances) value;
-
-			ArrayList<Attribute> attributes = new ArrayList<Attribute>();
-			for (int i = 0; i < header.numAttributes(); i++) {
-				attributes.add(header.attribute(i));
-			}
-			return attributes;
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 }

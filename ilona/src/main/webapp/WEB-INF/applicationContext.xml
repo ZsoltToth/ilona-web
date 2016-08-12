@@ -69,9 +69,16 @@
 		<constructor-arg ref="measurementDAO" />
 	</bean>
 	<bean id="positioningService"
-		class="uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork.NeuralNetworkPositioning">
+		class="uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork.NeuralNetworkPositioningOverSensors">
 		<constructor-arg name="zoneService" ref="zoneManagerService" />
-		<constructor-arg name="serializedMultilayerPerceptron" value="/home/ilona/neuralnetwork.ser"/>
+		<constructor-arg name="bluetoothWeight" value="0.5" />
+		<constructor-arg name="magnetometerWeight" value="0.4" />
+		<constructor-arg name="wifiWeight" value="0.6" />
+		<constructor-arg name="pathOfBluetoothNeuralNetwork"
+			value="/home/ilona/BTneuralnetwork.ser" />
+		<constructor-arg name="pathToMagnetometerNeuralNetwork"
+			value="/home/ilona/Mneuralnetwork.ser" />
+		<constructor-arg name="pathToWifiNeuralNetwork" value="/home/ilona/Wneuralnetwork.ser" />
 	</bean>
 
 	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 

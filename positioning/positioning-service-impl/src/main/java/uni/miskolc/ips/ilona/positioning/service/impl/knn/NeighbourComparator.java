@@ -6,7 +6,7 @@ import java.util.Comparator;
  * @author ilona
  * The comparator class of the Neighbours based on the distance.
  */
-	class NeighbourComparator implements Comparator<Neighbour> {
+public class NeighbourComparator implements Comparator<Neighbour> {
 /**
  * Compare the Neighbours based on the distance, it allows an ascending order.
  * @param n1 One Neighbour

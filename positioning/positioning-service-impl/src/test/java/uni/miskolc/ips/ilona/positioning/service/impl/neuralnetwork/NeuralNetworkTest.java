@@ -1,8 +1,10 @@
 package uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +13,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 import org.easymock.EasyMock;
-import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -19,6 +21,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import junit.framework.Assert;
 import uni.miskolc.ips.ilona.measurement.model.measurement.BluetoothTags;
 import uni.miskolc.ips.ilona.measurement.model.measurement.Magnetometer;
 import uni.miskolc.ips.ilona.measurement.model.measurement.Measurement;
@@ -30,47 +33,146 @@ import uni.miskolc.ips.ilona.measurement.model.position.Zone;
 import uni.miskolc.ips.ilona.measurement.service.ZoneService;
 import uni.miskolc.ips.ilona.measurement.service.exception.DatabaseUnavailableException;
 import uni.miskolc.ips.ilona.measurement.service.exception.ZoneNotFoundException;
-import weka.core.converters.JSONLoader;
-import weka.core.json.JSONInstances;
-
-import org.apache.logging.log4j.core.config.json.*;
+import weka.core.Instance;
 
 public class NeuralNetworkTest {
-	Zone zone1, zone2, zone3,zone4,zone5,zone6,zone7,zone8,zone9,zone10,zone11,zone12,zone13,zone14,zone15,zone16,zone17,zone18,zone19,zone20,zone21;
-
+	static Zone zone1, zone2, zone3,zone4,zone5,zone6,zone7,zone8,zone9,zone10,zone11,zone12,zone13,zone14,zone15,zone16,zone17,zone18,zone19,zone20,zone21;
+ ZoneService zoneService;
+	
+	@SuppressWarnings("deprecation")
 	@Ignore
 	public void determinePositionTest() throws FileNotFoundException, IOException, Exception {
 		NeuralNetwork neuralnetwork = new NeuralNetwork(0.6, 0.7, 140, "13",
-				"/home/ilona/probaworkspace/neuralnetwork/test.arff");
+				"/home/ilona/probaworkspace/neuralnetwork/trainingset.txt");
 		String serializedPath = "/home/ilona/probaworkspace/neuralnetwork/neuralnetwork.ser";
-		neuralnetwork.serializeNeuralNetwork(serializedPath);
-		ZoneService zoneService = mockingZoneService();
+	//	neuralnetwork.serializeNeuralNetwork(serializedPath);
 		NeuralNetworkPositioning neuralNetworkPositioning = new NeuralNetworkPositioning(zoneService, serializedPath);
-		Measurement measurement = createMeasurement();
+		Measurement measurement = instanceFromJSON();
 		Position result = neuralNetworkPositioning.determinePosition(measurement);
-		System.out.println("\n" + result.toString());
+		Assert.assertNotNull(result);
+	}
+	
+	
+	@SuppressWarnings("deprecation")
+	@Test
+	public void deserializeNeuralNetworkIsTheSame() throws FileNotFoundException, IOException, Exception {
+		NeuralNetwork expected = new NeuralNetwork(0.6, 0.7, 140, "13",
+				"/home/ilona/probaworkspace/neuralnetwork/trainingset.txt");
+		String serializedPath = "/home/ilona/probaworkspace/neuralnetwork/neuralnetworkExample.ser";
+		NeuralNetwork.serializeNeuralNetwork(expected, serializedPath);
+	//	expected.serializeNeuralNetwork(serializedPath);
+		NeuralNetwork actual = NeuralNetwork.deserialization(serializedPath);
+		Assert.assertEquals(expected, actual);
+	}
+	
+	
+	
+	@SuppressWarnings("deprecation")
+	@Ignore
+	public void deserializedNeuralNetworkGivesTheSameResult() throws FileNotFoundException, IOException, Exception {
+		NeuralNetwork neuralnetwork = new NeuralNetwork(0.6, 0.7, 140, "13",
+				"/home/ilona/probaworkspace/neuralnetwork/trainingset.txt");
+		String serializedPath = "/home/ilona/probaworkspace/neuralnetwork/neuralnetwork.ser";
+		//neuralnetwork.serializeNeuralNetwork(serializedPath);
+		NeuralNetworkPositioning neuralNetworkPositioning = new NeuralNetworkPositioning(zoneService, serializedPath);
+		Measurement measurement = instanceFromJSON();
+		Instance instance = neuralnetwork.convertMeasurementToInstance(measurement);
+		double cls = neuralnetwork.getMultilayerPerceptron().classifyInstance(instance);
+		Zone zoneresult = zoneService.getZone(UUID.fromString(instance.classAttribute().value((int) cls)));
+		Position expected = new Position(zoneresult);
+		Position actual = neuralNetworkPositioning.determinePosition(measurement);
+		Assert.assertEquals(expected.getZone().getId(), actual.getZone().getId());
+	}
+	
+	
+	@Test
+	public void determinePositionForNullSensorsTest() throws FileNotFoundException, IOException, Exception {
+		NeuralNetwork magnetoNeuralNetwork = new NeuralNetwork(0.6, 0.7, 140, "13",
+				"/home/ilona/probaworkspace/neuralnetwork/magnetometertrainingset.arff");
+		NeuralNetwork bluetoothneuralnetwork = new NeuralNetwork(0.6, 0.7, 140, "13",
+				"/home/ilona/probaworkspace/neuralnetwork/bluetoothtrainingset.arff");
+		NeuralNetwork wifineuralnetwork = new NeuralNetwork(0.6, 0.7, 140, "13",
+				"/home/ilona/probaworkspace/neuralnetwork/wifitrainingset.arff");
+		String magnetoserializedPath = "/home/ilona/probaworkspace/neuralnetwork/Mneuralnetwork.ser";
+		String bluetoothserializedPath = "/home/ilona/probaworkspace/neuralnetwork/BTneuralnetwork.ser";
+		String wifiserializedPath = "/home/ilona/probaworkspace/neuralnetwork/Wneuralnetwork.ser";
+		
+		//magnetoNeuralNetwork.serializeNeuralNetwork(magnetoserializedPath);
+		//bluetoothneuralnetwork.serializeNeuralNetwork(bluetoothserializedPath);
+	//	wifineuralnetwork.serializeNeuralNetwork(wifiserializedPath);
+		Measurement measurement = instanceFromJSON();
+		NeuralNetworkPositioningOverSensors positioningOverSensors = new NeuralNetworkPositioningOverSensors(zoneService, 0.6, 0.3, 0.5, bluetoothserializedPath, magnetoserializedPath, wifiserializedPath);
+		Position result = positioningOverSensors.determinePosition(measurement);
+	
 
 	}
 	
 	
 	
+	@Ignore
+	public void createSensorNeuralNetwork() throws FileNotFoundException, IOException, Exception {
+		NeuralNetwork magnetoNeuralNetwork = new NeuralNetwork(0.6, 0.7, 140, "13",
+				"/home/ilona/probaworkspace/neuralnetwork/magnetometertrainingset.arff");
+		NeuralNetwork bluetoothneuralnetwork = new NeuralNetwork(0.6, 0.7, 140, "13",
+				"/home/ilona/probaworkspace/neuralnetwork/bluetoothtrainingset.arff");
+		NeuralNetwork wifineuralnetwork = new NeuralNetwork(0.6, 0.7, 140, "13",
+				"/home/ilona/probaworkspace/neuralnetwork/wifitrainingset.arff");
+		String magnetoserializedPath = "/home/ilona/probaworkspace/neuralnetwork/Mneuralnetwork.ser";
+		String bluetoothserializedPath = "/home/ilona/probaworkspace/neuralnetwork/BTneuralnetwork.ser";
+		String wifiserializedPath = "/home/ilona/probaworkspace/neuralnetwork/Wneuralnetwork.ser";
+		
+	//	magnetoNeuralNetwork.serializeNeuralNetwork(magnetoserializedPath);
+	//	bluetoothneuralnetwork.serializeNeuralNetwork(bluetoothserializedPath);
+	//	wifineuralnetwork.serializeNeuralNetwork(wifiserializedPath);
+	
 
-	@Test
+	}
+	
+
+	@SuppressWarnings("deprecation")
+	@Ignore
 	public void determinePositionOfJSONTest() throws FileNotFoundException, IOException, Exception {
 		NeuralNetwork neuralnetwork = new NeuralNetwork(0.9, 0.7, 280, "18",
 				"/home/ilona/probaworkspace/neuralnetwork/trainingset.txt");
 		String serializedPath = "/home/ilona/probaworkspace/neuralnetwork/neuralnetwork.ser";
-		neuralnetwork.serializeNeuralNetwork(serializedPath);
-		ZoneService zoneService = mockingZoneService();
+	//	neuralnetwork.serializeNeuralNetwork(serializedPath);
 		NeuralNetworkPositioning neuralNetworkPositioning = new NeuralNetworkPositioning(zoneService, serializedPath);
 		Measurement measurement = instanceFromJSON();
 		Position result = neuralNetworkPositioning.determinePosition(measurement);
-		System.out.println("\n" + result.toString());
+		Assert.assertNotNull(result);
 
 	}
 	
+	
+	@Ignore
+	public void deserializeNeuralNetwork() throws JsonParseException, JsonMappingException, IOException{
+		String serializedPath = "/home/ilona/Wneuralnetwork.ser";
+		NeuralNetworkPositioning neuralNetworkPositioning = new NeuralNetworkPositioning(zoneService, serializedPath);
+		Measurement measurement = instanceFromJSON();
+	}
+	
+	
+	
+	@Test
+	public void deserializeJustSerializedObject() throws FileNotFoundException, IOException, Exception{
+		NeuralNetwork neuralnetwork = new NeuralNetwork(0.7, 0.6, 140, "13",
+				"/home/ilona/probaworkspace/neuralnetwork/trainingset.txt");
+		String targetPath = "/tmp/Wneuralnetwork.ser";
+		NeuralNetwork.serializeNeuralNetwork(neuralnetwork, targetPath);
+		NeuralNetwork e = NeuralNetwork.deserialization(targetPath);
 
-	private ZoneService mockingZoneService() throws DatabaseUnavailableException, ZoneNotFoundException {
+		
+		System.out.println("Deserialized NeuralNetwork...");
+		System.out.println("LR: " + e.getLearningRate());
+		System.out.println("M: " + e.getMomentum());
+		System.out.println("TT: " + e.getTrainingTime());
+		System.out.println("HL: " + e.getHiddenLayers());
+
+	}
+	
+	
+	@Before
+	public void mockingZoneService() throws DatabaseUnavailableException, ZoneNotFoundException {
 		zone1 = new Zone("Lab101");
 		zone1.setId(UUID.fromString("5e27bae6-076f-4e5d-acb0-11a2cc2b9e0d"));
 		zone2 = new Zone("Lab102");
@@ -114,7 +216,6 @@ public class NeuralNetworkTest {
 		zone21 = new Zone("Lecture Hall XXVI");
 		zone21.setId(UUID.fromString("fff52967-5b13-4935-afa0-44c375cb84db"));
 		
-		
 		Collection<Zone> zones = new ArrayList<Zone>() {
 			{
 				add(zone1);
@@ -141,32 +242,32 @@ public class NeuralNetworkTest {
 			}
 		};
 
-		ZoneService zoneService = EasyMock.createMock(ZoneService.class);
-		EasyMock.expect(zoneService.getZone(zone1.getId())).andReturn(zone1);
-		EasyMock.expect(zoneService.getZone(zone2.getId())).andReturn(zone2);
-		EasyMock.expect(zoneService.getZone(zone3.getId())).andReturn(zone3);
-		EasyMock.expect(zoneService.getZone(zone4.getId())).andReturn(zone4);
-		EasyMock.expect(zoneService.getZone(zone5.getId())).andReturn(zone5);
-		EasyMock.expect(zoneService.getZone(zone6.getId())).andReturn(zone6);
-		EasyMock.expect(zoneService.getZone(zone7.getId())).andReturn(zone7);
-		EasyMock.expect(zoneService.getZone(zone8.getId())).andReturn(zone8);
-		EasyMock.expect(zoneService.getZone(zone9.getId())).andReturn(zone9);
-		EasyMock.expect(zoneService.getZone(zone10.getId())).andReturn(zone10);
-		EasyMock.expect(zoneService.getZone(zone11.getId())).andReturn(zone11);
-		EasyMock.expect(zoneService.getZone(zone12.getId())).andReturn(zone12);
-		EasyMock.expect(zoneService.getZone(zone13.getId())).andReturn(zone13);
-		EasyMock.expect(zoneService.getZone(zone14.getId())).andReturn(zone14);
-		EasyMock.expect(zoneService.getZone(zone15.getId())).andReturn(zone15);
-		EasyMock.expect(zoneService.getZone(zone16.getId())).andReturn(zone16);
-		EasyMock.expect(zoneService.getZone(zone17.getId())).andReturn(zone17);
-		EasyMock.expect(zoneService.getZone(zone18.getId())).andReturn(zone18);
-		EasyMock.expect(zoneService.getZone(zone19.getId())).andReturn(zone19);
-		EasyMock.expect(zoneService.getZone(zone20.getId())).andReturn(zone20);
-		EasyMock.expect(zoneService.getZone(zone21.getId())).andReturn(zone21);
+		zoneService = EasyMock.createMock(ZoneService.class);
+		EasyMock.expect(zoneService.getZone(zone1.getId())).andReturn(zone1).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone2.getId())).andReturn(zone2).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone3.getId())).andReturn(zone3).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone4.getId())).andReturn(zone4).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone5.getId())).andReturn(zone5).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone6.getId())).andReturn(zone6).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone7.getId())).andReturn(zone7).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone8.getId())).andReturn(zone8).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone9.getId())).andReturn(zone9).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone10.getId())).andReturn(zone10).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone11.getId())).andReturn(zone11).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone12.getId())).andReturn(zone12).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone13.getId())).andReturn(zone13).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone14.getId())).andReturn(zone14).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone15.getId())).andReturn(zone15).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone16.getId())).andReturn(zone16).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone17.getId())).andReturn(zone17).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone18.getId())).andReturn(zone18).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone19.getId())).andReturn(zone19).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone20.getId())).andReturn(zone20).anyTimes();
+		EasyMock.expect(zoneService.getZone(zone21.getId())).andReturn(zone21).anyTimes();
 		EasyMock.expect(zoneService.getZones()).andReturn(zones);
 		EasyMock.replay(zoneService);
-		return zoneService;
 	}
+	
 
 	private Measurement createMeasurement() {
 		MeasurementBuilder measbuilder = new MeasurementBuilder();
@@ -191,8 +292,7 @@ public class NeuralNetworkTest {
 	private Measurement instanceFromJSON() throws JsonParseException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		String json = "{\"id\":\"aded8741-7dae-4c72-b2b1-7f76f63db10c\",\"timestamp\":null"
-				+ ",\"position\":{\"coordinate\":{\"x\":28.0,\"y\":9.0,\"z\":4.4},\"zone\":{\"id\":\"07a25de0-a013-486d-9463-404a348e05ee\",\"name\":null"
-				+ "},\"uuid\":\"2ff85c99-ba99-429b-9453-c740d23fd4f2\"},\"wifiRSSI\":{\"rssiValues\":{\"IITAP2-GUEST\":-79.0,\"doa6\":-83.0,\"doa203\":-82.0,"
+				+ ",\"wifiRSSI\":{\"rssiValues\":{\"IITAP2-GUEST\":-79.0,\"doa6\":-83.0,\"doa203\":-82.0,"
 				+"\"aut-sams-1\":-80.0,\"IITAP2\":-78.0,\"IITAP1\":-55.0,\"IITAP3-GUEST\":-73.0,\"dd\":-83.0,\"IITAP3\":-74.0,\"109\":-70.0,\"GEIAKFSZ\":-63.0,\"KRZq\":-65.0"
 				+",\"doa208\":-53.0,\"IITAP1-GUEST\":-57.0,\"doa207\":-74.0}},\"magnetometer\":{\"xAxis\":0.11991008371114731,"
 				+ "\"yAxis\":-0.9326502084732056,\"zAxis\":0.04995839670300484,\"radian\":0.0},\"bluetoothTags\":{\"tags\":[\"DANI 6B:C2:26:12:62:60\",\"JOE 00:16:53:4C:F9:A4\",\"EV3BD 00:16:53:4C:F5:2D\",\"EV3 00:16:53:4C:FA:67\"]},\"gpsCoordinates\":null,\"rfidtags\":{\"tags\":[]}}";
