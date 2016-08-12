@@ -82,7 +82,8 @@ public class OntologyDAOImpl implements OntologyDAO {
 	 *            the ontology from which we want to create the graph
 	 * @return the graph as a object
 	 */
-	public ZoneMap createGraphWithoutRestrictions(OWLOntology ontology) {
+	public ZoneMap createGraphWithoutRestrictions() {
+		OWLOntology ontology = getNavigationOntology();
 		Set<UUID> iDs = getAllZoneIDs(ontology);
 		Set<Gateway> paths = getPaths(ontology);
 

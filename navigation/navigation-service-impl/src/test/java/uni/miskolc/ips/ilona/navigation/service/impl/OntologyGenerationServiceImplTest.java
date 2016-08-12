@@ -31,7 +31,7 @@ public class OntologyGenerationServiceImplTest {
 	@Test
 	public void testGenerateRawOntology() throws OWLOntologyCreationException {
 		ZoneDAO zoneDAOMock = EasyMock.createMock(ZoneDAO.class);
-		//OntologyDAO ontologyDAOMock = EasyMock.createMock(OntologyDAO.class);
+		OntologyDAO ontologyDAOMock = EasyMock.createMock(OntologyDAO.class);
 		OntologyDAO odao = new OntologyDAOImpl("resources/ILONABASE.owl", "resources/ILONA.owl");
 		Collection<Zone> zones = new ArrayList<Zone>();
 		zones.add(new Zone("test #One"));
@@ -41,11 +41,11 @@ public class OntologyGenerationServiceImplTest {
 		
 		System.out.println(zones.toString());
 
-		//EasyMock.expect(ontologyDAOMock.getBaseOntology())
-		//		.andReturn(manager.loadOntologyFromOntologyDocument(new File("resources/ILONABASE.owl")));
+		EasyMock.expect(ontologyDAOMock.getBaseOntology())
+				.andReturn(manager.loadOntologyFromOntologyDocument(new File("resources/ILONABASE.owl")));
 		EasyMock.expect(zoneDAOMock.readZones()).andReturn(zones);
 		EasyMock.replay(zoneDAOMock);
-		//EasyMock.replay(ontologyDAOMock);
+		EasyMock.replay(ontologyDAOMock);
 
 		OntologyGenerationServiceImpl test = new OntologyGenerationServiceImpl(odao, zoneDAOMock);
 
