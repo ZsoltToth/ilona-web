@@ -13,18 +13,42 @@
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
 
 <script type="text/javascript">
+
 	$("#selectUsers").click(function(event){
 		event.preventDefault();
+		
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		var selectedIndex = document.getElementById("sel2").selectedIndex;
+		 
+		$.ajax({
+			type : "POST",
+			async : true,
+			url : "<c:url value='/tracking/admin/trackingselectdevicesforuser' ></c:url>",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : ""
+			},
+			success : function(result, status, xhr) {
+				alert("SUCCESS!")
+			},
+			error : function(xhr, status, error) {
+				alert("ERROR!");
+			}
+		});
+		/*
 		var list = document.getElementById("sel2");
 		var szov = "";
 		while(list.length != 0) {
 			list.remove(0);
 		}
-		/*
+		
 		for (var i = 0; i < list.length; i++) {
 			list.remove(i);
 		}
-		*/
+		
 		for (var i = 0; i < list.length; i++) {
 			szov += " " + list[i].text;
 		}
@@ -32,8 +56,9 @@
 			var option = document.createElement("option");
 			option.text = "text" + i;
 			list.add(option);
-		}
+		}		
 		$("#szovki").html(szov);
+		*/
 	});
 </script>
 
@@ -47,11 +72,9 @@
 			</div>
 			<div class="panel-body">
 				<select  class="form-control" id="sel2">
-       				<option>1</option>
-       				<option>2</option>
-   				    <option>3</option>
-    				<option>4</option>
-      				<option>5</option>
+       				<c:forEach items="${userids}" var="userid">
+       				<option>${userid}</option>
+       				</c:forEach>
       			</select>
       			<br />
       			<input type="button" value="Select user!" id="selectUsers" >
@@ -66,11 +89,19 @@
       			</select>
       			<br />
       			<input type="button" value="Select device!" >
+      			
+      			Date picker from - to !
 			</div>
 		</div>
 	</div>
 	<div class="col-lg-10">
-		
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				User position:
+			</div>
+			<div class="panel-body">
+			</div>
+		</div>
      
 	</div>
 	

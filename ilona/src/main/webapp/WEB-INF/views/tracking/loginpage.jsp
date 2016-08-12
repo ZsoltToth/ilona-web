@@ -14,42 +14,53 @@
 
 <script type="text/javascript">
 	
-	//$(document).ready(function() {
-		/*
-		 Popover and tooltip initialization in the page.
-		 This two inicialization must be here, because the architect of the page.
-		 If I put this in the main page, that initialization will not initialize the newest elements.
-	    */
-
-		$("#trackingLoginpageLoginbutton").click(function() {
-			$("#errorContent").html("");
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
-			
-			
-			
-			$.ajax({
-				async : true,
-				type : "POST",
-				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
-				},
-				data : {
-					username : $("#trackingLoginpageUseridInput").val(),
-					password : $("#trackingLoginpagePasswordInput").val()
-				},
-				url : "<c:url value='/tracking/processlogin'></c:url>",
-				timeout : 10000,
-				error : function(xhr, status, error) {
-					$("#errorContent").html(xhr.responseText + status + error);
-				},
-				success : function(result, status, xhr) {
-					$("#page-wrapper").html(result);
-				}
-			});
+	$("#trackingLoginpageLoginbutton").click(function() {
+		$("#errorContent").html("");
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+						
+		$.ajax({
+			async : true,
+			type : "POST",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				username : $("#trackingLoginpageUseridInput").val(),
+				password : $("#trackingLoginpagePasswordInput").val()
+			},
+			url : "<c:url value='/tracking/processlogin'></c:url>",
+			timeout : 10000,
+			error : function(xhr, status, error) {
+				$("#errorContent").html(xhr.responseText + status + error);
+			},
+			success : function(result, status, xhr) {
+				$("#page-wrapper").html(result);
+			}
 		});
-	//});
+	});
 
+	$("#trackingLoginpagePasswordReset").click(function() {
+		$("#errorContent").html("");
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+						
+		$.ajax({
+			async : true,
+			type : "POST",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			url : "<c:url value='/tracking/passwordreset'></c:url>",
+			timeout : 10000,
+			error : function(xhr, status, error) {
+				$("#errorContent").html(xhr.responseText + status + error);
+			},
+			success : function(result, status, xhr) {
+				$("#page-wrapper").html(result);
+			}
+		});
+	});
 	
 </script>
 
@@ -87,7 +98,8 @@
 					pattern="[a-zA-Z0-9,.-_?]{6,30}"
 					name="password">  <br/>
 			
-			<button id="trackingLoginpageLoginbutton" type="button" class="btn">Login</button>			
+			<input id="trackingLoginpageLoginbutton" type="button"  value="Login">
+			<input type="button" value="Password reset" id="trackingLoginpagePasswordReset">			
 		</div>
 	</div>
 	

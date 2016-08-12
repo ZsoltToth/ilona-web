@@ -159,40 +159,10 @@ public class TrackingController {
 	@RequestMapping(value = "/probalgatasok", method = { RequestMethod.GET, RequestMethod.POST })
 	public ModelAndView progaltasokToltese(@ModelAttribute("roleadmin") String roleadmin,
 			@ModelAttribute("userid") String userid, Model model, HttpEntity<byte[]> httpEntity) {
-		logger.error("logolás történt 1 !!!");
-		System.out.println(userid);
-		System.out.println(httpEntity.getHeaders().toString());
-		boolean isEqual = "áááé".equals(userid);
-		System.out.println("\n Egyezes " + isEqual);
-		model.addAttribute("kijelzes", userid);
+	
 		
-		UserData user = new UserData();
-		user.setUserid("user2");
-		user.setPassword("password1");
-		user.setUsername("usernameVÁÁÁLT");
-		user.setEmail("emailVALTÁÁÁ@dasdas.com");
-		user.setEnabled(true);
-		user.setLastLoginDate(new Date());
-		user.setCredentialNonExpiredUntil(new Date());
-		user.setNonLocked(true);
-		user.setLockedUntil(new Date());
-		Collection<String> roles = new ArrayList<>();
-		roles.add("ROLE_ADMIN");
-		roles.add("ROLE_USER");
-		user.setRoles(roles);
 		
-		DeviceData device = new DeviceData();
-		device.setDeviceid("dev1");
-		device.setDeviceName("Sajáteszköz");
-		device.setDeviceType("MOBILE");
-		device.setDeviceTypeName("SAMSUNG E3dwasda2");
-		try {
-			dao.deleteDevice(device, user);
-			System.out.println(dao.getUser("user2"));
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
 		
 		
 		return new ModelAndView("Probalgatasok");

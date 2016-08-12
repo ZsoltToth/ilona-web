@@ -16,8 +16,11 @@ public class TrackingModuleCentralManager {
 
 	/*
 	 * Time intervals in milliseconds:
-	 * 1 hour : 3600000L
-	 * 1 day : 86400000L
+	 * 1 hour: 3600000L
+	 * 1 day: 86400000L
+	 * 1 week: 604800000L
+	 * 1 month: 2678400000L
+	 * 1 year: 31536000000L
 	 */
 
 	/*

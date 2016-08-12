@@ -13,6 +13,23 @@
 
 <script type="text/javascript">
 
+	function showModification() {
+		$(".listDevicesUpdateDevice").css("visibility","visible");
+	};
+
+	$(".deviceTypeNameClass").change(function(){
+		var id = $(this).attr('id');
+		id = id.slice(7);
+		var elements = document.getElementsByClassName("listDevicesUpdateDevice");
+	
+		for(var i = 0; i < elements.length; i++) {
+			if(elements[i].getAttribute('href') == id) {
+				elements[i].style.visibility = "visible";				
+			}
+		}		
+		
+	});
+
 	$(".listDevicesDeleteDevice").click(function(event){
 		event.preventDefault();
 		
@@ -90,6 +107,29 @@
 			
 		});
 	});
+	
+	$("#adminUserDevAddNewDeviceBTN").click(function(event){
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			type : "POST",
+			async : true,
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : $("#listDevicesOwnerid").val(),			
+			},
+			url : "<c:url value='/tracking/admin/userdevcreatenewdevicepagerequest'></c:url>",
+			success : function(result, status, xhr) {
+				$("#page-wrapper").html(result);
+			},
+			error : function(xhr, status, error) {
+				alert("error!");
+			}
+		});
+	});
 
 </script>
 
@@ -101,6 +141,7 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<p>${deviceOwner}</p>
+				<p><input id="adminUserDevAddNewDeviceBTN" class="btn btn-default" value="Add new device"> </p>
 			</div>
 			<div class="panel-body">
 				<div class="table-responsive">
@@ -122,11 +163,18 @@
 							<c:forEach var="device" items="${devices}" >
 								<tr>
 									<td>${device.deviceid}</td>
-									<td><input type="text" value="${device.deviceName}" id="devName${device.deviceid}"></td>
-									<td><input type="text" value="${device.deviceType}" id="devType${device.deviceid}"></td>
+									<td><input type="text" value="${device.deviceName}" id="devName${device.deviceid}" onchange="showModification();"></td>
+									<td><input type="text" value="${device.deviceType}" id="devType${device.deviceid}" class="deviceTypeNameClass"></td>
 									<td><input type="text" value="${device.deviceTypeName}" id="devTypeName${device.deviceid}"></td>
 									<td><a href="${device.deviceid}" class="listDevicesDeleteDevice">Delete device <span class="glyphicon glyphicon-ban-circle "></span></a></td>
-									<td><a href="${device.deviceid}" class="listDevicesUpdateDevice">Confirm modifications <span class="glyphicon glyphicon-ok-sign "></span></a></td>
+									<td><a style="visibility:hidden" 
+										href="${device.deviceid}" 
+										class="listDevicesUpdateDevice">Confirm modifications 
+											<span 
+												class="glyphicon glyphicon-ok-sign ">
+											</span>
+										</a>
+									</td>
 											
 								</tr>
 							</c:forEach>						

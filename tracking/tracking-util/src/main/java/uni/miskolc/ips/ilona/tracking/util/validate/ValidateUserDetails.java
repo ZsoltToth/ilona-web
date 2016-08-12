@@ -2,8 +2,6 @@ package uni.miskolc.ips.ilona.tracking.util.validate;
 
 import java.util.regex.Pattern;
 
-import uni.miskolc.ips.ilona.tracking.model.UserDetails;
-
 /**
  * 
  * @author Patrik / A5USL0
@@ -14,7 +12,7 @@ public class ValidateUserDetails {
 	private static String useridPattern = "[a-zA-Z]{1}[a-zA-Z0-9]{0-9}";
 	private static String userNamePattern = "[a-zA-Z]{1}[a-zA-Z0-9]{0-9}";
 	private static String emailPattrern = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-
+/*
 	public static void validateUserDetails(UserDetails userdetails) {
 
 		boolean isUseridValid = Pattern.matches(useridPattern, userdetails.getUserid());

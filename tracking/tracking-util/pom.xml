@@ -29,6 +29,7 @@
 		</dependency>
 
 		<!-- Ilona modul dependencies -->
+		<!-- 
 		<dependency>
 			<groupId>uni.miskolc.ips.ilona</groupId>
 			<artifactId>tracking-service</artifactId>
@@ -39,7 +40,7 @@
 			<artifactId>tracking-persist</artifactId>
 			<version>${tracking.persist.version}</version>
 		</dependency>
-
+		 -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>

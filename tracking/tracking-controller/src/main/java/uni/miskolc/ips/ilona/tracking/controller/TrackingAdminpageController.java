@@ -1,7 +1,6 @@
 package uni.miskolc.ips.ilona.tracking.controller;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +18,6 @@ import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.model.database.DatabaseUserDatas;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedUserException;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;

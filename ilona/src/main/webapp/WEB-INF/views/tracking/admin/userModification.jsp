@@ -15,8 +15,50 @@
 	
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
+		
+	$("#adminUserModUpdateUserDetailsBTN").click(function(event){
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		
+		var enabledCB = document.getElementById("adminUserModEnabledCheckbox");
+		var adminRoleCB = document.getElementById("adminUserModAdminRoleCheckbox");
+		
+		var isEnabled = false;
+		var hasAdminRole = false;
+		
+		if(enabledCB.checked) {
+			isEnabled = true;
+		}
+		
+		if(adminRoleCB.checked) {
+			hasAdminRole = true;
+		}
+		
+		$.ajax({
+			type : "POST",
+			async : true,
+			url : "<c:url value='/tracking/admin/usermodchangeaccountdetails'></c:url>",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : $("#adminUserModUseridHidden").val(),
+				username : $("#adminUserModUsernameTXT").val(),
+				email : $("#adminUserModEmailTXT").val(),
+				enabled : isEnabled,
+				adminRole : hasAdminRole
+			},
+			success : function(result, status, xhr) {
+				alert("success!");
+			},
+			error : function(xhr, status, error) {
+				alert("error!"+status+error);
+			}
+		});
+	});
 	
-	$("#automaticPasswordChange").click(function(event){
+	$("#adminUserModManautomaticPasswordResetBTN").click(function(event){
 		event.preventDefault();
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
@@ -28,7 +70,7 @@
 				xhr.setRequestHeader(header, token);
 			},
 			data : {
-				userid : "patriku"
+				userid : $("#adminUserModUseridHidden").val()
 			},
 			success : function(result, status, xhr) {
 				alert("success!");
@@ -36,6 +78,142 @@
 			error : function(xhr, status, error) {
 				alert("error!"+status+error);
 			}
+		});
+	});
+	
+	$("#adminUserModManualPasswordChangeBTN").click(function(event){
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		
+		//password validity check!
+		
+		$.ajax({
+			type :"POST",
+			async : true,
+			url : "<c:url value='/tracking/admin/usermodmanualpasswordchange'></c:url>",
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : $("#adminUserModUseridHidden").val(),
+				password : $("#adminUserModPassword1TXT").val()
+			},
+			success : function(result, status, xhr) {
+				$("#adminUserModManualPasswordChangeResponseParagh").html(result);
+				$("#adminUserModPassword1TXT").val("");
+				$("#adminUserModPassword2TXT").val("");
+			},
+			error : function(xhr, status, error) {
+				$("#adminUserModManualPasswordChangeResponseParagh").html("Error :'(");
+				$("#adminUserModPassword1TXT").val("");
+				$("#adminUserModPassword2TXT").val("");
+			}
+		});
+	});
+	
+	$("#adminUserModResetAccountExpirationBTN").click(function(event){
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			type : "POST",
+			async : true,
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : $("#adminUserModUseridHidden").val()
+			},
+			url : "<c:url value='/tracking/admin/usermodresetaccountexpiration'></c:url>",
+			success : function(result, status, xhr) {
+				$("#adminUserModLastLoginDateParagh").html("Last login date: " + new Date(result));
+			},
+			error : function(xhr, status, error) {
+				alert("error!"+status+error);
+			}		 
+		});
+	});
+	
+	$("#adminUserModResetPasswordExpirationBTN").click(function(event){
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			type : "POST",
+			async : true,
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : $("#adminUserModUseridHidden").val()
+			},
+			url : "<c:url value='/tracking/admin/usermodresetpasswordexpiration'></c:url>",
+			success : function(result, status, xhr) {
+				$("#adminUserManPasswordValidUntilParagh").html("Account valid until: " + new Date(result));
+				$("#id001test").html("<p class='text-success'>The current password is not expired!</p>");
+				$("#adminUserManResetPasswordExpirationResultParagh").html("Successful modification!");
+				
+			},
+			error : function(xhr, status, error) {
+				alert("error!"+status+error);
+			}		 
+		});
+	});
+	
+	$("#adminUserManLoginAttemptsClearBTN").click(function(event){
+		event.preventDefault();
+		var attempts = document.getElementById("adminUserManLoginAttemptsSelect");
+		while(attempts.length != 0) {
+			attempts.remove(0);
+		}
+	});
+	
+	$("#adminUserManLoginAttemptsDeleteSelectedBTN").click(function(event){
+		event.preventDefault();
+		var attempts = document.getElementById("adminUserManLoginAttemptsSelect");
+		var selected = 1;
+		var maxlimit =attempts.length * attempts.length;
+		while(selected != 0 || maxlimit == 0) {
+			selected = 0;
+			for(var i = 0; i < attempts.length; i++) {
+				if(attempts[i].selected) {
+					attempts.remove(i);
+					selected++;
+				}
+			}
+			maxlimit--;
+		}
+	});
+	
+	$("#adminUserManLoginAttemptsConfirmChangesBTN").click(function(event){
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		var attempts = document.getElementById("adminUserManLoginAttemptsSelect");
+		var attemptArray = [];
+		for (var i = 0; i < attempts.length; i++) {
+			attemptArray[i] = attempts[i].value;
+		}	
+
+		$.ajax({
+			type : "POST",
+			async : true,
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			data : {
+				userid : $("#adminUserModUseridHidden").val(),
+				attempts : attemptArray
+			},
+			url : "<c:url value='/tracking/admin/usermodupdateloginattempts'></c:url>",
+			success : function(result, status, xhr) {
+				alert("success!");
+				
+			},
+			error : function(xhr, status, error) {
+				alert("error!"+status+error);
+			}		 
 		});
 	});
 	
@@ -50,7 +228,7 @@
 				User base details:
 			</div>
 			<div class="panel-body">
-				<label for="creationUserid">Userid:
+				<label for="adminUserModUseridTXT">Userid:
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
@@ -66,9 +244,12 @@
 					required="required"
 					placeholder="Please type in the userid!"
 					pattern = "${useridPattern}"
-					name="userid"><br />
+					name="userid"
+					value="${Userid}"><br />
 					
-				<label for="creationUserid">Username:
+				<input type="hidden" id="adminUserModUseridHidden" value="${Userid}">
+					
+				<label for="adminUserModUsernameTXT">Username:
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
@@ -80,13 +261,14 @@
 					
 				<input type="text" 
 					class="form-control"
-					id="creationUserid"
+					id="adminUserModUsernameTXT"
 					required="required"
 					placeholder="Please type in the userid!"
 					pattern = "${useridPattern}"
-					name="userid"><br />
+					name="userid"
+					value="${Username}"><br />
 					
-				<label for="creationUserid">Email address:
+				<label for="adminUserModEmailTXT">Email address:
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
@@ -98,16 +280,17 @@
 					
 				<input type="text" 
 					class="form-control"
-					id="creationUserid"
+					id="adminUserModEmailTXT"
 					required="required"
 					placeholder="Please type in the userid!"
 					pattern = "${useridPattern}"
-					name="userid"><br />
+					name="userid"
+					value="${Email}"><br />
 				
-				<label for="creationUserid">Enabled:
+				<label for="adminUserModEnabledCheckbox">Enabled:
 					<span data-toggle="popover"
 						data-html="true"
-						data-trigger="hover"
+						data-trigger="hover"				
 						data-content="${useridRestriction}"
 						title="The userid pattern can contain the following elements:"
 						class="fa  fa-info-circle">
@@ -115,11 +298,46 @@
 				</label> <br />
 					
 				<input type="checkbox" 
-					id="creationUserid"
+					id="adminUserModEnabledCheckbox"
 					required="required"
+					${Enabled}
 					placeholder="Please type in the userid!"
 					pattern = "${useridPattern}"
 					name="userid"><br />
+				
+				<label for="adminUserModAdminRoleCheckbox">Admin role:
+					<span data-toggle="popover"
+						data-html="true"
+						data-trigger="hover"
+						${Enabled}
+						data-content="${useridRestriction}"
+						title="The userid pattern can contain the following elements:"
+						class="fa  fa-info-circle">
+					</span>
+				</label> <br />
+				
+				<input type="checkbox" 
+					id="adminUserModAdminRoleCheckbox"
+					required="required"
+					placeholder="Please type in the userid!"
+					pattern = "${useridPattern}"
+					name="userid"
+					${IsAdmin}><br /><br />
+					
+				<input type="button" class="btn btn-default" value="Update account details!" id="adminUserModUpdateUserDetailsBTN"><br /><br /><br />
+					<c:choose >
+							<c:when test="${AccountExpiration == 'ERROR'}">
+								<p class="text-danger">The current account is expired!</p>
+							
+							</c:when>
+							<c:otherwise>
+								<p class="text-success">The current account is not expired!</p>
+							</c:otherwise>
+						</c:choose>
+					
+					<p id ="adminUserModLastLoginDateParagh">Last login date: ${lastLoginDate}</p><br />
+				<input type="button" class="btn btn-default" value="Reset account expiration!" id="adminUserModResetAccountExpirationBTN"><br />
+						
 			</div>
 		</div>
 	</div>
@@ -127,7 +345,7 @@
 	<div class="col-lg-6">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				User password change
+				User password change:
 			</div>
 			<div class="panel-body">
 				<label for="creationUserid">Password:
@@ -140,25 +358,60 @@
 					</span>
 				</label>
 					
-				<input type="text" 
+				<input type="password" 
 					class="form-control"
-					id="creationUserid"
+					id="adminUserModPassword1TXT"
 					required="required"
 					placeholder="Please type in the userid!"
 					pattern = "${useridPattern}"
-					name="userid"><br />			
+					name="password1"><br />			
 					
-				<input type="text" 
+				<input type="password" 
 					class="form-control"
-					id="creationUserid"
+					id="adminUserModPassword2TXT"
 					required="required"
 					placeholder="Please type in the userid!"
 					pattern = "${useridPattern}"
-					name="userid"><br />
+					name="password2"><br />
 					
-				<input type="button" value="Change password!" id="changepadasd"><br /><br /><br />
-				<input type="button" value="Generate and send password!" id="automaticPasswordChange">
+				<input type="button" value="Change password!" id="adminUserModManualPasswordChangeBTN">
+				<input type="button" value="Generate and send password!" id="adminUserModManautomaticPasswordResetBTN">
+				<p id="adminUserModManualPasswordChangeResponseParagh"></p><br />
+				<p><b>Account expiration details:</b></p>
+				<div id="id001test">
+				<c:choose>
+					<c:when test="${passwordExpiration == 'ERROR'}">
+						<p class="text-danger">The current password is expired!</p>
+					</c:when>
+					<c:otherwise>
+						<p class="text-success">The current password is not expired!</p>
+					</c:otherwise> 				
+				</c:choose>
+				</div>	
+				<p id="adminUserManPasswordValidUntilParagh">Account valid until: ${passwordValidUntil}</p>
+				<br />
+				<input type="button" value="Reset password expiration!" id="adminUserModResetPasswordExpirationBTN">
+				<p id="adminUserManResetPasswordExpirationResultParagh"></p>
 				
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-lg-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Account locked details:
+			</div>
+			<div class="panel-body">
+				<p>Bad login attempts: (Hold ctrl to select more!)</p>
+				<select multiple class="form-control" id="adminUserManLoginAttemptsSelect" size="15">
+       				<c:forEach items="${loginAttempts}" var="attempt">
+       					<option value="${attempt.formatMilliseconds}">${attempt.formatDate}</option>
+       				</c:forEach>
+      			</select> <br />		
+      			<input type="button" value="Clear all!" id="adminUserManLoginAttemptsClearBTN"> 
+      			<input type="button" value="Clear selected!" id="adminUserManLoginAttemptsDeleteSelectedBTN"> 
+      			<input type="button" value="Confirm changes!" id="adminUserManLoginAttemptsConfirmChangesBTN">		
 			</div>
 		</div>
 	</div>

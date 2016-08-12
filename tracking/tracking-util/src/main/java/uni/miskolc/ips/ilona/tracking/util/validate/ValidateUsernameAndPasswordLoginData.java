@@ -2,7 +2,7 @@ package uni.miskolc.ips.ilona.tracking.util.validate;
 
 import java.util.regex.Pattern;
 
-import uni.miskolc.ips.ilona.tracking.model.UsernameAndPasswordLoginData;
+
 
 /**
  * This class is responsible for validating the UsernameAndPasswordLoginData.
@@ -22,25 +22,21 @@ public class ValidateUsernameAndPasswordLoginData {
 	public ValidateUsernameAndPasswordLoginData() {
 
 	}
-
+/* 
 	public static ValidityStatusHolder ValidateLoginData(UsernameAndPasswordLoginData logindata) {
 		ValidityStatusHolder holder = new ValidityStatusHolder();
 		if (logindata == null) {
 			holder.addValidityError("the password is null");
 			return holder;
 		}
-		/*
-		 * Get the userid errors
-		 */
+		
 		holder.appendValidityStatusHolder(ValidateUserid(logindata.getUserid()));
-		/*
-		 * Get the password errors
-		 */
+		
 		holder.appendValidityStatusHolder(ValidatePassword(logindata.getPassword()));
 
 		return holder;
 	}
-
+*/
 	public static ValidityStatusHolder ValidateUserid(String userid) {
 		ValidityStatusHolder holder = new ValidityStatusHolder();
 		if (userid == null) {

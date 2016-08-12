@@ -2,6 +2,7 @@ package uni.miskolc.ips.ilona.tracking.model;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * Dokumentáció készítése!
@@ -147,7 +148,31 @@ public class UserData {
 	}
 
 	public void setRoles(Collection<String> roles) {
-		this.roles = roles;
+		if (roles != null) {
+			this.roles = roles;
+		}
+	}
+
+	public void addRole(String role) {
+		if (role == null) {
+			return;
+		}
+		boolean exists = false;
+		for (String storedrole : roles) {
+			if (storedrole.equals(role)) {
+				exists = true;
+			}
+		}
+		if (exists == true) {
+			roles.add(role);
+		}
+	}
+
+	public void removeRole(String role) {
+		if (role == null) {
+			return;
+		}
+		roles.remove(role);
 	}
 
 	public Date getLastLoginDate() {
@@ -187,7 +212,31 @@ public class UserData {
 	}
 
 	public void setBadLogins(Collection<Date> badLogins) {
-		this.badLogins = badLogins;
+		if (badLogins != null) {
+			this.badLogins = badLogins;
+		}
+	}
+
+	public void addBadLogin(Date login) {
+		if (login == null) {
+			return;
+		}
+		boolean exists = false;
+		for (Date storedLogin : this.badLogins) {
+			if (storedLogin.getTime() == login.getTime()) {
+				exists = true;
+			}
+		}
+		if (exists != true) {
+			this.badLogins.add(login);
+		}
+	}
+
+	public void removeBadLogin(Date login) {
+		if (login == null) {
+			return;
+		}
+		this.badLogins.remove(login);
 	}
 
 	public Collection<DeviceData> getDevices() {
@@ -195,7 +244,45 @@ public class UserData {
 	}
 
 	public void setDevices(Collection<DeviceData> devices) {
-		this.devices = devices;
+		if (devices != null) {
+			this.devices = devices;
+		}
+	}
+
+	public void addDevice(DeviceData newDevice) {
+		if (newDevice == null) {
+			return;
+		}
+		// validity?!
+		/*
+		 * Update
+		 */
+		for (DeviceData dev : this.devices) {
+			if (dev.getDeviceid().equals(newDevice.getDeviceid())) {
+				dev.setDeviceName(newDevice.getDeviceName());
+				dev.setDeviceType(newDevice.getDeviceType());
+				dev.setDeviceTypeName(newDevice.getDeviceTypeName());
+				return;
+			}
+		}
+		/*
+		 * Not exists, add
+		 */
+		this.devices.add(newDevice);
+	}
+
+	public void removeDevice(DeviceData noDevice) {
+		if (noDevice == null) {
+			return;
+		}
+		Iterator<DeviceData> devIt = this.devices.iterator();
+		while (devIt.hasNext()) {
+			DeviceData data = devIt.next();
+			if (data.getDeviceid().equals(noDevice.getDeviceid())) {
+				devIt.remove();
+				return;
+			}
+		}
 	}
 
 	@Override
@@ -206,5 +293,4 @@ public class UserData {
 				+ ", nonLocked=" + nonLocked + ", badLogins=" + badLogins + ", devices=" + devices + "]";
 	}
 
-	
 }

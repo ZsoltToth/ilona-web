@@ -8,9 +8,9 @@
 
 
 <!-- CSRF Protection token -->
-<meta name="_csrf" content="${_csrf.token}"/>
-	<!-- default header name is X-CSRF-TOKEN -->
-<meta name="_csrf_header" content="${_csrf.headerName}"/>
+<meta name="_csrf" content="${_csrf.token}" />
+<!-- default header name is X-CSRF-TOKEN -->
+<meta name="_csrf_header" content="${_csrf.headerName}" />
 
 
 
@@ -19,6 +19,9 @@
 
 <div class="row" id="adminMainpageContent">
 	<div class="col-lg-12">
-	dsadasdas
+		<div class="panel panel-default">
+			<div class="panel-heading"></div>
+			<div class="panel-body"></div>
+		</div>
 	</div>
 </div>

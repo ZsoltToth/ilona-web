@@ -132,6 +132,26 @@
 		});
 	});
 	
+	$("#adminNavbarStat").click(function(event) {
+		event.preventDefault();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			async : true,
+			type : "POST",
+			url : $("#adminNavbarStat").attr('href'),
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+			},
+			success : function(result, status, xhr) {
+				$("#page-wrapper").html(result);
+			},
+			error : function(xhr, status, error) {
+				alert("ADMIN - CREATE USER ERROR!");
+			}
+		});
+	});
+	
 	$("#adminNavbarLogout").click(function(event) {
 		event.preventDefault();
 		var token = $("meta[name='_csrf']").attr("content");
@@ -183,7 +203,7 @@
 				href="<c:url value='/tracking/admin/trackingmainpage'></c:url>"><span
 					class="fa fa-share-alt"></span> Track</a></li>
 			<li><a id="adminNavbarStat"
-				href="<c:url value='/tracking/getmainpagehome'></c:url>"><span
+				href="<c:url value='/tracking/admin/statistics'></c:url>"><span
 					class="glyphicon glyphicon-tasks"></span> Statistics</a></li>
 		</ul>
 		<ul class="nav navbar-nav navbar-right">

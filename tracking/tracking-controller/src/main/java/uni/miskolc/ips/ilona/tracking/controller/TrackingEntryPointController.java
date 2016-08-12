@@ -106,12 +106,12 @@ public class TrackingEntryPointController {
 		 */
 		if (authentication != null) {
 			logger.error("Anonymus authentication request!");
-			
-			for(GrantedAuthority role : authentication.getAuthorities()) {
-				if(role.getAuthority().equals("ROLE_ANONYMOUS")) {
+
+			for (GrantedAuthority role : authentication.getAuthorities()) {
+				if (role.getAuthority().equals("ROLE_ANONYMOUS")) {
 					return new ModelAndView("tracking/mainpageHome");
 				}
-			}					
+			}
 		}
 
 		/**
@@ -201,8 +201,21 @@ public class TrackingEntryPointController {
 		}
 		return mav;
 	}
-	
-	
+
+	@RequestMapping(value = "/passwordreset", method = { RequestMethod.POST })
+	public ModelAndView createTrackingPasswordResetpageHandler() {
+		ModelAndView mav = new ModelAndView("tracking/passwordReset");
+
+		return mav;
+	}
+
+	@RequestMapping(value = "/resetpassword", method = { RequestMethod.POST })
+	public ModelAndView trackingResetPasswordHandler() {
+		ModelAndView mav = new ModelAndView("tracking/passwordReset");
+
+		return mav;
+	}
+
 	@ExceptionHandler(value = { InvalidUserRegistration.class })
 	public ModelAndView userRegistrationInvalidityHandler(Throwable error) {
 		if (error instanceof InvalidUserRegistration) {

@@ -1,5 +1,6 @@
 package uni.miskolc.ips.ilona.tracking.controller;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,11 @@ public class AdminpageTrackingController {
 		ModelAndView mav = new ModelAndView("tracking/admin/tracking");
 		try {
 			Collection<UserData> users = userAndDeviceDAO.getAllUsers();
+			Collection<String> userids = new ArrayList<String>(users.size());
+			for(UserData user : users) {
+				userids.add(user.getUserid());
+			}
+ 			mav.addObject("userids", userids);
 		} catch (Exception e) {
 
 		}
