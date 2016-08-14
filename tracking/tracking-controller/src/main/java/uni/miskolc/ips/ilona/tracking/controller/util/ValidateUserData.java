@@ -67,6 +67,10 @@ public class ValidateUserData {
 
 	public static ValidityStatusHolder validateRawPassword(String password) {
 		ValidityStatusHolder errors = new ValidityStatusHolder();
+		if(password == null) {
+			errors.addValidityError("The password is empty!");
+			return errors;
+		}
 		if(!Pattern.matches(WebpageInformationProvider.getPasswordpattern(), password)) {
 			errors.addValidityError("Invalid password!");
 		}

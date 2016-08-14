@@ -27,13 +27,6 @@ public class UserAccountManagementController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@RequestMapping(value = "/homepage", method = { RequestMethod.POST })
-	public ModelAndView createUserMainpageHandler() {
-		ModelAndView mav = new ModelAndView("tracking/user/userMainpage");
-
-		return mav;
-	}
-
 	@RequestMapping(value = "/accountmanagement", method = { RequestMethod.POST })
 	public ModelAndView createAccountManagementHandler() {
 		ModelAndView mav = new ModelAndView("tracking/user/accountManagement");
@@ -41,7 +34,7 @@ public class UserAccountManagementController {
 		return mav;
 	}
 
-	@RequestMapping(value = "/accmanchangeuserdetails", method = { RequestMethod.POST })
+	@RequestMapping(value = "/accountmanagement/changeuserdetails", method = { RequestMethod.POST })
 	public ModelAndView changerUserDetailsHandler(@ModelAttribute() UserBaseDetailsDTO newUserDetails) {
 		ModelAndView mav = new ModelAndView("tracking/user/accountManagement");
 
@@ -158,6 +151,10 @@ public class UserAccountManagementController {
 		return mav;
 	}
 
+	/**
+	 * 
+	 * @param mav
+	 */
 	private void fillModelAndViewPageDetails(ModelAndView mav) {
 
 		mav.addObject("useridRestriction", WebpageInformationProvider.getUseridRestrictionMessage());

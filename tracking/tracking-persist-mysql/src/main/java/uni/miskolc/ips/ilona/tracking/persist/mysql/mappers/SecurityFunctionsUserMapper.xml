@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="uni.miskolc.ips.ilona.tracking.persist.mysql.mappers.SecurityFunctionsUserMapper">
+
+	<insert id="insertRoles">
+		insert into TrackingUserRoles(userid, userrole) values
+		<foreach collection="roles" item="role" separator=",">
+			(#{userid},
+			#{role})
+		</foreach>
+		;
+	</insert>
+
+	<insert id="updateBadLogins">
+		insert into TrackingLoginAttempts(userid, attempt) values
+		<foreach collection="badLogins" item="badlogin" separator=",">
+			(#{userid}, from_unixtime(#{badlogin}))
+		</foreach>
+		;
+	</insert>
+
+	<update id="updatePassword">
+		update TrackingUsers set password = #{password} where
+		userid = #{userid};
+	</update>
+
+	<update id="updateEnabled">
+		update TrackingUsers set enabled = #{enabled,
+		typeHandler=BooleanToIntHander} where userid = #{userid};
+	</update>
+
+	<update id="updateAccountExpiration">
+		update TrackingUsers set lastlogindate =
+		#{accountExpiration} where userid = #{userid};
+	</update>
+
+	<update id="updateLockedAndUntilLocked">
+		update TrackingUsers set nonlocked = #{nonLocked,
+		typeHandler=BooleanToIntHander}, lockeduntil =
+		from_unixtime(#{lockedUntil});
+	</update>
+
+	<delete id="eraseRoles">
+		delete from
+		TrackingUserRoles where userid =
+		#{userid};
+	</delete>
+
+	<delete id="eraseBadLogins">
+		delete from TrackingLoginAttempts where userid =
+		#{userid};
+	</delete>
+
+
+</mapper>

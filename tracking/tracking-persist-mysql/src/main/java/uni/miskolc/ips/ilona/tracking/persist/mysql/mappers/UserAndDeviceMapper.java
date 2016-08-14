@@ -16,21 +16,13 @@ public interface UserAndDeviceMapper {
 	 */
 
 	/**
-	 * UserBase part
-	 * This basedata contains the following columns:
+	 * UserBase part This basedata contains the following columns:
 	 * 
-	 *  - userid
-	 *  - username
-	 *  - email
-	 *  - password
-	 *  - enabled
-	 *  - nonlocked
-	 *  - lockeduntil
-	 *  - lastlogindate
-	 *  - credentialsvaliduntil
-	 *  
-	 *  and fills these values into a UserBase.
-	 *  
+	 * - userid - username - email - password - enabled - nonlocked -
+	 * lockeduntil - lastlogindate - credentialsvaliduntil
+	 * 
+	 * and fills these values into a UserBase.
+	 * 
 	 */
 	int createUserBaseData(UserData user);
 
@@ -57,9 +49,12 @@ public interface UserAndDeviceMapper {
 	 * LoginAttempts part
 	 */
 
-	Collection<Date> readLoginAttempts(String userid);
+	Collection<Long> readLoginAttempts(String userid);
 
 	int deleteLoginAttempts(@Param(value = "userid") String userid, @Param(value = "beforeDate") Date beforeDate);
+
+	int storeLoginAttemptsWithMilliseconds(@Param(value = "userid") String userid,
+			@Param(value = "attempts") Collection<Double> attempts);
 
 	int storeLoginAttempts(UserData user);
 
@@ -68,11 +63,11 @@ public interface UserAndDeviceMapper {
 	 */
 
 	int storeDevice(@Param(value = "device") DeviceData device, @Param(value = "user") UserData user);
-	
-	Collection<DeviceData> getUserDevices(@Param("user")UserData user);
-	
+
+	Collection<DeviceData> getUserDevices(@Param("user") UserData user);
+
 	int deleteDevice(@Param(value = "device") DeviceData device, @Param(value = "user") UserData user);
-	
+
 	int updateDevice(@Param(value = "device") DeviceData device, @Param(value = "user") UserData user);
 
 }

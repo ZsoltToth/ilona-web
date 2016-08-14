@@ -17,33 +17,40 @@
 <script type="text/javascript">
 	/*
 	 * Popover and tooltip initialization.
-	 * This two inicialization must be here, because the architect of the page.
+	 * This two inicializations must be here, because the architect of the page.
 	 * If I put this in the main page, that initialization will not initialize the newest elements.
 	 */
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
 	
-	$("#btnUserCreation").click(function(event){
+	$("#mainpageSignupRegistrationBTN").click(function(event){
 		event.preventDefault();
-		$("#signupErrors").html("");
+		/*
+		 * Clear the error div.
+		 */
+		$("#mainpageSignupErrorDIV").html("");
+		
+		/*
+		 * Validity checking.
+		 */
 		var hadError = 0;
 		var errorText = "";
 		
-		var userid = document.getElementById("useridInput");			
+		var userid = document.getElementById("mainpageSignupUseridTXT");			
 		if (userid.checkValidity() == false) {
 			errorText += "<p class='text-danger bg-primary'>Invalid userid!</p>";
 			
 			hadError = 1;
 		}
 		
-		var username = document.getElementById("usernameInput");	
+		var username = document.getElementById("mainpageSignupUsernameTXT");	
 		if (username.checkValidity() == false) {
 			errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
 			hadError = 1;
 		}
 		
-		var password1 = document.getElementById("passwordInput1");
-		var password2 = document.getElementById("passwordInput2");
+		var password1 = document.getElementById("mainpageSignupPassword1TXT");
+		var password2 = document.getElementById("mainpageSignupPassword2TXT");
 		if (password1.checkValidity() == false) {
 			errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
 			hadError = 1;
@@ -53,14 +60,20 @@
 			hadError = 1;
 		}
 		
-		var email = document.getElementById("emailInput");
+		var email = document.getElementById("mainpageSignupEmailTXT");
 		if(email.checkValidity()  == false) {
 			errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
 			hadError = 1;
 		}
 		
+		/*
+		 * Bad validity.
+		 */
 		if (Boolean(hadError) == true) {
-			$("#signupErrors").html(errorText);
+			$("#mainpageSignupErrorDIV").html(errorText);
+			/*
+			 * After good validity.
+			 */
 		} else{
 			var token = $("meta[name='_csrf']").attr("content");
 			var header = $("meta[name='_csrf_header']").attr("content");
@@ -72,125 +85,133 @@
 					xhr.setRequestHeader(header, token);
 				},
 				data : {
-					userid : $("#useridInput").val(),
-					username : $("#usernameInput").val(),
-					password : $("#passwordInput1").val(),
-					email : $("#emailInput").val(),
+					userid : $("#mainpageSignupUseridTXT").val(),
+					username : $("#mainpageSignupUsernameTXT").val(),
+					password : $("#mainpageSignupPassword1TXT").val(),
+					email : $("#mainpageSignupEmailTXT").val(),
 				},
 				success : function(result, status, xhr) {
-					$("#page-wrapper").html(result);
+					$("#mainpageSignupUseridTXT").val("");
+					$("#mainpageSignupUsernameTXT").val("");
+					$("#mainpageSignupPassword1TXT").val("");
+					$("#mainpageSignupPassword2TXT").val("");
+					$("#mainpageSignupEmailTXT").val("");				
+					var resultText = "";
+					for(var i = 0; i < result.length; i++) {						
+						resultText+= "<p class='bg-primary'>" + result[i] +"</p>"
+					}
+					$("#mainpageSignupErrorDIV").html(resultText);
+
 				},
 				error : function(xhr, status, error) {
-					$("#page-wrapper").html(xhr.responseText);
+					$("#mainpageSignupUseridTXT").val("");
+					$("#mainpageSignupUsernameTXT").val("");
+					$("#mainpageSignupPassword1TXT").val("");
+					$("#mainpageSignupPassword1TXT").val("");
+					$("#mainpageSignupEmailTXT").val("");
+					$("#mainpageSignupErrorDIV").
+					html("<p class='bg-primary'>There has been an error with the service!</p>");
 				}
 			});
-		}	
-		//alert("OK!");
-		
+		}			
 	});
 </script>
 
-<div class="col-lg-12">
+<jsp:directive.include file="mainpageNavbar.jsp" />
 
-	<jsp:directive.include file="mainpageNavbar.jsp" />
-	
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<h3 class="panel-title">ILONA - Tracking module user sign up!</h3>
-		</div>
-		<div class="panel-body">
-			
-				
-				<label for="useridInput">Userid: <br /> For more information:
-					<span data-toggle="popover"
-						data-html="true"
-						data-trigger="hover"
-						data-content="${useridRestriction}"
-						title="The userid can contain the following elements:"
-						class="fa  fa-info-circle">
-					</span>
-				</label>
-					
-				<input type="text"
-					class="form-control"
-					id="useridInput"
-					required="required"
-					placeholder="Please type in your userid!"
-					pattern="${useridPattern}"
-					name="userid"> <br />
-					
-				<label for="usernameInput">Username: <br /> For more information:
-					<span data-toggle="popover"
-						data-html="true"
-						data-trigger="hover"
-						data-content="${usernameRestriction}"
-						title="The username can contain the following elements:"
-						class="fa  fa-info-circle">
-					</span>
-				</label>
-					
-				<input type="text"
-					class="form-control"
-					id="usernameInput"
-					required="required"
-					placeholder="Please type in your username!"
-					pattern="${usernamePattern}"
-					name="username" > <br />
-					
-				<label for="passwordInput1">Password: <br /> For more information:
-					<span data-toggle="popover"
-						data-html="true" 
-						data-trigger="hover"
-						data-content="${passwordRestriction}"
-						title="The userid pattern can contain the following elements:"
-						class="fa  fa-info-circle">
-					</span>
-				</label>
-				
-				<input type="password"
-					class="form-control"
-					id="passwordInput1"
-					required="required"
-					placeholder="Please type in your password!"
-					pattern="${passwordPattern}"
-					name="password"> <br />
-					
-				<input type="password"
-					class="form-control"
-					id="passwordInput2"
-					required="required"
-					placeholder="Please type in your password!"
-					pattern="[a-zA-Z0-9,.-_?]{6,30}"
-					name="password"> <br />
-					
-				<label for="emailInput">Email address: <br /> For more information:
-					<span data-toggle="popover"
-						data-html="true"
-						data-trigger="hover"
-						data-content="${emailRestriction}"
-						class="fa  fa-info-circle">
-					</span>
-				</label>
-					
-				<input type="email"
-					class="form-control"
-					id="emailInput"
-					required="required"
-					placeholder="Please type in your email address!"
-					name="userid"><br />
-
-			<button id="btnUserCreation" type="button" class="btn">Register</button>
-			
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-lg-12">		
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">ILONA - Tracking module user sign up!</h3>
+				</div>
+				<div class="panel-body">
+						<div id="mainpageSignupErrorDIV">
+							
+						</div>				
+						<label for="mainpageSignupUseridTXT">Userid: <br /> For more information:
+							<span data-toggle="popover"
+								data-html="true"
+								data-trigger="hover"
+								data-content="${useridRestriction}"
+								title="The userid can contain the following elements:"
+								class="fa  fa-info-circle">
+							</span>
+						</label>
+							
+						<input type="text"
+							class="form-control"
+							id="mainpageSignupUseridTXT"
+							required="required"
+							placeholder="Please type in your userid!"
+							pattern="${useridPattern}"
+							name="userid"> <br />
+							
+						<label for="mainpageSignupUsernameTXT">Username: <br /> For more information:
+							<span data-toggle="popover"
+								data-html="true"
+								data-trigger="hover"
+								data-content="${usernameRestriction}"
+								title="The username can contain the following elements:"
+								class="fa  fa-info-circle">
+							</span>
+						</label>
+							
+						<input type="text"
+							class="form-control"
+							id="mainpageSignupUsernameTXT"
+							required="required"
+							placeholder="Please type in your username!"
+							pattern="${usernamePattern}"
+							name="username" > <br />
+							
+						<label for="mainpageSignupPassword1TXT">Password: <br /> For more information:
+							<span data-toggle="popover"
+								data-html="true" 
+								data-trigger="hover"
+								data-content="${passwordRestriction}"
+								title="The userid pattern can contain the following elements:"
+								class="fa  fa-info-circle">
+							</span>
+						</label>
 						
-		</div>
+						<input type="password"
+							class="form-control"
+							id="mainpageSignupPassword1TXT"
+							required="required"
+							placeholder="Please type in your password!"
+							pattern="${passwordPattern}"
+							name="password"> <br />
+							
+						<input type="password"
+							class="form-control"
+							id="mainpageSignupPassword2TXT"
+							required="required"
+							placeholder="Please type in your password!"
+							pattern="[a-zA-Z0-9,.-_?]{6,30}"
+							name="password"> <br />
+							
+						<label for="mainpageSignupEmailTXT">Email address: <br /> For more information:
+							<span data-toggle="popover"
+								data-html="true"
+								data-trigger="hover"
+								data-content="${emailRestriction}"
+								class="fa  fa-info-circle">
+							</span>
+						</label>
+							
+						<input type="email"
+							class="form-control"
+							id="mainpageSignupEmailTXT"
+							required="required"
+							placeholder="Please type in your email address!"
+							name="userid"><br />
 		
-		<div class="panel panel-default" id="signupErrors">
-		<c:if test="${errors != null }">
-			<c:forEach var="error" items="${errors}" >
-				<p class='text-danger bg-primary'>${error}</p> <br/>
-			</c:forEach>
-		</c:if>
-	</div>
-	</div>
-	
-</div>
+					<button id="mainpageSignupRegistrationBTN" type="button" class="btn">Register</button>
+							
+				</div>	<!-- panel body end -->							
+			</div> <!-- panel default end -->
+		</div> <!-- col-12 end -->
+	</div> <!-- Row end -->
+</div> <!-- container fluid end -->

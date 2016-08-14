@@ -23,53 +23,18 @@
 	<mvc:resources mapping="/fonts/**" location="/fonts/" />
 	<mvc:resources mapping="/jpg/**" location="/jpg/" />
 
-<!-- 
-	<bean
-		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-		<property name="messageConverters">
-			<list>
-				<bean
-					class="org.springframework.http.converter.StringHttpMessageConverter">
-					<property name="supportedMediaTypes">
-						<list>
-							<bean class="org.springframework.http.MediaType">
-								<constructor-arg index="0" value="text" />
-								<constructor-arg index="1" value="plain" />
-								<constructor-arg index="2" value="UTF-8" />
-							</bean>
-							<bean class="org.springframework.http.MediaType">
-								<constructor-arg index="0" value="*" />
-								<constructor-arg index="1" value="*" />
-								<constructor-arg index="2" value="UTF-8" />
-							</bean>
-						</list>
-					</property>
-				</bean>
-			</list>
-		</property>
-	</bean>
- -->
-	<!-- Properties Bean git/ilona/ilona/src/main/webapp/WEB-INF/mybatis-configuration.xml-->
+	<!-- Properties Bean linux: git/ilona/ilona/src/main/webapp/WEB-INF/mybatis-configuration.xml -->
+	<!-- Properties Bean windows: mybatis-configuration.xml (default! desktop) -->
 	<bean id="systemProperties"
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
 			<props>
-				<prop key="mybatisConfig">git/ilona/ilona/src/main/webapp/WEB-INF/mybatis-configuration.xml
+				<prop key="mybatisConfig">mybatis-configuration.xml
 				</prop>
 			</props>
 		</property>
 	</bean>
-<!-- 
-	<bean id="TrackingUserDAO"
-		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySqlAndMybatisTrackingUserDAOImplementation">
-		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
-		<constructor-arg name="host" value="${database.host}" />
-		<constructor-arg name="port" value="${database.port}" />
-		<constructor-arg name="database" value="${database.db}" />
-		<constructor-arg name="user" value="${database.user}" />
-		<constructor-arg name="password" value="${database.password}" />
-	</bean>
- -->
+
 	<!-- DATABASE DAO Beans -->
 	<bean id="zoneDAO"
 		class="uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLZoneDAO">
@@ -112,52 +77,7 @@
 		<!--<constructor-arg ref="positionDAO" /> -->
 		<constructor-arg ref="measurementDAO" />
 	</bean>
- <!--  
- 	<bean id="trackingUserAndTrackingService" 
- 		class="uni.miskolc.ips.ilona.tracking.service.impl.TrackingUserManagementAndTrackingServiceImpl" >
- 		<constructor-arg ref="trackingUserAndTrackingDAO"></constructor-arg>
- 	</bean>
-  -->
-  
-  	<!-- 
-  	<bean id="trackingCenterManager" 
-  		class="uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager"
-  		init-method="init">
-  		
-  	</bean>
- 	--> 
- 	 
- 	 <bean id="CustomUserSecurityService" class="uni.miskolc.ips.ilona.tracking.controller.security.CustomUserDetailsService">
- 	 	<constructor-arg>
- 	 		<ref bean="trackingUserAndDeviceDAO"/>
- 	 	</constructor-arg>
- 	 </bean>
- 	 
- 	 <bean id="CustomAuthProvider" class="uni.miskolc.ips.ilona.tracking.controller.security.CustomAuthenticationProvider">
- 	 	<constructor-arg ref="CustomUserSecurityService"></constructor-arg>
- 	 	<constructor-arg ref="passwordEncoder"></constructor-arg>
- 	 </bean>
- 	 	
-  	<bean id="UserAndDeviceService" class="uni.miskolc.ips.ilona.tracking.service.impl.UserAndDeviceServiceImpl"
-  		depends-on="trackingUserAndDeviceDAO">
-  		<constructor-arg>
-  			<ref bean="trackingUserAndDeviceDAO"/>
-  		</constructor-arg>
-  	</bean>
-  	
- 	<bean id="trackingUserAndDeviceDAO"
-		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySqlAndMybatisUserAndDeviceDAOImplementation">
-		<constructor-arg name="configFilePath" value="${mybatisConfig}" />
-		<constructor-arg name="host" value="${database.host}" />
-		<constructor-arg name="port" value="${database.port}" />
-		<constructor-arg name="database" value="${database.db}" />
-		<constructor-arg name="user" value="${database.user}" />
-		<constructor-arg name="password" value="${database.password}" />
-	</bean>
 
-	<bean id="customLogout" class="security.CustomlogoutSuccerHandler">
-
-	</bean>
 	<!-- Spring security configuration -->
 
 	<bean id="jsonConverter"
@@ -166,28 +86,6 @@
 		<property name="supportedMediaTypes" value="application/json" />
 	</bean>
 
-	<bean id="passwordEncoder" autowire="byName"
-		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
-		<constructor-arg name="strength" value="10"></constructor-arg>
-	</bean>
-
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="smtp.gmail.com"/>
-        <property name="port" value="587"/>
-        <property name="username" value="ILONA.UNI.MISKOLC@gmail.com"/>
-        <property name="password" value="ilonapassword2016"/>
-        <property name="javaMailProperties">
-            <props>
-                <prop key="mail.transport.protocol">smtp</prop>
-                <prop key="mail.smtp.auth">true</prop>
-                <prop key="mail.smtp.starttls.enable">true</prop>
-                <prop key="mail.debug">true</prop>
-            </props>
-        </property>
-    </bean>
-
-	<!-- url="hera.iit.uni-miskolc.hu" <security:ldap-server root="dc=iit,dc=uni-miskolc,dc=hu" 
-		id="ldapserver" url="ldap://hera.iit.uni-miskolc.hu"/> -->
 	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 
 		<constructor-arg ref="positionDAO" /> <constructor-arg ref="measurementDAO" 
 		/> </bean> -->

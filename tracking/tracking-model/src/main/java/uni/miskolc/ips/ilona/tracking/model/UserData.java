@@ -147,15 +147,17 @@ public class UserData {
 		return roles;
 	}
 
-	public void setRoles(Collection<String> roles) {
+	public Collection<String> setRoles(Collection<String> roles) {
 		if (roles != null) {
 			this.roles = roles;
+			return roles;
 		}
+		return null;
 	}
 
-	public void addRole(String role) {
+	public String addRole(String role) {
 		if (role == null) {
-			return;
+			return null;
 		}
 		boolean exists = false;
 		for (String storedrole : roles) {
@@ -163,16 +165,18 @@ public class UserData {
 				exists = true;
 			}
 		}
-		if (exists == true) {
+		if (exists != true) {
 			roles.add(role);
 		}
+		return role;
 	}
 
-	public void removeRole(String role) {
+	public String removeRole(String role) {
 		if (role == null) {
-			return;
+			return null;
 		}
 		roles.remove(role);
+		return role;
 	}
 
 	public Date getLastLoginDate() {
@@ -211,15 +215,17 @@ public class UserData {
 		return badLogins;
 	}
 
-	public void setBadLogins(Collection<Date> badLogins) {
+	public Collection<Date> setBadLogins(Collection<Date> badLogins) {
 		if (badLogins != null) {
 			this.badLogins = badLogins;
+			return badLogins;
 		}
+		return null;
 	}
 
-	public void addBadLogin(Date login) {
+	public Date addBadLogin(Date login) {
 		if (login == null) {
-			return;
+			return null;
 		}
 		boolean exists = false;
 		for (Date storedLogin : this.badLogins) {
@@ -230,30 +236,33 @@ public class UserData {
 		if (exists != true) {
 			this.badLogins.add(login);
 		}
+		return login;
 	}
 
-	public void removeBadLogin(Date login) {
+	public Date removeBadLogin(Date login) {
 		if (login == null) {
-			return;
+			return null;
 		}
 		this.badLogins.remove(login);
+		return login;
 	}
 
 	public Collection<DeviceData> getDevices() {
 		return devices;
 	}
 
-	public void setDevices(Collection<DeviceData> devices) {
+	public Collection<DeviceData> setDevices(Collection<DeviceData> devices) {
 		if (devices != null) {
 			this.devices = devices;
+			return devices;
 		}
+		return null;
 	}
 
-	public void addDevice(DeviceData newDevice) {
+	public DeviceData addDevice(DeviceData newDevice) {
 		if (newDevice == null) {
-			return;
+			return null;
 		}
-		// validity?!
 		/*
 		 * Update
 		 */
@@ -262,27 +271,29 @@ public class UserData {
 				dev.setDeviceName(newDevice.getDeviceName());
 				dev.setDeviceType(newDevice.getDeviceType());
 				dev.setDeviceTypeName(newDevice.getDeviceTypeName());
-				return;
+				return newDevice;
 			}
 		}
 		/*
 		 * Not exists, add
 		 */
 		this.devices.add(newDevice);
+		return newDevice;
 	}
 
-	public void removeDevice(DeviceData noDevice) {
+	public DeviceData removeDevice(DeviceData noDevice) {
 		if (noDevice == null) {
-			return;
+			return null;
 		}
 		Iterator<DeviceData> devIt = this.devices.iterator();
 		while (devIt.hasNext()) {
 			DeviceData data = devIt.next();
 			if (data.getDeviceid().equals(noDevice.getDeviceid())) {
 				devIt.remove();
-				return;
+				return noDevice;
 			}
 		}
+		return noDevice;
 	}
 
 	@Override

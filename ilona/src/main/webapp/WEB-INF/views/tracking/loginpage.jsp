@@ -14,11 +14,15 @@
 
 <script type="text/javascript">
 	
-	$("#trackingLoginpageLoginbutton").click(function() {
+	$("#mainpageLoginLoginBTN").click(function() {
 		$("#errorContent").html("");
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
-						
+		var rememberMe = document.getElementById("mainpageLoginRemeberMeCHB");
+		var rememberMevalue = false;
+		if(rememberMe.checked) {
+			rememberMevalue = true;
+		}
 		$.ajax({
 			async : true,
 			type : "POST",
@@ -26,13 +30,14 @@
 				xhr.setRequestHeader(header, token);
 			},
 			data : {
-				username : $("#trackingLoginpageUseridInput").val(),
-				password : $("#trackingLoginpagePasswordInput").val()
+				username : $("#mainpageLoginUseridTXT").val(),
+				password : $("#mainpageLoginPasswordTXT").val(),
+				rememberme : rememberMevalue
 			},
 			url : "<c:url value='/tracking/processlogin'></c:url>",
 			timeout : 10000,
 			error : function(xhr, status, error) {
-				$("#errorContent").html(xhr.responseText + status + error);
+				$("#mainpageLoginErrorContent").html("Service error!");
 			},
 			success : function(result, status, xhr) {
 				$("#page-wrapper").html(result);
@@ -40,7 +45,7 @@
 		});
 	});
 
-	$("#trackingLoginpagePasswordReset").click(function() {
+	$("#mainpageLoginPasswordResetBTN").click(function() {
 		$("#errorContent").html("");
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
@@ -51,13 +56,17 @@
 			beforeSend : function(xhr) {
 				xhr.setRequestHeader(header, token);
 			},
-			url : "<c:url value='/tracking/passwordreset'></c:url>",
+			url : "<c:url value='/tracking/resetpassword'></c:url>",
+			data : {
+				userid : $("#mainpageLoginResetPasswordTXT").val()
+			},
 			timeout : 10000,
 			error : function(xhr, status, error) {
-				$("#errorContent").html(xhr.responseText + status + error);
+				$("#mainpageLoginPasswordResetErrorParagh").html("Service error!");
 			},
 			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
+				//$("#page-wrapper").html(result);
+				$("#mainpageLoginPasswordResetErrorParagh").html(result);
 			}
 		});
 	});
@@ -65,54 +74,87 @@
 </script>
 
 <jsp:directive.include file="mainpageNavbar.jsp" />
-
-<div class="col-lg-12">
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<h3 class="panel-title">ILONA - Tracking module login page!</h3>
-		</div>
-		<div class="panel-body">
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">ILONA - Tracking module login page!</h3>
+				</div>
+				<div class="panel-body">
+											
+						<p class="bg-primary" id="mainpageLoginErrorContent">
+							<c:if test="${error != null}">
+								Authentication failed, bad login data!
+							</c:if>
+						</p>
+					
+						<label for="mainpageLoginUseridTXT">Userid:</label>
+							
+						<input type="text"
+							class="form-control"
+							id="mainpageLoginUseridTXT"
+							required="required"
+							placeholder="Please type in your userid!"
+							name="userid">  <br/>
+							
+						<label for="mainpageLoginPasswordTXT">Password:
+							
+						</label>
+						
+						<input type="password"
+							class="form-control"
+							id="mainpageLoginPasswordTXT"
+							required="required"
+							placeholder="Please type in your password!"
+							name="password">  <br/>
+							
+					<label for="mainpageLoginRemeberMeCHB">Remember me:</label>
+					 <input type="checkbox" 
+						id="mainpageLoginRemeberMeCHB">
+						
+					<br />
+					
+					<input id="mainpageLoginLoginBTN"
+						type="button"  
+						value="Login">
+							
+				</div>
+			</div>
 			
-				<label for="trackingLoginpageUseridInput">Userid:
-
-				</label>
-					
-				<input type="text"
-					class="form-control"
-					id="trackingLoginpageUseridInput"
-					required="required"
-					placeholder="Please type in your userid!"
-					maxlength="20"
-					name="userid">  <br/>
-					
-				<label for="trackingLoginpagePasswordInput">Password:
-					
-				</label>
-				
-				<input type="password"
-					class="form-control"
-					id="trackingLoginpagePasswordInput"
-					required="required"
-					placeholder="Please type in your password!"
-					maxlength="30"
-					pattern="[a-zA-Z0-9,.-_?]{6,30}"
-					name="password">  <br/>
 			
-			<input id="trackingLoginpageLoginbutton" type="button"  value="Login">
-			<input type="button" value="Password reset" id="trackingLoginpagePasswordReset">			
 		</div>
-	</div>
+	</div> <!-- login content row div end -->
 	
-	<div class="panel panel-body" id="trackingLoginpageErrorContent">
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">ILONA - Password reset!</h3>
+				</div>
+				<div class="panel-body">
 	
-	</div>
-</div>
-
-<div class="row">
-	<div class="col-lg-12" id="errorContent">
-		<p>${error}</p>
-	</div>
-</div>
-
+					<label for="mainpageLoginResetPasswordTXT">Password:						
+					</label>
+						
+					<input type="text"
+						class="form-control"
+						id="mainpageLoginResetPasswordTXT"
+						required="required"
+						placeholder="Please type in your userid!"
+						name="password">  <br/>
+		
+					<input type="button" 
+						value="Password reset" 
+						id="mainpageLoginPasswordResetBTN">
+					<br /><br />	
+					<p class="bg-primary" id="mainpageLoginPasswordResetErrorParagh"></p>		
+				</div>
+			</div>
+		
+		</div>
+	</div> <!-- Password reset row end -->
+	
+</div> <!-- container fluid  end -->
 
 

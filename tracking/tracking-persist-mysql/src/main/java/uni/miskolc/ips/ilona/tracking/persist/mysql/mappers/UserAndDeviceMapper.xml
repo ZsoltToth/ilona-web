@@ -17,12 +17,12 @@
 		<result column="nonlocked" property="nonLocked" typeHandler="BooleanToIntHander" />
 		<result column="lockeduntil" property="lockedUntil" />
 	</resultMap>
-	
+
 	<resultMap type="DeviceData" id="DeviceDataResult">
-		<id column="deviceid" property="deviceid"/>
-		<result column="devicename" property="deviceName"/>
-		<result column="devicetype" property="deviceType"/>
-		<result column="devicetypename" property="deviceTypeName"/>
+		<id column="deviceid" property="deviceid" />
+		<result column="devicename" property="deviceName" />
+		<result column="devicetype" property="deviceType" />
+		<result column="devicetypename" property="deviceTypeName" />
 	</resultMap>
 
 	<!-- <resultMap type="java.util.HashMap" id="allRolesResult"> <id property="key" 
@@ -49,8 +49,9 @@
 		TrackingUsers tu;
 	</select>
 
-	<select id="readLoginAttempts" resultType="Date" parameterType="string">
-		select attempt from TrackingLoginAttempts where userid =#{userid};
+	<select id="readLoginAttempts" resultType="Long" parameterType="string">
+		SELECT round(unix_timestamp(attempt)*1000) FROM
+		ilona.trackingloginattempts where userid = #{userid};
 	</select>
 
 	<select id="getUserRoles" parameterType="string" resultType="String"
@@ -58,9 +59,11 @@
 		select tur.userrole from TrackingUserRoles tur where
 		userid = #{userid};
 	</select>
-	
+
 	<select id="getUserDevices" resultMap="DeviceDataResult">
-		select deviceid, devicename, devicetype, devicetypename from TrackingDevices where ownerid = #{user.userid};
+		select deviceid,
+		devicename, devicetype, devicetypename from TrackingDevices where
+		ownerid = #{user.userid};
 	</select>
 
 	<!-- <select id="getAllUsersRoles" resultMap="allRolesResult" > select tur.userid, 
@@ -99,7 +102,16 @@
 		insert into TrackingLoginAttempts(userid,attempt) values
 		<foreach collection="badLogins" item="badlogin" separator=",">
 			(#{userid},
-			 #{badlogin})
+			#{badlogin})
+		</foreach>
+		;
+	</insert>
+
+	<insert id="storeLoginAttemptsWithMilliseconds">
+		insert into TrackingLoginAttempts(userid, attempt) values
+		<foreach collection="attempts" item="badlogin" separator=",">
+			(#{userid},
+			from_unixtime(#{badlogin}))
 		</foreach>
 		;
 	</insert>

@@ -15,11 +15,14 @@
 
 <jsp:directive.include file="mainpageNavbar.jsp" />
 
-
-
-
-<div id="actual-content">
-	<img class="img-responsive"
-		src="<c:url value='/img/ilonaFrontpage.jpg'/>"
-		alt="Indoor positioning front image!" width="80%" height="60%">
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-lg-12">
+			<div>
+				<img class="img-responsive center-block"
+					src="<c:url value='/img/ilonaFrontpage.jpg'/>"
+					alt="Indoor positioning front image!" width="100%" height="60%">
+			</div>
+		</div>
+	</div>
 </div>

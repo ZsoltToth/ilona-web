@@ -1,4 +1,4 @@
-package uni.miskolc.ips.ilona.tracking.model.connection;
+package uni.miskolc.ips.ilona.tracking.controller.model;
 
 /**
  * 
@@ -105,7 +105,7 @@ public class UserCreationDTO {
 
 	@Override
 	public String toString() {
-		return "UserCreateDTO [userid=" + userid + ", username=" + username + ", password=" + password + ", email="
+		return "UserCreateDTO [userid=" + userid + ", username=" + username + ", password=" + "[PROTECTED]" + ", email="
 				+ email + "]";
 	}
 	

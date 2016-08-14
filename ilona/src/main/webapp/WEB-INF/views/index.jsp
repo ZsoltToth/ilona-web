@@ -94,7 +94,6 @@
 			event.preventDefault();
 			//var token = $("meta[name='_csrf']").attr("content");
 			//var header = $("meta[name='_csrf_header']").attr("content");
-			//alert("működik eleje!");
 			$.ajax({
 				type : "GET",
 				async : true,
@@ -105,16 +104,12 @@
 				success : function(result, status, xhr) {
 					$("#page-wrapper").html(result);
 				},
+				timeout : 10000,
 				error : function(xhr, status, error) {
-					$("#page-wrapper").html(xhr.responseText);
+					var text = "<p class='bg-primary'>The tracking service is unreachable!</p>";
+					$("#page-wrapper").html(text);
 				}
-			});
-
-			/*
-			$.get($(this).attr('href'), function(data) {
-			$('#page-wrapper').html(data);
-			});
-			 */
+			});			
 			
 		});
 		

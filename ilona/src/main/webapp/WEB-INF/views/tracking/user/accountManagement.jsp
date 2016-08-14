@@ -43,7 +43,7 @@
 			$.ajax({
 				type : "POST",
 				async : true,
-				url : "<c:url value='/tracking/user/accmanchangeuserdetails'></c:url>",
+				url : "<c:url value='/tracking/user/accountmanagement/changeuserdetails'></c:url>",
 				beforeSend : function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
@@ -105,111 +105,126 @@
 					$("#userAccManChangePasswordErrorsDIV").html("<p class='text-danger bg-primary'>An error occured!</p>"+error);
 				}
 			});
-		}
-		
+		}		
 	});
 </script>
 
 <jsp:directive.include file="userNavbar.jsp" />
 
-
-<div class="row">
-<div class="col-lg-12">
-	<div class="panel panel-primary">
-		<div class="panel-heading">
-			<h4><b>Account details change: ${successfulDetailsModification}${userDetailsChangeError}</b></h4>
-		</div>
-		<div class="panel-body">
-			<label for="userAccManUseridTXT" id="userAccManUseridTXTLabel">Userid: READONLY<span class="glyphicon glyphicon-exclamation-sign">
-			</span></label>
-			<input id="userAccManUseridTXT"
-				type="text" 
-				readonly="readonly" 
-				required="required"
-				class="form-control"
-				value="${useridValue}"><br/>
-			
-			<label for="userAccManUsernameTXT" id="userAccManUsernameTXTLabel">Username:
-				<span data-toggle="popover"
-					data-html="true"
-					data-trigger="hover"
-					data-content="${usernameRestriction}"
-					title="The username can contain the following elements:"
-					class="fa  fa-info-circle">
-				</span>
-			</label>
-			<input type="text" 
-				id="userAccManUsernameTXT" 
-				class="form-control"
-				required="required"
-				pattern="${usernamePattern}"
-				value="${usernameValue}"><br />
-
-			<label for="userAccManEmailTXT" id="userAccManEmailTXTLabel">Email address:
-				<span data-toggle="popover"
-					data-html="true"
-					data-trigger="hover"
-					data-content="${emailRestriction}"
-					title="The email address can contain the following elements:"
-					class="fa  fa-info-circle">
-				</span>
-			</label>
-			<input type="text"
-				id="userAccManEmailTXT" 
-				class="form-control" 
-				required="required"
-				value="${emailValue}"><br />
-		
-			<input type="button" id="userAccManUpdateDetailsBTN" class="btn btn-primary" value="Update account!"><br/>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h4><b>Account details change: ${successfulDetailsModification}
+						${userDetailsChangeError}</b>
+					</h4>
+				</div>
+				<div class="panel-body">
+					<label for="userAccManUseridTXT"id="userAccManUseridTXTLabel">
+						 Userid: READONLY
+						 <span class="glyphicon glyphicon-exclamation-sign">
+						</span>
+					</label>
+					<input id="userAccManUseridTXT"
+						type="text" 
+						readonly="readonly" 
+						required="required"
+						class="form-control"
+						value="${useridValue}"><br/>
 					
-		</div>
+					<label for="userAccManUsernameTXT" id="userAccManUsernameTXTLabel">Username:
+						<span data-toggle="popover"
+							data-html="true"
+							data-trigger="hover"
+							data-content="${usernameRestriction}"
+							title="The username can contain the following elements:"
+							class="fa  fa-info-circle">
+						</span>
+					</label>
+					<input type="text" 
+						id="userAccManUsernameTXT" 
+						class="form-control"
+						required="required"
+						pattern="${usernamePattern}"
+						value="${usernameValue}"><br />
 		
-		<div class="panel-body" id="userAccManUpdateDetailsErrorDIV">
-			<c:forEach var="error" items="${changeDetailsErrors}">
-				<p class='text-danger bg-primary'>${error}</p>
-			</c:forEach>
-		</div>
-	</div>
-		
-	<div class="panel panel-danger">
-		<div class="panel-heading">
-			<h4><b>Account password change: ${successfulPasswordModification}</b></h4>
-			
-		</div>
-		
-		<div class="panel-body">
-			<label for="userAccManPassword1TXT" id="userAccManPassword1TXTLabel">Password:
-				<span data-toggle="popover"
-					data-html="true"
-					data-trigger="hover"
-					data-content="${passwordRestriction}"
-					title="The email address can contain the following elements:"
-					class="fa  fa-info-circle">
-				</span>
-			</label>
-			<input type="password"
-				id="userAccManPassword1TXT"
-				class="form-control"
-				required="required"
-				pattern="${passwordPattern}"
-				name="userAccManPassword1TXTName"
-				value=""><br />
-			
-			<input type="password"
-				id="userAccManPassword2TXT"
-				required="required"
-				class="form-control"
-				name="userAccManPassword2TXTName"
-				value=""><br />
-			
-			<input type="button" id="userAccManChangePasswordBTN" class="btn btn-danger" value="Change password!">
-		</div>
-		
-		<div class="panel-body" id="userAccManChangePasswordErrorsDIV">
-			<c:forEach var="error" items="${passwordErrors}">
-				<p class='text-danger bg-primary'>${error}</p>
-			</c:forEach>
-		</div>
-	</div>
-</div>
-</div>
+					<label for="userAccManEmailTXT" id="userAccManEmailTXTLabel">
+						Email address:
+						<span data-toggle="popover"
+							data-html="true"
+							data-trigger="hover"
+							data-content="${emailRestriction}"
+							title="The email address can contain the following elements:"
+							class="fa  fa-info-circle">
+						</span>
+					</label>
+					<input type="text"
+						id="userAccManEmailTXT" 
+						class="form-control" 
+						required="required"
+						value="${emailValue}"><br />
+				
+					<input type="button" 
+						id="userAccManUpdateDetailsBTN" 
+						class="btn btn-primary" 
+						value="Update account!"><br/>
+							
+				</div>
+				
+				<div class="panel-body" id="userAccManUpdateDetailsErrorDIV">
+					<c:forEach var="error" items="${changeDetailsErrors}">
+						<p class='text-danger bg-primary'>${error}</p>
+					</c:forEach>
+				</div>
+			</div> <!-- panel primary basic details end -->
+				
+			<div class="panel panel-danger">
+				<div class="panel-heading">
+					<h4><b>Account password change: ${successfulPasswordModification}</b></h4>
+					
+				</div>
+				
+				<div class="panel-body">
+					<label for="userAccManPassword1TXT" id="userAccManPassword1TXTLabel">
+						Password:
+						<span data-toggle="popover"
+							data-html="true"
+							data-trigger="hover"
+							data-content="${passwordRestriction}"
+							title="The email address can contain the following elements:"
+							class="fa  fa-info-circle">
+						</span>
+					</label>
+					<input type="password"
+						id="userAccManPassword1TXT"
+						class="form-control"
+						required="required"
+						pattern="${passwordPattern}"
+						name="userAccManPassword1TXTName"
+						value="">
+					<br />
+					
+					<input type="password"
+						id="userAccManPassword2TXT"
+						required="required"
+						class="form-control"
+						name="userAccManPassword2TXTName"
+						value="">
+					<br />
+					
+					<input type="button" 
+						id="userAccManChangePasswordBTN" 
+						class="btn btn-danger" 
+						value="Change password!">
+				</div>
+				
+				<div class="panel-body" id="userAccManChangePasswordErrorsDIV">
+					<c:forEach var="error" items="${passwordErrors}">
+						<p class='text-danger bg-primary'>${error}</p>
+					</c:forEach>
+				</div>
+			</div> <!-- panel danger account password end -->
+		</div> <!-- colg 12 end -->
+	</div> <!-- row end -->
+</div><!-- container end -->

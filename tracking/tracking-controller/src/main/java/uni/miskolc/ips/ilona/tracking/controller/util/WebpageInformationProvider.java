@@ -28,8 +28,7 @@ public class WebpageInformationProvider {
 			+ "The username can contain any english alphabet letters and these letters:<br><br>  öüóőúéáű and ÖÜÓŐÚŰÁÉ";
 
 	private static final String passwordRestrictionMessage = "<b>The password maximum length is 30 characters!"
-			+ "</b><br><br><b>The minimum length is 6 characters!</b>"
-			+ "<br><br>The password can contain the following elements: <br><br>a-z A-Z ? ! . - _ ";
+			+ "</b><br><br><b>The minimum length is 6 characters!</b>";
 
 	private static final String emailRestrictionMessage = "The email address must be a valid address!";
 

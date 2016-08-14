@@ -12,6 +12,8 @@ import java.util.Properties;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
@@ -26,6 +28,8 @@ import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
 import uni.miskolc.ips.ilona.tracking.persist.mysql.mappers.UserAndDeviceMapper;
 
 public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDeviceDAO {
+
+	private static Logger logger = LogManager.getLogger(MySqlAndMybatisUserAndDeviceDAOImplementation.class);
 
 	private SqlSessionFactory sessionFactory;
 
@@ -64,16 +68,18 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 		try {
 			UserAndDeviceMapper mapper = session.getMapper(UserAndDeviceMapper.class);
 			mapper.createUserBaseData(user);
-			// mapper.eraseUserRoles(user.getUserid());
+			// mapper.eraseUserRoles(user.getUserid()); // empty roles
 			mapper.createUserRoles(user);
-			// mapper.storeLoginAttempts(user); // még ránézni
+			// mapper.storeLoginAttempts(user); // empty login attemps
 			session.commit();
 
 		} catch (Exception e) {
 			if (e instanceof MySQLIntegrityConstraintViolationException) {
+				logger.error("Duplicated user with id: " + user.getUserid() + "  Error: " + e.getMessage());
 				throw new UserAlreadyExistsException("User already exists: " + user.getUserid());
 			}
-			throw new OperationExecutionErrorException(e.getMessage());
+			logger.error("Error: " + e.getMessage());
+			throw new OperationExecutionErrorException("Error: " + e.getMessage());
 		} finally {
 			session.close();
 		}
@@ -91,16 +97,29 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			}
 			user.setRoles(mapper.getUserRoles(userid));
 
-			user.setBadLogins(mapper.readLoginAttempts(userid));
-			if(user.getBadLogins() == null) {
+			/*
+			 * Convert from long to date
+			 */
+			Collection<Long> millisecValues = mapper.readLoginAttempts(userid);
+			if (millisecValues == null) {
 				user.setBadLogins(new ArrayList<Date>());
+			} else {
+				Collection<Date> loginAttempts = new ArrayList<Date>();
+				for (long value : millisecValues) {
+					loginAttempts.add(new Date(value));
+				}
+				user.setBadLogins(loginAttempts);
 			}
-			
+
+			user.setDevices(new ArrayList<DeviceData>());
+
 		} catch (Exception e) {
-			if (e instanceof UserNotFoundException ) {
+			if (e instanceof UserNotFoundException) {
+				logger.error("User not exists with id: " + userid + "  Error: " + e.getMessage());
 				throw new UserNotFoundException("User not found by userid: " + userid);
 			}
-			e.printStackTrace();
+			logger.error("Error: " + e.getMessage());
+			throw new OperationExecutionErrorException("Error: " + e.getMessage());
 		} finally {
 			session.close();
 		}
@@ -116,11 +135,25 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			users = mapper.getAllUsersBaseData();
 			for (UserData user : users) {
 				user.setRoles(mapper.getUserRoles(user.getUserid()));
-				user.setBadLogins(mapper.readLoginAttempts(user.getUserid()));
-				// user.setDevices(mapper.getUserDevices(user));
+				/*
+				 * Convert from long to date
+				 */
+				Collection<Long> millisecValues = mapper.readLoginAttempts(user.getUserid());
+				if (millisecValues == null) {
+					user.setBadLogins(new ArrayList<Date>());
+				} else {
+					Collection<Date> loginAttempts = new ArrayList<Date>();
+					for (long value : millisecValues) {
+						loginAttempts.add(new Date(value));
+					}
+					user.setBadLogins(loginAttempts);
+				}
+
+				user.setDevices(new ArrayList<DeviceData>());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("getAllUsers error, message:" + e.getMessage());
+			throw new OperationExecutionErrorException(e.getMessage());
 		} finally {
 			session.close();
 		}
@@ -138,16 +171,24 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			}
 			mapper.eraseUserRoles(user.getUserid());
 			mapper.createUserRoles(user);
-			
+
 			mapper.deleteLoginAttempts(user.getUserid(), new Date());
 			if (user.getBadLogins().size() != 0) {
-				mapper.storeLoginAttempts(user);
-			}		
+
+				// mapper.storeLoginAttempts(user);
+				Collection<Double> coll = new ArrayList<Double>();
+				for (Date i : user.getBadLogins()) {
+					coll.add(i.getTime() * 0.001);
+				}
+				mapper.storeLoginAttemptsWithMilliseconds(user.getUserid(), coll);
+			}
 			session.commit();
 		} catch (UserNotFoundException e) {
+			logger.error("User has not found with this id: " + user.getUserid() + "  Error: " + e.getMessage());
 			throw new UserNotFoundException("This user is not exists: " + user.getUserid());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Error: " + e.getMessage());
+			throw new OperationExecutionErrorException("Error: " + e.getMessage());
 		} finally {
 			session.close();
 		}
@@ -165,9 +206,11 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			}
 			session.commit();
 		} catch (UserNotFoundException e) {
+			logger.error("User has not with this id: " + userid + "  Error: " + e.getMessage());
 			throw new UserNotFoundException("Error: User cannot be deleted because not found, userid: " + userid);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Error: " + e.getMessage());
+			throw new OperationExecutionErrorException("Error: " + e.getMessage());
 		} finally {
 			session.close();
 		}
@@ -186,7 +229,13 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			mapper.storeDevice(device, user);
 			session.commit();
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (e instanceof MySQLIntegrityConstraintViolationException) {
+				logger.error("Duplacated device error, deviceid: " + device.getDeviceid());
+				throw new DeviceAlreadyExistsException(
+						"Device already exists with this deviceid:" + device.getDeviceid());
+			}
+			logger.error("Error: " + e.getMessage());
+			throw new OperationExecutionErrorException("Error message: " + e.getMessage());
 		} finally {
 			session.close();
 		}
@@ -199,8 +248,12 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 		try {
 			UserAndDeviceMapper mapper = session.getMapper(UserAndDeviceMapper.class);
 			devices = mapper.getUserDevices(user);
+			if (devices == null) {
+				devices = new ArrayList<DeviceData>();
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Error message: " + e.getMessage());
+			throw new OperationExecutionErrorException("Error: " + e.getMessage());
 		} finally {
 			session.close();
 		}
@@ -213,10 +266,19 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 		SqlSession session = sessionFactory.openSession();
 		try {
 			UserAndDeviceMapper mapper = session.getMapper(UserAndDeviceMapper.class);
-			mapper.updateDevice(device, user);
+			int updated = mapper.updateDevice(device, user);
+			if (updated == 0) {
+				throw new DeviceNotFoundException();
+			}
 			session.commit();
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (e instanceof DeviceNotFoundException) {
+				logger.error("Device update has failed, no decice has found with id: " + device.getDeviceid());
+				throw new DeviceNotFoundException("Device has not found by this id: " + device.getDeviceid()
+						+ "  error message: " + e.getMessage());
+			}
+			logger.error("Error: " + e.getMessage());
+			throw new OperationExecutionErrorException("Error: " + e.getMessage());
 		} finally {
 			session.close();
 		}
@@ -228,10 +290,19 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 		SqlSession session = sessionFactory.openSession();
 		try {
 			UserAndDeviceMapper mapper = session.getMapper(UserAndDeviceMapper.class);
-			mapper.deleteDevice(device, user);
+			int deleted = mapper.deleteDevice(device, user);
+			if (deleted == 0) {
+				throw new DeviceNotFoundException();
+			}
 			session.commit();
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (e instanceof DeviceNotFoundException) {
+				logger.error("Device deletion has failed, no device as found with this id: " + device.getDeviceid()
+						+ "  Error message: " + e.getMessage());
+				throw new DeviceNotFoundException(
+						"Device not found id: " + device.getDeviceid() + "  error" + e.getMessage());
+			}
+			throw new OperationExecutionErrorException("Error: " + e.getMessage());
 		} finally {
 			session.close();
 		}

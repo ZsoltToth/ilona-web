@@ -11,21 +11,26 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.controller.exception.InvalidUserRegistration;
+import uni.miskolc.ips.ilona.tracking.controller.model.UserCreationDTO;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.model.connection.UserCreationDTO;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
+import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedUserException;
+import uni.miskolc.ips.ilona.tracking.service.exceptions.ServiceGeneralErrorException;
+import uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 /*
@@ -59,7 +64,10 @@ public class TrackingEntryPointController {
 	private UserAndDeviceService userDeviceService;
 
 	@Autowired
-	private BCryptPasswordEncoder passwordEncoder;
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private TrackingModuleCentralManager centralManager;
 
 	/**
 	 * This method sends back the actual tracking content.<br>
@@ -78,7 +86,7 @@ public class TrackingEntryPointController {
 	 * @return The actual tracking content depends on the actual login status
 	 *         and/or the actual authority of the current user.
 	 */
-	@RequestMapping(value = "/maincontentdecision", method = { RequestMethod.GET })
+	@RequestMapping(value = "/maincontentdecision", method = { RequestMethod.GET, RequestMethod.POST })
 	public ModelAndView createTrackingContentpage(Authentication authentication) {
 		/*
 		 * 
@@ -96,7 +104,7 @@ public class TrackingEntryPointController {
 		 */
 
 		if (authentication == null) {
-			logger.error("Anonymus authentication request!");
+			logger.info("Anonymus authentication request!");
 			return new ModelAndView("tracking/mainpageHome");
 		}
 
@@ -105,7 +113,7 @@ public class TrackingEntryPointController {
 		 * page will be the tracking login page.
 		 */
 		if (authentication != null) {
-			logger.error("Anonymus authentication request!");
+			logger.info("Anonymus authentication request!");
 
 			for (GrantedAuthority role : authentication.getAuthorities()) {
 				if (role.getAuthority().equals("ROLE_ANONYMOUS")) {
@@ -119,11 +127,14 @@ public class TrackingEntryPointController {
 		 */
 		for (GrantedAuthority auth : authentication.getAuthorities()) {
 			if (auth.getAuthority().equals("ROLE_ADMIN")) {
-				logger.error("Admin page authentication request!" + authentication.getName());
+				logger.info("Admin page authentication request!" + authentication.getName());
 				return new ModelAndView("tracking/admin/mainpage");
 			}
 		}
 
+		/**
+		 * Return user page
+		 */
 		return new ModelAndView("tracking/user/userMainpage");
 	}
 
@@ -131,12 +142,13 @@ public class TrackingEntryPointController {
 	 * This method sends back the login page for the tracking main page.
 	 * 
 	 * @return
+	 * 
+	 * @RequestMapping(value = "/login", method = { RequestMethod.GET,
+	 *                       RequestMethod.POST }) public ModelAndView
+	 *                       loadTrackingLoginpage() { ModelAndView loginpage =
+	 *                       new ModelAndView("tracking/loginpage"); return
+	 *                       loginpage; }
 	 */
-	@RequestMapping(value = "/login", method = { RequestMethod.GET, RequestMethod.POST })
-	public ModelAndView loadTrackingLoginpage() {
-		ModelAndView loginpage = new ModelAndView("tracking/loginpage");
-		return loginpage;
-	}
 
 	@RequestMapping(value = "/getmainpagehome", method = { RequestMethod.POST })
 	public ModelAndView generateMainpageHome() {
@@ -167,53 +179,87 @@ public class TrackingEntryPointController {
 	}
 
 	@RequestMapping(value = "/registeruser", method = { RequestMethod.POST })
-	public ModelAndView registerUser(@ModelAttribute(name = "user") UserCreationDTO user)
+	@ResponseBody
+	public Collection<String> registerUser(@ModelAttribute(name = "user") UserCreationDTO user)
 			throws InvalidUserRegistration {
-		ModelAndView mav = new ModelAndView("tracking/mainpageSignup");
+		// ModelAndView mav = new ModelAndView("tracking/mainpageSignup");
+		/*
+		 * Validity check.
+		 */
 		ValidityStatusHolder errors = new ValidityStatusHolder();
 		errors = ValidateUserData.validateUserid(user.getUserid());
 		errors.appendValidityStatusHolder(ValidateUserData.validateUsername(user.getUsername()));
 		errors.appendValidityStatusHolder(ValidateUserData.validateEmail(user.getEmail()));
-		// errors.appendValidityStatusHolder(ValidateUserData.validatePassword(user.getPassword()));
+		errors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
+
+		/*
+		 * Empty error/success holder.
+		 */
+		Collection<String> returnValues = new ArrayList<String>();
+
 		if (errors.isValid()) {
 			try {
-
+				/*
+				 * Password encoding.
+				 */
 				String encodedPassword = passwordEncoder.encode(user.getPassword());
+				/*
+				 * ROLES setup.
+				 */
 				ArrayList<String> roles = new ArrayList<String>();
 				roles.add("ROLE_USER");
-				long yearInMilliseconds = 31556952000L;
-				Date passwordExpired = new Date(new Date().getTime() + yearInMilliseconds);
+
+				/*
+				 * Credentials validity setup.
+				 */
+				Date passwordExpired = new Date(new Date().getTime() + centralManager.getCredentialsValidityPeriod());
+
+				/*
+				 * Setup other still null fields.
+				 */
 				Collection<Date> badLogins = new ArrayList<Date>();
 				Collection<DeviceData> devices = new ArrayList<DeviceData>();
+				/*
+				 * Create user with the given details. The account will be
+				 * enabled and non locked and the last login date is the account
+				 * creation time.
+				 */
 				UserData userDB = new UserData(user.getUserid(), user.getUsername(), user.getEmail(), encodedPassword,
 						true, roles, new Date(), passwordExpired, new Date(), true, badLogins, devices);
+				/*
+				 * 
+				 */
 				this.userDeviceService.createUser(userDB);
+			} catch (DuplicatedUserException e) {
+				logger.error("Duplicated userid: " + user.getUserid() + "  Error: " + e.getMessage());
+				returnValues.add("Duplicated user with this userid: " + user.getUserid());
+				return returnValues;
+			} catch (ServiceGeneralErrorException e) {
+				logger.error("Error: " + e.getMessage());
+				returnValues.add("There has been an error with the service, the account is not created!");
+				return returnValues;
 			} catch (Exception e) {
-				e.printStackTrace();
-				ValidityStatusHolder duplicatedUserError = new ValidityStatusHolder();
-				duplicatedUserError.addValidityError("A user with this userid is already exists!");
-				throw new InvalidUserRegistration("Duplicated user with userid: " + user.getUserid(),
-						duplicatedUserError);
+				logger.error("Error: " + e.getMessage());
+				returnValues.add("There has been an error with the service, the account is not created!");
+				return returnValues;
 			}
-			mav.addObject("registrationSuccessful", "User Registration was successful!");
 		} else {
-			throw new InvalidUserRegistration("Invalid registration:", errors);
+			logger.info("User creation failed with values " + user.toString());
+			returnValues.addAll(errors.getErrors());
+			return returnValues;
 		}
-		return mav;
-	}
-
-	@RequestMapping(value = "/passwordreset", method = { RequestMethod.POST })
-	public ModelAndView createTrackingPasswordResetpageHandler() {
-		ModelAndView mav = new ModelAndView("tracking/passwordReset");
-
-		return mav;
+		returnValues.add("The account has been successfully created!");
+		return returnValues;
 	}
 
 	@RequestMapping(value = "/resetpassword", method = { RequestMethod.POST })
-	public ModelAndView trackingResetPasswordHandler() {
-		ModelAndView mav = new ModelAndView("tracking/passwordReset");
-
-		return mav;
+	@ResponseBody
+	public String trackingResetPasswordHandler(@RequestParam(value = "userid", required = false) String userid) {
+		//ModelAndView mav = new ModelAndView("tracking/passwordReset");
+		if(userid == null) {
+			return "Invalid userid!";
+		}
+		return "OK!";
 	}
 
 	@ExceptionHandler(value = { InvalidUserRegistration.class })
@@ -231,4 +277,13 @@ public class TrackingEntryPointController {
 	public void setUserDeviceService(UserAndDeviceService userDeviceService) {
 		this.userDeviceService = userDeviceService;
 	}
+
+	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	public void setCentralManager(TrackingModuleCentralManager centralManager) {
+		this.centralManager = centralManager;
+	}
+
 }

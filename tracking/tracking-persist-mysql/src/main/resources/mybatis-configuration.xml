@@ -5,27 +5,13 @@
 <configuration>
 
 	<typeAliases>
-		<typeAlias alias="Zone" type="uni.miskolc.ips.ilona.measurement.model.position.Zone" />
-		<typeAlias alias="Position" type="uni.miskolc.ips.ilona.measurement.model.position.Position" />
-		<typeAlias alias="Coordinate" type="uni.miskolc.ips.ilona.measurement.model.position.Coordinate" />
-		<typeAlias alias="Measurement" type="uni.miskolc.ips.ilona.measurement.model.measurement.Measurement" />
-		
-		<typeAlias alias="BluetoothTags" type="uni.miskolc.ips.ilona.measurement.model.measurement.BluetoothTags" />
-		<typeAlias alias="GPSCoordinate" type="uni.miskolc.ips.ilona.measurement.model.measurement.GPSCoordinate" />
-		<typeAlias alias="Magnetometer" type="uni.miskolc.ips.ilona.measurement.model.measurement.Magnetometer" />
-		<typeAlias alias="RFIDTags" type="uni.miskolc.ips.ilona.measurement.model.measurement.RFIDTags" />
-		<typeAlias alias="WiFiRSSI" type="uni.miskolc.ips.ilona.measurement.model.measurement.WiFiRSSI" />
-		
-		<typeAlias alias="UUID" type="java.util.UUID"/>
-		<typeAlias alias="UUIDTypeHandler"
-			type="uni.miskolc.ips.ilona.measurement.persist.mappers.typehandlers.UUIDTypeHandler" />
-		<typeAlias alias="LoginUserData" type="uni.miskolc.ips.ilona.tracking.model.TrackingLoginUserData"/>
-		<typeAlias alias="BooleanToIntHander" type="uni.miskolc.ips.ilona.tracking.persist.mysql.BooleanEnabledTypeHandler"/>
+		<typeAlias alias="BooleanToIntHander"
+			type="uni.miskolc.ips.ilona.tracking.persist.mysql.BooleanEnabledTypeHandler" />
 	</typeAliases>
-	
+
 	<typeHandlers>
-	    <typeHandler handler="UUIDTypeHandler" javaType="UUID" jdbcType="VARCHAR"/>
-	    <typeHandler handler="BooleanToIntHander" javaType="boolean" jdbcType="INTEGER"/>
+		<typeHandler handler="BooleanToIntHander" javaType="boolean"
+			jdbcType="INTEGER" />
 	</typeHandlers>
 
 	<environments default="development">
@@ -40,26 +26,11 @@
 		</environment>
 	</environments>
 	<mappers>
-		<!-- It works -->
-		<!-- <mapper url="file:///home/zsolt/workspace/ips/measurement/measurement-persist-mysql/src/main/resources/ZoneMapper.xml" 
-			/> -->
-		<!-- <mapper url="file:///home/zsolt/workspace/ips/measurement/measurement-persist-mysql/src/main/java/uni/miskolc/ips/ilona/measurement/persist/mappers/ZoneMapper.xml" 
-			/> -->
+
 
 		<mapper
-			resource="uni/miskolc/ips/ilona/measurement/persist/mappers/ZoneMapper.xml" />
-		<mapper
-			resource="uni/miskolc/ips/ilona/measurement/persist/mappers/PositionMapper.xml" />
-		<mapper
-			resource="uni/miskolc/ips/ilona/measurement/persist/mappers/MeasurementMapper.xml" />
-		<mapper
-			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/TrackingMapper.xml"/>
-			
-		<!-- Do not work. Fault may be caused by the classpath. -->
-		<!-- <mapper class="uni.miskolc.ips.ilona.measurement.persist.mappers.ZoneMapper" 
-			/> <package name="uni.miskolc.ips.ilona.measurement.persist.mappers"/> -->
+			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/mapper/SecurityFunctionsUserMapper.xml" />
 
-		<!-- <mapper resource="file:///home/zsolt/workspace/ips/measurement/measurement-persist-mysql/resources/ZoneMapper.xml" 
-			/> -->
+
 	</mappers>
 </configuration>
