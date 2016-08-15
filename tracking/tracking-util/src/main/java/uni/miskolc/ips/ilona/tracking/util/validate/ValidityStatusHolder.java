@@ -1,6 +1,7 @@
 package uni.miskolc.ips.ilona.tracking.util.validate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,6 +49,14 @@ public class ValidityStatusHolder {
 		errors.add(validityError);
 	}
 
+	public void addValidityErrors(Collection<String> validityErrors) {
+		if (validityErrors == null) {
+			return;
+		}
+		
+		errors.addAll(validityErrors);
+	}
+	
 	public String getErrorsAsString() {
 		StringBuilder builder = new StringBuilder();
 		for (String error : errors) {

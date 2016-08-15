@@ -2,8 +2,6 @@ package uni.miskolc.ips.ilona.tracking.service.impl;
 
 import java.util.Collection;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.persist.UserAndDeviceDAO;
@@ -42,7 +40,7 @@ public class UserAndDeviceServiceImpl implements UserAndDeviceService {
 	}
 
 	@Override
-	public UserData getUser(String userid) throws UsernameNotFoundException, ServiceGeneralErrorException {
+	public UserData getUser(String userid) throws UserNotFoundException, ServiceGeneralErrorException {
 		UserData user = null;
 
 		try {

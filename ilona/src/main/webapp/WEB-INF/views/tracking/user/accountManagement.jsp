@@ -18,10 +18,17 @@
 
 	$("#userAccManUpdateDetailsBTN").click(function(event){
 		event.preventDefault();
+		/*
+		 * get CSTF Token
+		 */
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
 		
+		/*
+		 * Validity 
+		 */
 		$("#userAccManUpdateDetailsErrorDIV").html("");
+		$("#userAccManUserChangeErrorSpan").html("");
 		var hadError = 0;
 		var errorText = "";
 						
@@ -36,7 +43,7 @@
 			errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
 			hadError = 1;
 		}
-
+		
 		if (Boolean(hadError) == true) {
 			$("#userAccManUpdateDetailsErrorDIV").html(errorText);
 		} else {
@@ -53,10 +60,29 @@
 					email : $("#userAccManEmailTXT").val()
 				},
 				success : function(result, status, xhr) {
-					$("#page-wrapper").html(result);
+					/*
+					 * Write the response JSON into the text fields.
+					 */
+					$("#userAccManUsernameTXT").val(result.username);
+					$("#userAccManEmailTXT").val(result.email);
+					$("#userAccManUserChangeErrorSpan").html("Account updated successfully!");
 				},
 				error : function(xhr, status, error) {
-					$("#userAccManUpdateDetailsErrorDIV").html("<p class='text-danger bg-primary'>An error occured!</p>"+error);	
+					try {
+						var Errors = JSON.parse(xhr.responseText);
+					} catch(err) {
+						/*
+						 * If the error was not from the controller 
+						 */
+						$("#userAccManUpdateDetailsErrorDIV").html("<p class='text-danger bg-primary'>Tracking service is offline!</p>");
+					}
+					if(Errors instanceof Array) {						
+						var errorHtml = "";
+						for(var i = 0; i < Errors.length; i++) {
+							errorHtml += "<p class='text-danger bg-primary'>" + Errors[i] +"</p>"
+						}
+						$("#userAccManUpdateDetailsErrorDIV").html(errorHtml);
+					}					
 				}
 			});
 		}
@@ -83,14 +109,14 @@
 			errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
 			hadError = 1;
 		}
-		
+
 		if(Boolean(hadError) == true) {
 			$("#userAccManChangePasswordErrorsDIV").html(errorText);
 		} else {
 			$.ajax({
 				type : "POST",
 				async : true,
-				url : "<c:url value='/tracking/user/accmanchangepassword'></c:url>",
+				url : "<c:url value='/tracking/user/accountmanagement/changepassword'></c:url>",
 				beforeSend : function(xhr) {
 					xhr.setRequestHeader(header, token);
 				},
@@ -99,10 +125,14 @@
 					password : $("#userAccManPassword1TXT").val()
 				},
 				success : function(result, status, xhr) {
-					$("#page-wrapper").html(result);
+					var ResultText = "";
+					for(var i = 0; i < result.length; i++) {
+						ResultText += "<p class='text-danger bg-primary'>" + result[i] + "</p>";
+					}
+					$("#userAccManChangePasswordErrorsDIV").html(ResultText);
 				},
 				error : function(xhr, status, error) {
-					$("#userAccManChangePasswordErrorsDIV").html("<p class='text-danger bg-primary'>An error occured!</p>"+error);
+					$("#userAccManChangePasswordErrorsDIV").html("<p class='text-danger bg-primary'>Tracking service error!</p>"+error);
 				}
 			});
 		}		
@@ -116,9 +146,7 @@
 		<div class="col-lg-12">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-					<h4><b>Account details change: ${successfulDetailsModification}
-						${userDetailsChangeError}</b>
-					</h4>
+					<h4><b>Account details change: <span id="userAccManUserChangeErrorSpan"></span></b></h4>
 				</div>
 				<div class="panel-body">
 					<label for="userAccManUseridTXT"id="userAccManUseridTXTLabel">

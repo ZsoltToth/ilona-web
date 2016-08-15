@@ -3,8 +3,6 @@ package uni.miskolc.ips.ilona.tracking.persist;
 import java.util.Collection;
 import java.util.Date;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 import uni.miskolc.ips.ilona.tracking.model.PasswordRecoveryToken;
 import uni.miskolc.ips.ilona.tracking.persist.exception.OperationExecutionErrorException;
 import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;

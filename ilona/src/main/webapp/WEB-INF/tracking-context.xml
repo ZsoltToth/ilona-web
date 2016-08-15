@@ -80,6 +80,8 @@
 	<!-- Security part -->
 	<!-- ========================================================== -->
 	
+	<bean id="AuthEntryPoint" class="uni.miskolc.ips.ilona.tracking.controller.security.AuthEntrypoint"></bean>
+	
 	<bean id="TrackingCentralManager" class="uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager"
 		lazy-init="false" primary="true" scope="singleton">
 		

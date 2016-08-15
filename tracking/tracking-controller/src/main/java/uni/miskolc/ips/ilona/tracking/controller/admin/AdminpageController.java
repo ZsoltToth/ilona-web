@@ -1,4 +1,4 @@
-package uni.miskolc.ips.ilona.tracking.controller;
+package uni.miskolc.ips.ilona.tracking.controller.admin;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,7 +29,7 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
  */
 @Controller
 @RequestMapping(value = "/tracking/admin")
-public class TrackingAdminpageController {
+public class AdminpageController {
 
 	@Autowired
 	private UserAndDeviceService userDeviceService;

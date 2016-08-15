@@ -8,14 +8,14 @@
 
 <script type="text/javascript">
 
-	$("#userNavbarHome").click(function(event) {
+	$("#userNavbarHomeMenuitem").click(function(event) {
 		event.preventDefault();
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
 		$.ajax({
 			async : true,
 			type : "POST",
-			url : $("#userNavbarHome").attr('href'),
+			url : $("#userNavbarHomeMenuitem").attr('href'),
 			beforeSend : function(xhr) {
 				xhr.setRequestHeader(header, token);
 			},
@@ -23,7 +23,7 @@
 				$("#page-wrapper").html(result);
 			},
 			error : function(xhr, status, error) {
-				alert("ADMIN-PAGE-ACCOUNT MANAGEMENT ERROR!");
+				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
 			},
 			timeout : 10000
 		});
@@ -44,7 +44,7 @@
 				$("#page-wrapper").html(result);
 			},
 			error : function(xhr, status, error) {
-				alert("ADMIN-PAGE-ACCOUNT MANAGEMENT ERROR!");
+				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
 			},
 			timeout : 10000
 		});
@@ -65,7 +65,7 @@
 				$("#page-wrapper").html(result);
 			},
 			error : function(xhr, status, error) {
-				alert("ADMIN-PAGE-ACCOUNT MANAGEMENT ERROR!");
+				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
 			},
 			timeout : 10000
 		});
@@ -86,7 +86,7 @@
 				$("#page-wrapper").html(result);
 			},
 			error : function(xhr, status, error) {
-				alert("ADMIN-PAGE-ACCOUNT MANAGEMENT ERROR!");
+				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
 			},
 			timeout : 10000
 		});
@@ -107,7 +107,7 @@
 				$("#page-wrapper").html(result);
 			},
 			error : function(xhr, status, error) {
-				alert("ADMIN-PAGE-ACCOUNT MANAGEMENT ERROR!");
+				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
 			},
 			timeout : 10000
 		});
@@ -128,7 +128,7 @@
 				$("#page-wrapper").html(result);
 			},
 			error : function(xhr, status, error) {
-				alert("ADMIN-PAGE-ACCOUNT MANAGEMENT ERROR!");
+				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
 			},
 			timeout : 10000
 		});
@@ -143,28 +143,53 @@
 			</div>
 		</div>
 		<ul class="nav navbar-nav">
-			<li><a id="userNavbarHome"
-				href="<c:url value='/tracking/user/homepage'></c:url>"><span
-					class="fa fa-globe"></span> Home</a></li>
+			<li>
+				<a id="userNavbarHomeMenuitem"
+					href="<c:url value='/tracking/user/homepage'></c:url>">
+					<span class="fa fa-globe"></span> Home
+				</a>
+			</li>
 		</ul>
 		<ul class="nav navbar-nav navbar-left">
-			<li><a id="userNavbarAccountManagement"
-				href="<c:url value='/tracking/user/accountmanagement'></c:url>"><span
-					class="glyphicon glyphicon-edit "></span> Account Management </a></li>
-			<li><a id="userNavbarManageDevices"
-				href="<c:url value='/tracking/user/managedevices'></c:url>"><span
-					class="glyphicon glyphicon-user"></span> Manage devices </a></li>
-			<li><a id="userNavbarAddDevice"
-				href="<c:url value='/tracking/user/createdevicepage'></c:url>"><span
-					class="glyphicon glyphicon-user"></span> Create device </a></li>
-			<li><a id="userNavbarDeviceTracking"
-				href="<c:url value='/tracking/user/devicetracking'></c:url>"><span
-					class="fa fa-share-alt"></span> Tracking </a></li>
+			<li>
+				<a id="userNavbarAccountManagement"
+					href="<c:url value='/tracking/user/accountmanagement'></c:url>">
+					<span class="glyphicon glyphicon-edit "></span> Account Management 
+				</a>
+			</li>
+			
+			<li>
+				<a id="userNavbarManageDevices"
+					href="<c:url value='/tracking/user/managedevices'></c:url>">
+					<span class="glyphicon glyphicon-user"></span> Manage devices 
+				</a>
+			</li>
+			
+			<li>
+				<a id="userNavbarAddDevice"
+					href="<c:url value='/tracking/user/createdevicepage'></c:url>">
+					<span class="glyphicon glyphicon-user"></span> Create device 
+				</a>
+			</li>
+					
+			<li>
+				<a id="userNavbarDeviceTracking"
+					href="<c:url value='/tracking/user/devicetracking'></c:url>">
+					<span class="fa fa-share-alt"></span> Tracking 
+				</a>
+			</li>
 		</ul>
 		<ul class="nav navbar-nav navbar-right">
-			<li><a id="userNavbarLogout"
-				href="<c:url value='/tracking/logout'></c:url>"><span
-					class="fa fa-power-off"></span> Logut</a></li>
+			<li>
+				<a id="userNavbarLogout"
+					href="<c:url value='/tracking/logout'></c:url>">
+					<span class="fa fa-power-off"></span> Logut
+				</a>
+			</li>
 		</ul>
 	</div>
 </nav>
+
+<div>
+	<p class="bg-primary text-center" id="userNavbarNavigationErrorDIV"></p>
+</div>

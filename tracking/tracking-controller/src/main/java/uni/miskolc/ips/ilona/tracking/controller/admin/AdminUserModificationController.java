@@ -1,4 +1,4 @@
-package uni.miskolc.ips.ilona.tracking.controller;
+package uni.miskolc.ips.ilona.tracking.controller.admin;
 
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;

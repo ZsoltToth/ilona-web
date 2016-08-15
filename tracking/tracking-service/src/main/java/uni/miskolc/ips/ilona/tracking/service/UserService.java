@@ -2,8 +2,6 @@ package uni.miskolc.ips.ilona.tracking.service;
 
 import java.util.Collection;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedUserException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.ServiceGeneralErrorException;
@@ -13,7 +11,7 @@ public interface UserService {
 
 	void createUser(UserData user) throws DuplicatedUserException, ServiceGeneralErrorException;
 
-	UserData getUser(String userid) throws UsernameNotFoundException, ServiceGeneralErrorException;
+	UserData getUser(String userid) throws UserNotFoundException, ServiceGeneralErrorException;
 
 	Collection<UserData> getAllUsers() throws ServiceGeneralErrorException;
 

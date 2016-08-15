@@ -39,6 +39,10 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 		if (userid == null || password == null) {
 			throw new BadCredentialsException("Invalid username or password!");
 		}
+		
+		if(userid.equals("") || password.equals("")) {
+			throw new BadCredentialsException("Invalid username or password!");
+		}
 		UserDetails user = null;
 		
 		try {

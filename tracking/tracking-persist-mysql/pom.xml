@@ -48,13 +48,7 @@
 			<groupId>uni.miskolc.ips.ilona</groupId>
 			<artifactId>tracking-persist</artifactId>
 			<version>${tracking.persist.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>uni.miskolc.ips.ilona</groupId>
-			<artifactId>tracking-controller</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		</dependency>		
 
 		<!-- Logging dependencies -->
 		<dependency>

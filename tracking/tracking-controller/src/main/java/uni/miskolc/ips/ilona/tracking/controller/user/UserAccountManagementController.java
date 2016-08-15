@@ -1,20 +1,28 @@
-package uni.miskolc.ips.ilona.tracking.controller;
+package uni.miskolc.ips.ilona.tracking.controller.user;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import uni.miskolc.ips.ilona.tracking.controller.exception.UserChangeDetailsExecutionException;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserBaseDetailsDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserSecurityDetails;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.persist.UserAndDeviceDAO;
+import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 @Controller
@@ -22,7 +30,7 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 public class UserAccountManagementController {
 
 	@Autowired
-	private UserAndDeviceDAO userDeviceDAO;
+	private UserAndDeviceService userDeviceService;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -35,51 +43,57 @@ public class UserAccountManagementController {
 	}
 
 	@RequestMapping(value = "/accountmanagement/changeuserdetails", method = { RequestMethod.POST })
-	public ModelAndView changerUserDetailsHandler(@ModelAttribute() UserBaseDetailsDTO newUserDetails) {
-		ModelAndView mav = new ModelAndView("tracking/user/accountManagement");
+	@ResponseBody
+	public UserBaseDetailsDTO changerUserDetailsHandler(@ModelAttribute() UserBaseDetailsDTO newUserDetails)
+			throws UserChangeDetailsExecutionException {
 
+		ValidityStatusHolder errors = new ValidityStatusHolder();
+
+		/*
+		 * Request null check
+		 */
 		if (newUserDetails == null) {
-			fillModelAndViewPageDetails(mav);
-			mav.addObject("userDetailsChangeError", "Error occured!");
-			return mav;
+			errors.addValidityError("The account is null!");
+			throw new UserChangeDetailsExecutionException("The account is null!", errors);
 		}
 
+		/*
+		 * Logged in user details
+		 */
 		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 
+		/*
+		 * The user only can't change other users data.
+		 */
 		if (newUserDetails.getUserid() == null || !newUserDetails.getUserid().equals(userDetails.getUserid())) {
-			fillModelAndViewPageDetails(mav);
-			mav.addObject("userDetailsChangeError", "Error occured!");
-			return mav;
+			errors.addValidityError("Account authorization requirements failed!");
+			throw new UserChangeDetailsExecutionException("Account authorization requirements failed!", errors);
 		}
 
 		/*
 		 * Validation
 		 */
 
-		ValidityStatusHolder errors = new ValidityStatusHolder();
 		errors.appendValidityStatusHolder(ValidateUserData.validateUsername(newUserDetails.getUsername()));
 		errors.appendValidityStatusHolder(ValidateUserData.validateEmail(newUserDetails.getEmail()));
 
 		if (!errors.isValid()) {
-			fillModelAndViewPageDetails(mav);
-			mav.addObject("changeDetailsErrors", errors.getErrors());
-			return mav;
+			throw new UserChangeDetailsExecutionException("Account validity error!", errors);
 		}
 
 		/*
 		 * Update User data
 		 */
 		try {
-			UserData updatedUserDetails = userDeviceDAO.getUser(newUserDetails.getUserid());
+			UserData updatedUserDetails = userDeviceService.getUser(newUserDetails.getUserid());
 			updatedUserDetails.setUsername(newUserDetails.getUsername());
 			updatedUserDetails.setEmail(newUserDetails.getEmail());
-			userDeviceDAO.updateUser(updatedUserDetails);
+			userDeviceService.updateUser(updatedUserDetails);
 
 		} catch (Exception e) {
-			fillModelAndViewPageDetails(mav);
-			mav.addObject("changeDetailsErrors", "UserDatase error, update failed!");
-			return mav;
+			errors.addValidityError("Tracking service error!");
+			throw new UserChangeDetailsExecutionException("Tracking service error!", errors);
 		}
 
 		/*
@@ -89,54 +103,49 @@ public class UserAccountManagementController {
 		userDetails.setUsername(newUserDetails.getUsername());
 
 		/*
-		 * Account management page with updated details
+		 * Return with the updated data.
 		 */
-		fillModelAndViewPageDetails(mav);
-		mav.addObject("successfulDetailsModification", "The update was successful!");
 
-		return mav;
+		return newUserDetails;
+
 	}
 
-	@RequestMapping(value = "/accmanchangepassword", method = { RequestMethod.POST })
-	public ModelAndView changeUserPasswordHandler(@ModelAttribute() UserBaseDetailsDTO user) {
-		ModelAndView mav = new ModelAndView("tracking/user/accountManagement");
-		
+	@RequestMapping(value = "/accountmanagement/changepassword", method = { RequestMethod.POST })
+	@ResponseBody
+	public Collection<String> changeUserPasswordHandler(@ModelAttribute() UserBaseDetailsDTO user) {
+
+		Collection<String> errors = new ArrayList<String>();
 		if (user == null) {
-			fillModelAndViewPageDetails(mav);
-			mav.addObject("userDetailsChangeError", "Error occured!");
-			return mav;
+			errors.add("Account error!");
+			return errors;
 		}
-		
+
 		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 
 		if (user.getUserid() == null || !user.getUserid().equals(userDetails.getUserid())) {
-			fillModelAndViewPageDetails(mav);
-			mav.addObject("userDetailsChangeError", "Error occured!");
-			return mav;
+			errors.add("User authorization error!");
+			return errors;
 		}
-		
-		ValidityStatusHolder errors = new ValidityStatusHolder();
-		errors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
-		
-		if(!errors.isValid()) {
-			fillModelAndViewPageDetails(mav);
-			mav.addObject("passwordErrors", errors.getErrors());
-			return mav;
+
+		ValidityStatusHolder valErrors = new ValidityStatusHolder();
+		valErrors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
+
+		if (!valErrors.isValid()) {
+			return valErrors.getErrors();
 		}
-		
+
 		String hashedPassword = null;
 		try {
-			UserData updatedUserDetails = userDeviceDAO.getUser(user.getUserid());
+			UserData updatedUserDetails = userDeviceService.getUser(user.getUserid());
 			hashedPassword = passwordEncoder.encode(user.getPassword());
 			updatedUserDetails.setPassword(hashedPassword);
-			userDeviceDAO.updateUser(updatedUserDetails);
+			userDeviceService.updateUser(updatedUserDetails);
 		} catch (Exception e) {
-			fillModelAndViewPageDetails(mav);
-			mav.addObject("changeDetailsErrors", "UserDatase error, update failed!");
-			return mav;
+			errors.add("Tracking serice error!");
+			return errors;
 		}
-		
+
 		/*
 		 * Update principal
 		 */
@@ -145,10 +154,9 @@ public class UserAccountManagementController {
 		/*
 		 * Account management page with updated details
 		 */
-		fillModelAndViewPageDetails(mav);
-		mav.addObject("successfulPasswordModification", "The update was successful!");
-		
-		return mav;
+		errors.add("The update was successful!");
+
+		return errors;
 	}
 
 	/**
@@ -177,8 +185,16 @@ public class UserAccountManagementController {
 
 	}
 
-	public void setUserDeviceDAO(UserAndDeviceDAO userDeviceDAO) {
-		this.userDeviceDAO = userDeviceDAO;
+	@ExceptionHandler(UserChangeDetailsExecutionException.class)
+	@ResponseBody
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	public Collection<String> UserDetailsChangeErrorsHandler(UserChangeDetailsExecutionException error) {
+
+		return error.getValidityErrors().getErrors();
+	}
+
+	public void setUserDeviceService(UserAndDeviceService userDeviceService) {
+		this.userDeviceService = userDeviceService;
 	}
 
 	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {

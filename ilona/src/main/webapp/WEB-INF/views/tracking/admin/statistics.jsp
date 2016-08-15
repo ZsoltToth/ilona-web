@@ -10,7 +10,7 @@
 <!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="<c:url value='/js/Donut3D.js'></c:url>"></script>
 
 <script type="text/javascript">
@@ -88,6 +88,9 @@ svg text.percent{
 
 <script>
 
+$("#drawonoff").click(function(){
+	
+$("#adminStatisticsOnlineUsersDIV").html("");
 var myData = [{letter: "All users", frequency: 120},
 			  {letter: "Normal users", frequency: 110},
 			  {letter: "Admins", frequency: 10}];
@@ -153,7 +156,7 @@ function type(d) {
   d.frequency = +d.frequency;
   return d;
 }
-
+});
 </script>
 
 
@@ -182,7 +185,9 @@ function type(d) {
 			<div class="panel-heading">
 				Users availability:  userek melyik zónában tartózkodtak piechart, legyen hozzá dao	
 			</div>
-			<div class="panel-body" id="adminStatisticsOnlineUsersDIV"></div>
+			<div class="panel-body" id="adminStatisticsOnlineUsersDIV">
+				<input type="button" value="Draw online/offline" id="drawonoff">
+			</div>
 		</div>
 	</div>
 	

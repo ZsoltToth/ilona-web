@@ -51,7 +51,7 @@
 
 	<select id="readLoginAttempts" resultType="Long" parameterType="string">
 		SELECT round(unix_timestamp(attempt)*1000) FROM
-		ilona.trackingloginattempts where userid = #{userid};
+		TrackingLoginAttempts where userid = #{userid};
 	</select>
 
 	<select id="getUserRoles" parameterType="string" resultType="String"

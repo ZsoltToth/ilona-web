@@ -1,7 +1,5 @@
 package uni.miskolc.ips.ilona.tracking.persist.mysql;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -14,7 +12,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import uni.miskolc.ips.ilona.tracking.model.PasswordRecoveryToken;
 import uni.miskolc.ips.ilona.tracking.persist.SecurityFunctionsDAO;
@@ -62,8 +59,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 		} catch (Exception e) {
 			if (e instanceof UserNotFoundException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
-				throw new UsernameNotFoundException(
-						"User has not found with id: " + userid + "  Error: " + e.getMessage());
+				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
 			logger.error("Error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Error: " + e.getMessage());
@@ -86,8 +82,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 		} catch (Exception e) {
 			if (e instanceof UserNotFoundException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
-				throw new UsernameNotFoundException(
-						"User has not found with id: " + userid + "  Error: " + e.getMessage());
+				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
 			logger.error("Error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Error: " + e.getMessage());
@@ -111,8 +106,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 		} catch (Exception e) {
 			if (e instanceof UserNotFoundException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
-				throw new UsernameNotFoundException(
-						"User has not found with id: " + userid + "  Error: " + e.getMessage());
+				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
 			logger.error("Error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Error: " + e.getMessage());
@@ -139,8 +133,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 		} catch (Exception e) {
 			if (e instanceof UserNotFoundException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
-				throw new UsernameNotFoundException(
-						"User has not found with id: " + userid + "  Error: " + e.getMessage());
+				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
 			logger.error("Error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Error: " + e.getMessage());
@@ -162,8 +155,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 		} catch (Exception e) {
 			if (e instanceof UserNotFoundException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
-				throw new UsernameNotFoundException(
-						"User has not found with id: " + userid + "  Error: " + e.getMessage());
+				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
 			logger.error("Error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Error: " + e.getMessage());
@@ -174,7 +166,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 
 	@Override
 	public void updateBadLogins(String userid, Collection<Date> badLogins)
-			throws UsernameNotFoundException, OperationExecutionErrorException {
+			throws UserNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		try {
 			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
@@ -194,8 +186,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 		} catch (Exception e) {
 			if (e instanceof UserNotFoundException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
-				throw new UsernameNotFoundException(
-						"User has not found with id: " + userid + "  Error: " + e.getMessage());
+				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
 			logger.error("Error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Error: " + e.getMessage());
@@ -206,7 +197,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 
 	@Override
 	public void updateLockedAndUntilLocked(String userid, Boolean nonLocked, Date lockedUntil, boolean deleteBadLogins)
-			throws UsernameNotFoundException, OperationExecutionErrorException {
+			throws UserNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		try {
 			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
@@ -215,15 +206,14 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			if (updated == 0) {
 				throw new UserNotFoundException();
 			}
-			if(deleteBadLogins == true) {
+			if (deleteBadLogins == true) {
 				mapper.eraseBadLogins(userid);
 			}
 			session.commit();
 		} catch (Exception e) {
 			if (e instanceof UserNotFoundException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
-				throw new UsernameNotFoundException(
-						"User has not found with id: " + userid + "  Error: " + e.getMessage());
+				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
 			logger.error("Error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Error: " + e.getMessage());
@@ -236,17 +226,17 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 	public void storePasswordResetToken(PasswordRecoveryToken token) throws OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		try {
-			
+
 		} finally {
 			// TODO: handle finally clause
 		}
-		
+
 	}
 
 	@Override
 	public void restorePasswordResetToken(String token) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

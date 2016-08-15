@@ -22,8 +22,11 @@
 	
 	<!-- Mobile part -->
 	<http pattern="/tracking/mobile/**" create-session="stateless" auto-config="true"  authentication-manager-ref="authManager">
-		
-		<http-basic/>
+		<intercept-url pattern="/tracking/mobile/proba" access="permitAll"/>
+		<intercept-url pattern="/tracking/mobile/**" access="hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')"/>
+		<access-denied-handler/>
+		<anonymous enabled="true" />
+		<http-basic  entry-point-ref="AuthEntryPoint"/>
 	</http>
 	
 	<http pattern="/tracking/**" auto-config="true" authentication-manager-ref="authManager"  create-session="ifRequired">

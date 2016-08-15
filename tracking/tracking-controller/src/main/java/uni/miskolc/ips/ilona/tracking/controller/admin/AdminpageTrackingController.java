@@ -1,4 +1,4 @@
-package uni.miskolc.ips.ilona.tracking.controller;
+package uni.miskolc.ips.ilona.tracking.controller.admin;
 
 import java.util.ArrayList;
 import java.util.Collection;

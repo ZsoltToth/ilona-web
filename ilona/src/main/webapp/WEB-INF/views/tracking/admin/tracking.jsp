@@ -12,6 +12,9 @@
 	<!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
 
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="<c:url value='/js/Donut3D.js'></c:url>"></script>
+
 <script type="text/javascript">
 
 	$("#selectUsers").click(function(event){
@@ -38,6 +41,34 @@
 				alert("ERROR!");
 			}
 		});
+	});
+		$("#draw111").click(function(){
+			var url = "<c:url value='/img/first2.jpg'></c:url>"
+				
+	        svgMain
+	        .append("image")
+	        .attr("xlink:href", url)
+	        .attr("x", 0)
+	        .attr("y", 0)
+	        .attr("width", 1287.5)
+	        .attr("height", 870);
+			
+			svgMain.append("circle").attr("cx", 300).attr("cy", 150).attr("r", 8);
+			svgMain.append("circle").attr("cx", 350).attr("cy", 500).attr("r", 8).attr("id","circleJo");
+			svgMain.append("circle").attr("cx", 700).attr("cy", 700).attr("r", 8);
+		});
+		
+		$("#draw1").click(function(){
+			//svgMain.selectAll("*").remove("*");
+			var dataSet1 = [{ "x": 300,   "y": 150},  { "x": 300,  "y": 250},
+			               { "x": 300,   "y": 400},  { "x": 350,  "y": 500},
+			               { "x": 400,   "y": 600},  { "x": 700,  "y": 700}];
+			//var lineGrapha = d3.svg.line().x( function(d) { return d.x; }).y( function(d) {return d.y; }).interpolate("linear"); // v3
+			var lineGrapha = d3.line().x( function(d) { return d.x; }).y( function(d) {return d.y; }).curve(d3.curveBasis);	// v4
+			svgMain.append("path").attr("d", lineGrapha(dataSet1)).attr("stroke", "blue").attr("stroke-width",5).attr("fill", "none");
+			
+	        //$("#circleJo").hide();
+		});
 		/*
 		var list = document.getElementById("sel2");
 		var szov = "";
@@ -59,7 +90,9 @@
 		}		
 		$("#szovki").html(szov);
 		*/
-	});
+		var svgMain = d3.select("#trackingDrawingContent").append("svg").attr("width",1500).attr("height",1000);
+		
+	
 </script>
 
 <jsp:directive.include file="adminNavbar.jsp" />
@@ -91,6 +124,9 @@
       			<input type="button" value="Select device!" >
       			
       			Date picker from - to !
+      			
+      			<input type="button" value="DRAW!" id="draw111">
+      			<input type="button" value="DRAW!" id="draw1">
 			</div>
 		</div>
 	</div>
@@ -99,7 +135,8 @@
 			<div class="panel-heading">
 				User position:
 			</div>
-			<div class="panel-body">
+			<div class="panel-body" id="trackingDrawingContent">
+				
 			</div>
 		</div>
      

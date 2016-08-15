@@ -6,7 +6,7 @@
 
 	<typeAliases>
 		<typeAlias alias="BooleanToIntHander"
-			type="uni.miskolc.ips.ilona.tracking.persist.mysql.BooleanEnabledTypeHandler" />
+			type="uni.miskolc.ips.ilona.tracking.persist.mysql.typehandlers.BooleanToFromTinyintTypeHandler" />
 	</typeAliases>
 
 	<typeHandlers>
@@ -29,7 +29,7 @@
 
 
 		<mapper
-			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/mapper/SecurityFunctionsUserMapper.xml" />
+			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/mappers/SecurityFunctionsUserMapper.xml" />
 
 
 	</mappers>
