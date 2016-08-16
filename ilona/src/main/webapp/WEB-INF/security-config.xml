@@ -27,6 +27,7 @@
 		<access-denied-handler/>
 		<anonymous enabled="true" />
 		<http-basic  entry-point-ref="AuthEntryPoint"/>
+		<csrf disabled="true"/>
 	</http>
 	
 	<http pattern="/tracking/**" auto-config="true" authentication-manager-ref="authManager"  create-session="ifRequired">

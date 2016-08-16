@@ -62,7 +62,11 @@
 			<artifactId>tracking-util</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-
+		<dependency>
+			<groupId>uni.miskolc.ips.ilona</groupId>
+			<artifactId>measurement-model</artifactId>
+			<version>0.1.1-SNAPSHOT</version>
+		</dependency>
 		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -127,6 +131,12 @@
 			<version>${log4j.version}</version>
 		</dependency>
 
+		<!-- JGrapht -->
+		<dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
+			<version>0.9.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
