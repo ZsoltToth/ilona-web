@@ -17,6 +17,70 @@
 
 <script type="text/javascript">
 
+
+	var zones = [
+	             {
+	            	 zoneid: "zone1",
+	            	 startx: 0,
+	            	 starty: 0,
+	            	 endx: 291,
+	            	 endy: 180,
+	            	 points: []
+	             },
+	             {
+	            	 zoneid: "zone2",
+	            	 startx: 291,
+	            	 starty: 0,
+	            	 endx: 519,
+	            	 endy: 180,
+	            	 points: []
+	             },
+	             {
+	            	 zoneid: "zone3",
+	            	 startx: 519,
+	            	 starty: 0,
+	            	 endx: 632,
+	            	 endy: 180,
+	            	 points: []
+	             },
+	             {
+	            	 zoneid: "zone4",
+	            	 startx: 632,
+	            	 starty: 0,
+	            	 endx: 961,
+	            	 endy: 180,
+	            	 points: []
+	             },
+	             {
+	            	 zoneid: "zone5",
+	            	 startx: 0,
+	            	 starty: 180,
+	            	 endx: 1250,
+	            	 endy: 243,
+	            	 points: []
+	             }];
+	var points = [{
+		pointid: "point1",
+		pointx: 110,
+		pointy: 90
+	}, {
+		pointid: "point2",
+		pointx: 205,
+		pointy: 175
+	}, {
+		pointid: "point3",
+		pointx: 405,
+		pointy: 210
+	}, {
+		pointid: "point4",
+		pointx: 585,
+		pointy: 175
+	}, {
+		pointid: "point5",
+		pointx: 585,
+		pointy: 95
+	}];
+
 	$("#selectUsers").click(function(event){
 		event.preventDefault();
 		
@@ -63,8 +127,34 @@
 		        .attr("width", 30)
 		        .attr("height", 30);
 			
-			var circleRadius = 6;
+			var circleRadius = 3;
 			
+			/*
+			 * TOP ROOMS AREA
+			 */
+			svgMain.append("rect").attr("x", 0).attr("y", 0).attr("height", 180).attr("width", 291)
+				.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+			
+			svgMain.append("rect").attr("x", 291).attr("y", 0).attr("height", 180).attr("width", 228)
+			.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+			
+			svgMain.append("rect").attr("x", 519).attr("y", 0).attr("height", 180).attr("width", 113)
+			.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+			
+			svgMain.append("rect").attr("x", 632).attr("y", 0).attr("height", 180).attr("width", 329)
+			.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+			
+			svgMain.append("rect").attr("x", 961).attr("y", 0).attr("height", 180).attr("width", 230)
+			.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+			
+			/*
+			 * TOP CORRIDOR AREA
+			 */
+			 svgMain.append("rect").attr("x", 0).attr("y", 180).attr("height", 63).attr("width", 1250)
+				.attr("fill", "none").attr("stroke", "blue").attr("stroke-width",1);
+			
+			 svgMain.append("rect").attr("x", 0).attr("y", 243).attr("height", 273).attr("width", 512)
+				.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
 			/*
 			 * LINE-1 inner room
 			 */
@@ -193,14 +283,105 @@
 		});
 		
 		$("#draw1").click(function(){
+			var startLocation = [108,85];
+			var endLocation=[580,93];
+
+			var startPoint;
+			var endPoint;
+			// calculated start point
+			startPoint = points[0];
+			var distance = Math.sqrt(Math.pow(points[0].pointx - startLocation[0],2)+
+					Math.pow(points[0].pointy - startLocation[1],2));
+			for(var i = 1; i < points.length; i++) {
+				var distancePoints = Math.sqrt(Math.pow(points[i].pointx - startLocation[0],2)+
+						Math.pow(points[i].pointy - startLocation[1],2));
+				if(distance > distancePoints) {
+					distance = distancePoints;
+					startPoint = points[i];
+				}
+			}
+			endPoint = points[0];
+			distance = Math.sqrt(Math.pow(points[0].pointx - endLocation[0],2)+
+					Math.pow(points[0].pointy - endLocation[1],2));
+			
+			for(var i = 1; i < points.length; i++) {
+				var distancePoints = Math.sqrt(Math.pow(points[i].pointx - endLocation[0],2)+
+						Math.pow(points[i].pointy - endLocation[1],2));
+				if(distance > distancePoints) {
+					distance = distancePoints;
+					endPoint = points[i];
+				}
+			}
+			//alert(startPoint.pointid);
+			//alert(endPoint.pointid);
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			var actualPoint;
+			$.ajax({
+				type : "POST",
+				async : false,
+				url : "<c:url value='/tracking/admin/tracking/calculatedpath' ></c:url>",
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : {
+					start : startPoint.pointid,
+					end : endPoint.pointid
+				},
+				success : function(result, status, xhr) {
+					actualPoint = result;
+				},
+				error : function(xhr, status, error) {
+					alert("Error" + status + error);
+				}
+				
+			});
+			
+			var drawPoints = [];
+			for(var i = 0; i < actualPoint.length; i++) {
+				for(var j = 0; j < points.length; j++) {
+					if(points[j].pointid == actualPoint[i]) {
+						drawPoints.push(points[j]);
+						continue;
+					}
+				}
+			}
+			
+			
+			//alert(drawPoints);
 			//svgMain.selectAll("*").remove("*");
+			var startPointData =[];
+			startPointData.push({"x" : startLocation[0], "y": startLocation[1]});
+			for(var i = 0; i < drawPoints.length; i++) {
+				startPointData.push({"x": drawPoints[i].pointx, "y": drawPoints[i].pointy});
+			}
+			startPointData.push({"x": endLocation[0], "y": endLocation[1]});
+			/*
+			
 			var dataSet1 = [{ "x": 300,   "y": 150},  { "x": 300,  "y": 250},
 			               { "x": 300,   "y": 400},  { "x": 350,  "y": 500},
 			               { "x": 400,   "y": 600},  { "x": 700,  "y": 700}];
+			*/
 			//var lineGrapha = d3.svg.line().x( function(d) { return d.x; }).y( function(d) {return d.y; }).interpolate("linear"); // v3
 			var lineGrapha = d3.line().x( function(d) { return d.x; }).y( function(d) {return d.y; }).curve(d3.curveBasis);	// v4
-			svgMain.append("path").attr("d", lineGrapha(dataSet1)).attr("stroke", "blue").attr("stroke-width",5).attr("fill", "none");
+			svgMain.append("path").attr("d", lineGrapha(startPointData)).attr("stroke", "blue").attr("stroke-width",2).attr("fill", "none");
+			var urlMarker = "<c:url value='/img/marker.png'></c:url>"
+			svgMain
+	    	.append("image")
+	        .attr("xlink:href", urlMarker)
+	        .attr("x", startLocation[0] - 7)
+	        .attr("y", startLocation[0] - 40)
+	        .attr("width", 14)
+	        .attr("height", 20);
 			
+			svgMain
+	    	.append("image")
+	        .attr("xlink:href", urlMarker)
+	        .attr("x", endLocation[0] - 30)
+	        .attr("y", endLocation[1] - 30)
+	        .attr("width", 30)
+	        .attr("height", 30)
+	        .attr("id","vege");
 	        //$("#circleJo").hide();
 		});
 		/*
@@ -226,7 +407,7 @@
 		*/
 		var svgMain = d3.select("#trackingDrawingContent").append("svg").attr("width",1500).attr("height",1000);
 		
-	
+
 </script>
 
 <jsp:directive.include file="adminNavbar.jsp" />
@@ -259,8 +440,9 @@
 	      			
 	      			Date picker from - to !
 	      			
-	      			<input type="button" value="DRAW!" id="draw111">
-	      			<input type="button" value="DRAW!" id="draw1">
+	      			<input type="button" value="DRAW111!" id="draw111"><br />
+	      			<input type="button" value="DRAW1!" id="draw1"><br />
+	      			<input type="button" value="DRAW2!" id="draw2">
 				</div>
 			</div>
 		</div>

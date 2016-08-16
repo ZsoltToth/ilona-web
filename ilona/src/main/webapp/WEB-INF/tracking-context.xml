@@ -28,6 +28,12 @@
 		<constructor-arg ref="passwordEncoder"></constructor-arg>
 	</bean>
 
+	<bean id="jsonConverter"
+		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="prefixJson" value="false" />
+		<property name="supportedMediaTypes" value="application/json" />
+	</bean>
+
 	<bean id="UserAndDeviceService"
 		class="uni.miskolc.ips.ilona.tracking.service.impl.UserAndDeviceServiceImpl"
 		depends-on="trackingUserAndDeviceDAO">

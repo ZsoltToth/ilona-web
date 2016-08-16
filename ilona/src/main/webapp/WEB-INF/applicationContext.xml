@@ -29,7 +29,7 @@
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
 			<props>
-				<prop key="mybatisConfig">git/ilona/ilona/src/main/webapp/WEB-INF/mybatis-configuration.xml
+				<prop key="mybatisConfig">mybatis-configuration.xml
 				</prop>
 			</props>
 		</property>
@@ -76,15 +76,7 @@
 		class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl">
 		<!--<constructor-arg ref="positionDAO" /> -->
 		<constructor-arg ref="measurementDAO" />
-	</bean>
-
-	<!-- Spring security configuration -->
-
-	<bean id="jsonConverter"
-		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-		<property name="prefixJson" value="false" />
-		<property name="supportedMediaTypes" value="application/json" />
-	</bean>
+	</bean>	
 
 	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 
 		<constructor-arg ref="positionDAO" /> <constructor-arg ref="measurementDAO" 
