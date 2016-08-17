@@ -338,6 +338,5 @@ public class OntologyDAOImpl implements OntologyDAO {
 			}
 		}
 		return result;
-
 	}
 }
