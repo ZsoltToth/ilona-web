@@ -68,7 +68,6 @@ public class OntologyGenerationServiceImpl implements OntologyGenerationService 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
 		File result = baseOntology();
-		IRI newIRI = IRI.create(result);
 		/*
 		 * try { result = File.createTempFile("ILONAOWL", ".owl"); } catch
 		 * (IOException e) { // TODO Auto-generated catch block
@@ -77,12 +76,12 @@ public class OntologyGenerationServiceImpl implements OntologyGenerationService 
 		try {
 			OWLOntology newOntology = manager.copyOntology(ontologyDAO.getBaseOntology(), OntologyCopy.DEEP);
 			OWLEntityRemover remover = new OWLEntityRemover(newOntology);
-			for (OWLDataProperty property : newOntology.getDataPropertiesInSignature()) {
+			/*for (OWLDataProperty property : newOntology.getDataPropertiesInSignature()) {
 				remover.visit(property);
 			}
 			for (OWLObjectProperty property : newOntology.getObjectPropertiesInSignature()) {
 				remover.visit(property);
-			}
+			}*/
 			for (OWLNamedIndividual individual : newOntology.getIndividualsInSignature()) {
 				remover.visit(individual);
 			}

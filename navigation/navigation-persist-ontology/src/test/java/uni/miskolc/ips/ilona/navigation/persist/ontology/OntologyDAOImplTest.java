@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uni.miskolc.ips.ilona.navigation.model.Gateway;
 import uni.miskolc.ips.ilona.navigation.model.ZoneMap;
+import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO.GatewayRestriction;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -117,5 +118,21 @@ public class OntologyDAOImplTest {
 		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(new File("resources/DummyOntology.owl"));
 	//	List<UUID> actual = test.getPathOnMap(ontology, start.toString(), finish.toString());
 	//	assertThat(actual, hasItems(start,finish));
+	}
+	
+	@Test
+	public void testStringGetPathsWithRestriction() throws OWLOntologyCreationException {
+		Set<GatewayRestriction> restrictions = new HashSet<>();
+		restrictions.add(GatewayRestriction.NO_DOOR);
+		restrictions.add(GatewayRestriction.NO_STAIRS);
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(new File("resources/DummyOntology.owl"));
+		OntologyDAOImpl test = new OntologyDAOImpl("resources/ILONABASE.owl", "resources/ILONA.owl");
+		Set<Gateway> res = test.getPaths(ontology, restrictions);
+	}
+	
+	@Test
+	public void testGenerateUUID(){
+		System.out.println(UUID.randomUUID());
 	}
 }

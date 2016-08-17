@@ -2,6 +2,7 @@ package uni.miskolc.ips.ilona.navigation.persist.ontology;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.util.BidirectionalShortFormProviderAdapter;
 import org.semanticweb.owlapi.util.ShortFormProvider;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
@@ -59,23 +61,27 @@ public class OntologyDAOImpl implements OntologyDAO {
 	}
 
 	/**
-	 * The method used to find the shortest path on a map generated from an ontology, between two zones
-	 * @param ontology the ontology used for the creation of the map
-	 * @param start the id of the starting zone, the current position
-	 * @param destination the id of the destination zone
+	 * The method used to find the shortest path on a map generated from an
+	 * ontology, between two zones
+	 * 
+	 * @param ontology
+	 *            the ontology used for the creation of the map
+	 * @param start
+	 *            the id of the starting zone, the current position
+	 * @param destination
+	 *            the id of the destination zone
 	 * @return the path as a list of UUID-s
 	 */
-	
-/*	public List<UUID> getPathOnMap(OWLOntology ontology, UUID start, UUID destination){
-		ZoneMap map = createGraphWithoutRestrictions(ontology);
-		UUID startID = getZone(start, ontology);
-		UUID destinationID = getZone(destination, ontology);
-		List<UUID> result = map.findPath(startID, destinationID);
-		return result;
-	} 
-	
-	*/
-	
+
+	/*
+	 * public List<UUID> getPathOnMap(OWLOntology ontology, UUID start, UUID
+	 * destination){ ZoneMap map = createGraphWithoutRestrictions(ontology);
+	 * UUID startID = getZone(start, ontology); UUID destinationID =
+	 * getZone(destination, ontology); List<UUID> result = map.findPath(startID,
+	 * destinationID); return result; }
+	 * 
+	 */
+
 	/**
 	 * 
 	 * @param ontology
@@ -88,6 +94,14 @@ public class OntologyDAOImpl implements OntologyDAO {
 		Set<Gateway> paths = getPaths(ontology);
 
 		return new ZoneMap(iDs, paths);
+	}
+
+	@Override
+	public ZoneMap createGraph(Set<GatewayRestriction> gatewayRestrictions, Set<ZoneRestriction> zoneRestrictions) {
+		OWLOntology ontology = getNavigationOntology();
+		Set<UUID> iDs = getZones(ontology, zoneRestrictions);
+		Set<Gateway> gateways = getPaths(ontology, gatewayRestrictions);
+		return new ZoneMap(iDs, gateways);
 	}
 
 	/**
@@ -134,7 +148,7 @@ public class OntologyDAOImpl implements OntologyDAO {
 
 		// get the subclasses of the gateway class
 		Set<OWLClass> gateWaySubClasses = new HashSet<OWLClass>();
-		for (Node<OWLClass> subclass : reasoner.getSubClasses(factory.getOWLClass(IlonaIRIs.TRAVERSAL))) {
+		for (Node<OWLClass> subclass : reasoner.getSubClasses(factory.getOWLClass(IlonaIRIs.GATEWAY))) {
 			gateWaySubClasses.add(subclass.getRepresentativeElement());
 		}
 
@@ -178,8 +192,11 @@ public class OntologyDAOImpl implements OntologyDAO {
 
 	/**
 	 * find a specific zone in the ontology
-	 * @param zoneId the zone id as String
-	 * @param ontology the searched ontology
+	 * 
+	 * @param zoneId
+	 *            the zone id as String
+	 * @param ontology
+	 *            the searched ontology
 	 * @return the UUID of the Zone
 	 */
 	public UUID getZone(UUID zoneId, OWLOntology ontology) {
@@ -205,6 +222,94 @@ public class OntologyDAOImpl implements OntologyDAO {
 			throw new NullPointerException("No Such Zone in the ontology");
 		}
 	}
+
+	public Set<Gateway> getPaths(OWLOntology ontology, Set<GatewayRestriction> restrictions) {
+		Set<Gateway> result = new HashSet<>();
+		if(restrictions.isEmpty()){
+			result=getPaths(ontology);
+		}else{
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLDataFactory factory = manager.getOWLDataFactory();
+		OWLReasoner reasoner = new Reasoner.ReasonerFactory().createReasoner(ontology);
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		QueryEngine engine = new QueryEngine(reasoner, new SimpleShortFormProvider());
+		String query = new String("Gateway and (");
+
+		// constructing the query
+		for (GatewayRestriction restriction : restrictions) {
+			query = query.concat(restriction.getStringForm() + " and ");
+		}
+		query = query.substring(0, query.length() - 5);
+		query = query.concat(")");
+		System.out.println(query);
+		Set<OWLNamedIndividual> individuals = engine.getInstances(query, false);
+
+		for (OWLNamedIndividual individual : individuals) {
+			UUID from = null;
+			UUID to = null;
+			// get fromzone
+			for (Node<OWLNamedIndividual> zoneIndividual : reasoner.getObjectPropertyValues(individual,
+					factory.getOWLObjectProperty(IlonaIRIs.FROMZONE))) {
+				OWLNamedIndividual fromZone = zoneIndividual.getRepresentativeElement();
+				for (OWLLiteral id : reasoner.getDataPropertyValues(fromZone,
+						factory.getOWLDataProperty(IlonaIRIs.ID))) {
+					from = UUID.fromString(id.getLiteral());
+				}
+			}
+			// get tozone
+			for (Node<OWLNamedIndividual> zoneIndividual : reasoner.getObjectPropertyValues(individual,
+					factory.getOWLObjectProperty(IlonaIRIs.TOZONE))) {
+				OWLNamedIndividual fromZone = zoneIndividual.getRepresentativeElement();
+				for (OWLLiteral id : reasoner.getDataPropertyValues(fromZone,
+						factory.getOWLDataProperty(IlonaIRIs.ID))) {
+					to = UUID.fromString(id.getLiteral());
+				}
+			}
+			// check if oneway
+			if (reasoner.getDataPropertyValues(individual, factory.getOWLDataProperty(IlonaIRIs.ONEWAY)).isEmpty()) {
+				// if not oneway, add the gateway to both ways
+				result.add(new Gateway(from, to));
+				result.add(new Gateway(to, from));
+			} else {
+				// if oneway, add only the appropiate edge
+				result.add(new Gateway(from, to));
+			}
+
+		}
+		}
+		return result;
+	}
+
+	public Set<UUID> getZones(OWLOntology ontology, Set<ZoneRestriction> restrictions){
+		Set<UUID> result = new HashSet<>();
+		if(restrictions.isEmpty()){
+			result=getAllZoneIDs(ontology);
+		}else{
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLDataFactory factory = manager.getOWLDataFactory();
+		OWLReasoner reasoner = new Reasoner.ReasonerFactory().createReasoner(ontology);
+		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+		QueryEngine engine = new QueryEngine(reasoner, new SimpleShortFormProvider());
+		
+		String query = new String("Zone and (");
+		// constructing the query
+				for (ZoneRestriction restriction : restrictions) {
+					query = query.concat(restriction.getStringForm() + " and ");
+				}
+				query = query.substring(0, query.length() - 5);
+				query = query.concat(")");
+				System.out.println(query);
+				Set<OWLNamedIndividual> individuals = engine.getInstances(query, true);
+				for (OWLNamedIndividual zone : individuals) {
+					// get the IDs of the zone
+					Set<OWLLiteral> UUIDs = reasoner.getDataPropertyValues(zone, factory.getOWLDataProperty(IlonaIRIs.ID));
+					for (OWLLiteral literal : UUIDs) {
+						UUID uUID = UUID.fromString(literal.getLiteral());
+						result.add(uUID);
+					}
+				}
 	
-	
+		}
+		return result;
+	}
 }

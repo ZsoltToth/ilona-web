@@ -11,6 +11,8 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import uni.miskolc.ips.ilona.measurement.model.position.Zone;
+
 public class ZoneMapTest {
 	static UUID zone1;
 	static UUID zone2;
@@ -75,5 +77,7 @@ public class ZoneMapTest {
 		destinations.add(zone5);
 		assertEquals(expected, map.findPath(zone1, destinations));
 	}
+	
+	
 
 }

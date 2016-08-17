@@ -67,8 +67,10 @@ public class ZoneMap {
 	 */
 	public List<UUID> findPath(UUID start, UUID destination){
 		List<UUID> result = new ArrayList<UUID>();
+		//System.out.println(start.toString()+ destination.toString());
 		DijkstraShortestPath<UUID, DefaultEdge> path= new DijkstraShortestPath<UUID, DefaultEdge>(zoneGraph, start, destination);
 		result=intoUUID(start,path.getPathEdgeList());
+		//System.out.println(result.toString());
 		return result;
 	}
 

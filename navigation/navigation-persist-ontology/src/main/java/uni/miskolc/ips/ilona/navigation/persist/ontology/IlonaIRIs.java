@@ -13,7 +13,7 @@ public class IlonaIRIs {
 	//
 	// Class IRIs
 	public static final String ZONE = new String("http://www.semanticweb.org/dpkun/ontologies/2016/ILONA#Zone");
-	public static final String TRAVERSAL = new String(
+	public static final String GATEWAY = new String(
 			"http://www.semanticweb.org/dpkun/ontologies/2016/ILONA#Gateway");
 	public static final String DOOR = new String("http://www.semanticweb.org/dpkun/ontologies/2016/ILONA#Door");
 	public static final String ESCALATOR = new String(
