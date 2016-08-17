@@ -8,17 +8,46 @@ import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import uni.miskolc.ips.ilona.measurement.model.measurement.Measurement;
+import uni.miskolc.ips.ilona.tracking.controller.model.MobileTransferDTO;
+import uni.miskolc.ips.ilona.tracking.controller.model.UserSecurityDetails;
 
 @Controller
 @RequestMapping(value = "/tracking/mobile")
 public class MobileRequestsController {
 
+	private UndirectedGraph<String, DefaultEdge> groundFloorGraph;
+	private UndirectedGraph<String, DefaultEdge> firstFloorGraph;
+	private UndirectedGraph<String, DefaultEdge> secondFloorGraph;
+	
+	
+	public MobileRequestsController() {
+		initializeGroundFloorGraph();
+		initializeFirstFloorGraph();
+		initializeSecondFloorGraph();
+	}
+	
+	
+	@RequestMapping(value = "/trackposition")
+	@ResponseBody
+	public MobileTransferDTO mobileSendMeasurementHandler(@RequestBody(required = false) MobileTransferDTO dto) {
+		
+		if(dto == null) {
+			return new MobileTransferDTO();
+		}
+		
+		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		System.out.println(userDetails.toString());
+		return dto;
+	}
+	
 	@RequestMapping(value = "/proba", produces = "application/json")
 	@ResponseBody
 	public Measurement dummyHandlerDELETEDDONTUSERIT(@RequestBody(required = false) Measurement mes) {
@@ -28,6 +57,7 @@ public class MobileRequestsController {
 		}
 		// Authentication auth =
 		// SecurityContextHolder.getContext().getAuthentication();
+		
 		UndirectedGraph<String, DefaultEdge> myGrapgh = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
 		myGrapgh.addVertex("V1");
 		myGrapgh.addVertex("V2");
@@ -179,7 +209,19 @@ public class MobileRequestsController {
 		System.out.println(path.toString());
 		System.out.println(path2.toString());
 		System.out.println(thePath.toString());
+		
 		return new Measurement();
 	}
+	
+	private void initializeGroundFloorGraph() {
+		this.groundFloorGraph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+	}
+	
+	private void initializeFirstFloorGraph() {
+		this.groundFloorGraph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+	}
 
+	private void initializeSecondFloorGraph() {
+		this.secondFloorGraph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+	}
 }

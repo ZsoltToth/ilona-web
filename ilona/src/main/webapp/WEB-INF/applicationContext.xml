@@ -29,7 +29,7 @@
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
 			<props>
-				<prop key="mybatisConfig">mybatis-configuration.xml
+				<prop key="mybatisConfig">git/ilona/ilona/src/main/webapp/WEB-INF/mybatis-configuration.xml
 				</prop>
 			</props>
 		</property>

@@ -12,12 +12,241 @@
 	<!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="<c:url value='/js/d3.min.js'></c:url>"></script>
 <script src="<c:url value='/js/Donut3D.js'></c:url>"></script>
 
 <script type="text/javascript">
 
+	var groundFloorImageSource = "<c:url value='/img/groundFloor.jpg'></c:url>";
+	var firstFloorImageSource = "<c:url value='/img/firstFloor.jpg'></c:url>";
+	var secondFloorImageSource = "<c:url value='/img/secondFloor.jpg'></c:url>";
 
+	var floorMapSVG;
+	
+	var graphPontCircleRadius = 3;
+	
+	$(document).ready(function(){
+		
+	});
+	
+	
+	$("#adminTrackingPositionsTableDrawMenuItem").click(function(event){
+		event.preventDefault();
+		$("#adminTrackingDrawingContent").html("Position table content!");
+		
+		// delete svg?!
+				
+		
+	});
+	
+	$("#adminTrackingGroundFloorMapDrawMenuItem").click(function(event){
+		event.preventDefault();
+		$("#adminTrackingDrawingContent").html("");
+		floorMapSVG = d3.select("#adminTrackingDrawingContent").append("svg").attr("width",1500).attr("height",1000);
+		
+		floorMapSVG
+        .append("image")
+        .attr("xlink:href", groundFloorImageSource)
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", 1200)
+        .attr("height", 700);
+	});
+	
+	$("#adminTrackingFirstFloorMapDrawMenuItem").click(function(event){
+		event.preventDefault();
+		$("#adminTrackingDrawingContent").html("");
+		floorMapSVG = d3.select("#adminTrackingDrawingContent").append("svg").attr("width",1500).attr("height",1000);
+		
+		floorMapSVG
+        .append("image")
+        .attr("xlink:href", firstFloorImageSource)
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", 1196)
+        .attr("height", 705);
+		
+		/*
+		 * AREAS
+		 */
+		 // TOP ROOMS
+		floorMapSVG.append("rect").attr("x", 0).attr("y", 0).attr("width", 285).attr("height", 178)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 285).attr("y", 0).attr("width", 231).attr("height", 178)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 516).attr("y", 0).attr("width", 113).attr("height", 178)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 629).attr("y", 0).attr("width", 111).attr("height", 178)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 740).attr("y", 0).attr("width", 222).attr("height", 178)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 962).attr("y", 0).attr("width", 250).attr("height", 178)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		
+		// TOP CORRIDOR	
+		floorMapSVG.append("rect").attr("x", 0).attr("y", 178).attr("width", 1200).attr("height", 67)
+		.attr("fill", "none").attr("stroke", "blue").attr("stroke-width",1);
+		
+		// middle left corridor top
+		floorMapSVG.append("rect").attr("x", 0).attr("y", 245).attr("width", 507).attr("height", 106)
+		.attr("fill", "none").attr("stroke", "blue").attr("stroke-width",1);
+				
+		// middle left corridor bottom
+		floorMapSVG.append("rect").attr("x", 0).attr("y", 351).attr("width", 507).attr("height", 98)
+		.attr("fill", "none").attr("stroke", "blue").attr("stroke-width",1);
+		
+		// Middle rooms top 		
+		floorMapSVG.append("rect").attr("x", 507).attr("y", 245).attr("width", 212).attr("height", 106)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 719).attr("y", 245).attr("width", 100).attr("height", 106)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 819).attr("y", 245).attr("width", 35).attr("height", 106)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 854).attr("y", 245).attr("width", 42).attr("height", 106)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 896).attr("y", 245).attr("width", 55).attr("height", 60)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 896).attr("y", 305).attr("width", 55).attr("height", 46)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 1008).attr("y", 245).attr("width", 190).attr("height", 108)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		
+		// Middle rooms bottom
+		floorMapSVG.append("rect").attr("x", 507).attr("y", 351).attr("width", 104).attr("height", 98)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 611).attr("y", 351).attr("width", 102).attr("height", 98)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 713).attr("y", 351).attr("width", 81).attr("height", 98)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 794).attr("y", 351).attr("width", 38).attr("height", 98)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 832).attr("y", 351).attr("width", 38).attr("height", 98)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 870).attr("y", 351).attr("width", 81).attr("height", 98)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 1008).attr("y", 353).attr("width", 200).attr("height", 96)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		
+		// corridor right
+		floorMapSVG.append("rect").attr("x", 951).attr("y", 178).attr("width", 57).attr("height", 342)
+		.attr("fill", "none").attr("stroke", "blue").attr("stroke-width",1);
+		
+		// Bottom corridor
+		
+		floorMapSVG.append("rect").attr("x", 0).attr("y", 449).attr("width", 1230).attr("height", 71)
+		.attr("fill", "none").attr("stroke", "blue").attr("stroke-width",1);
+		
+		floorMapSVG.append("rect").attr("x", 1032).attr("y", 449).attr("width", 39).attr("height", 113)
+		.attr("fill", "none").attr("stroke", "green").attr("stroke-width",1);
+		
+		// Bottom rooms
+		
+		floorMapSVG.append("rect").attr("x", 0).attr("y", 520).attr("width", 273).attr("height", 200)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 273).attr("y", 520).attr("width", 120).attr("height", 200)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 393).attr("y", 520).attr("width", 111).attr("height", 200)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 504).attr("y", 520).attr("width", 116).attr("height", 200)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 620).attr("y", 520).attr("width", 114).attr("height", 200)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 734).attr("y", 520).attr("width", 114).attr("height", 200)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 848).attr("y", 520).attr("width", 110).attr("height", 200)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 958).attr("y", 520).attr("width", 74).attr("height", 200)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 1032).attr("y", 562).attr("width", 39).attr("height", 150)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		floorMapSVG.append("rect").attr("x", 1071).attr("y", 520).attr("width", 130).attr("height", 200)
+		.attr("fill", "none").attr("stroke", "red").attr("stroke-width",1);
+		
+		var topInRoomLinePosY = 110;
+		floorMapSVG.append("circle").attr("cx", 110).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 230).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 350).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 450).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 570).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 690).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 800).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 900).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 1020).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 1111).attr("cy", topInRoomLinePosY).attr("r", graphPontCircleRadius);
+		/*
+		 * ROOM DOOR LINE
+		 */
+		var topRoomDoorPosY = 178;
+		floorMapSVG.append("circle").attr("cx", 255).attr("cy", topRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 408).attr("cy", topRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 575).attr("cy", topRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 690).attr("cy", topRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 908).attr("cy", topRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 1015).attr("cy", topRoomDoorPosY).attr("r", graphPontCircleRadius);
+		
+		var topCorridorPosY = 210;
+		floorMapSVG.append("circle").attr("cx", 255).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 408).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 575).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 680).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 760).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 835).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);		
+		floorMapSVG.append("circle").attr("cx", 908).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 978).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 1015).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 1120).attr("cy", topCorridorPosY).attr("r", graphPontCircleRadius);
+		
+		var MiddleUpperRoomDoorPosY = 245;
+		floorMapSVG.append("circle").attr("cx", 678).attr("cy", MiddleUpperRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 760).attr("cy", MiddleUpperRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 835).attr("cy", MiddleUpperRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 925).attr("cy", MiddleUpperRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 1040).attr("cy", MiddleUpperRoomDoorPosY).attr("r", graphPontCircleRadius);
+		
+		var MiddleUpperInRoomLinePosY = 270;
+		floorMapSVG.append("circle").attr("cx", 560).attr("cy", MiddleUpperInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 678).attr("cy", MiddleUpperInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 770).attr("cy", MiddleUpperInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 835).attr("cy", MiddleUpperInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 925).attr("cy", MiddleUpperInRoomLinePosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 1040).attr("cy", MiddleUpperInRoomLinePosY).attr("r", graphPontCircleRadius);
+		
+		var middleLowerRoomDoorPosY = 449;
+		floorMapSVG.append("circle").attr("cx", 548).attr("cy", middleLowerRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 688).attr("cy", middleLowerRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 740).attr("cy", middleLowerRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 815).attr("cy", middleLowerRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 850).attr("cy", middleLowerRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 1050).attr("cy", middleLowerRoomDoorPosY).attr("r", graphPontCircleRadius);
+		
+		var bottomRoomDoorPosY = 520;
+		floorMapSVG.append("circle").attr("cx", 253).attr("cy", bottomRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 330).attr("cy", bottomRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 448).attr("cy", bottomRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 560).attr("cy", bottomRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 672).attr("cy", bottomRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 785).attr("cy", bottomRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 900).attr("cy", bottomRoomDoorPosY).attr("r", graphPontCircleRadius);
+		floorMapSVG.append("circle").attr("cx", 1050).attr("cy", bottomRoomDoorPosY).attr("r", graphPontCircleRadius);
+		
+		floorMapSVG.append("circle").attr("cx", 1071).attr("cy", 540).attr("r", graphPontCircleRadius);
+	});
+	
+	$("#adminTrackingSecondFloorMapDrawMenuItem").click(function(event){
+		event.preventDefault();
+		$("#adminTrackingDrawingContent").html("");
+		floorMapSVG = d3.select("#adminTrackingDrawingContent").append("svg").attr("width",1500).attr("height",1000);
+		
+		floorMapSVG
+        .append("image")
+        .attr("xlink:href", secondFloorImageSource)
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", 1200)
+        .attr("height", 705);
+	});
+	
+	
 	var zones = [
 	             {
 	            	 zoneid: "zone1",
@@ -405,12 +634,13 @@
 		}		
 		$("#szovki").html(szov);
 		*/
-		var svgMain = d3.select("#trackingDrawingContent").append("svg").attr("width",1500).attr("height",1000);
+		var svgMain = d3.select("#adminTrackingDrawingContent").append("svg").attr("width",1500).attr("height",1000);
 		
 
 </script>
 
 <jsp:directive.include file="adminNavbar.jsp" />
+
 <div class="container-fluid">
 	<div class="row" id="adminMainpageContent">
 		<div class="col-lg-2">
@@ -425,9 +655,19 @@
 	       				</c:forEach>
 	      			</select>
 	      			<br />
-	      			<input type="button" value="Select user!" id="selectUsers" >
-	      			<p id="szovki"></p>     			
-	      			<br /><br /><br />
+	      			<input type="button" value="Select user!" id="selectUsers" >    			
+	      			<br />
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-lg-2">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					Devices:
+				</div>
+				<div class="panel-body">
+   			
 	      			<select  class="form-control" id="sel3">
 	       				<option>1</option>
 	       				<option>2</option>
@@ -436,33 +676,53 @@
 	      				<option>5</option>
 	      			</select>
 	      			<br />
-	      			<input type="button" value="Select device!" >
-	      			
-	      			Date picker from - to !
-	      			
-	      			<input type="button" value="DRAW111!" id="draw111"><br />
-	      			<input type="button" value="DRAW1!" id="draw1"><br />
-	      			<input type="button" value="DRAW2!" id="draw2">
+	      			<input type="button" value="Select device!" >   			
 				</div>
 			</div>
 		</div>
-		<div class="col-lg-10">
+		
+		<div class="col-lg-2">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					User position:
-					<ul class="breadcrumb">
-					  <li><a href="#">Home</a></li>
-					  <li><a href="#">Private</a></li>
-					  <li><a href="#">Pictures</a></li>
-					  <li class="active">Vacation</li> 
-					</ul>
+					Position details:
 				</div>
-				<div class="panel-body" id="trackingDrawingContent">
-					
+				<div class="panel-body">	
+	      			<br />
+	      			<input type="text" value="Select device!" >
+			</div>
+			</div>
+		</div>
+		
+		<div class="col-lg-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">			
+					Date picker from - to !	      			
+	      			<input type="button" value="DRAW111!" id="draw111">
+	      			<input type="button" value="DRAW1!" id="draw1"><br />
+	      			<input type="button" value="DRAW2!" id="draw2">
 				</div>
+				
 			</div>
 	     
 		</div>
 		
+	</div>
+	
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<ul class="breadcrumb">
+					  <li><a id="adminTrackingPositionsTableDrawMenuItem" href="#">Positions table</a></li>
+					  <li><a id="adminTrackingGroundFloorMapDrawMenuItem" href="#">Ground floor</a></li>
+					  <li><a id="adminTrackingFirstFloorMapDrawMenuItem" href="#">First floor</a></li>
+					  <li><a id="adminTrackingSecondFloorMapDrawMenuItem">Second floor</a></li> 
+					</ul>
+				</div>
+				<div class="panel-body" id="adminTrackingDrawingContent">
+					
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
