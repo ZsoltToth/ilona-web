@@ -225,91 +225,119 @@ public class OntologyDAOImpl implements OntologyDAO {
 
 	public Set<Gateway> getPaths(OWLOntology ontology, Set<GatewayRestriction> restrictions) {
 		Set<Gateway> result = new HashSet<>();
-		if(restrictions.isEmpty()){
-			result=getPaths(ontology);
-		}else{
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLDataFactory factory = manager.getOWLDataFactory();
-		OWLReasoner reasoner = new Reasoner.ReasonerFactory().createReasoner(ontology);
-		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-		QueryEngine engine = new QueryEngine(reasoner, new SimpleShortFormProvider());
-		String query = new String("Gateway and (");
+		if (restrictions.isEmpty()) {
+			result = getPaths(ontology);
+		} else {
+			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+			OWLDataFactory factory = manager.getOWLDataFactory();
+			OWLReasoner reasoner = new Reasoner.ReasonerFactory().createReasoner(ontology);
+			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+			QueryEngine engine = new QueryEngine(reasoner, new SimpleShortFormProvider());
+			String query = new String("Gateway and (");
 
-		// constructing the query
-		for (GatewayRestriction restriction : restrictions) {
-			query = query.concat(restriction.getStringForm() + " and ");
-		}
-		query = query.substring(0, query.length() - 5);
-		query = query.concat(")");
-		System.out.println(query);
-		Set<OWLNamedIndividual> individuals = engine.getInstances(query, false);
+			// constructing the query
+			for (GatewayRestriction restriction : restrictions) {
+				query = query.concat(restriction.getStringForm() + " and ");
+			}
+			query = query.substring(0, query.length() - 5);
+			query = query.concat(")");
+			System.out.println(query);
+			Set<OWLNamedIndividual> individuals = engine.getInstances(query, false);
 
-		for (OWLNamedIndividual individual : individuals) {
-			UUID from = null;
-			UUID to = null;
-			// get fromzone
-			for (Node<OWLNamedIndividual> zoneIndividual : reasoner.getObjectPropertyValues(individual,
-					factory.getOWLObjectProperty(IlonaIRIs.FROMZONE))) {
-				OWLNamedIndividual fromZone = zoneIndividual.getRepresentativeElement();
-				for (OWLLiteral id : reasoner.getDataPropertyValues(fromZone,
-						factory.getOWLDataProperty(IlonaIRIs.ID))) {
-					from = UUID.fromString(id.getLiteral());
+			for (OWLNamedIndividual individual : individuals) {
+				UUID from = null;
+				UUID to = null;
+				// get fromzone
+				for (Node<OWLNamedIndividual> zoneIndividual : reasoner.getObjectPropertyValues(individual,
+						factory.getOWLObjectProperty(IlonaIRIs.FROMZONE))) {
+					OWLNamedIndividual fromZone = zoneIndividual.getRepresentativeElement();
+					for (OWLLiteral id : reasoner.getDataPropertyValues(fromZone,
+							factory.getOWLDataProperty(IlonaIRIs.ID))) {
+						from = UUID.fromString(id.getLiteral());
+					}
 				}
-			}
-			// get tozone
-			for (Node<OWLNamedIndividual> zoneIndividual : reasoner.getObjectPropertyValues(individual,
-					factory.getOWLObjectProperty(IlonaIRIs.TOZONE))) {
-				OWLNamedIndividual fromZone = zoneIndividual.getRepresentativeElement();
-				for (OWLLiteral id : reasoner.getDataPropertyValues(fromZone,
-						factory.getOWLDataProperty(IlonaIRIs.ID))) {
-					to = UUID.fromString(id.getLiteral());
+				// get tozone
+				for (Node<OWLNamedIndividual> zoneIndividual : reasoner.getObjectPropertyValues(individual,
+						factory.getOWLObjectProperty(IlonaIRIs.TOZONE))) {
+					OWLNamedIndividual fromZone = zoneIndividual.getRepresentativeElement();
+					for (OWLLiteral id : reasoner.getDataPropertyValues(fromZone,
+							factory.getOWLDataProperty(IlonaIRIs.ID))) {
+						to = UUID.fromString(id.getLiteral());
+					}
 				}
-			}
-			// check if oneway
-			if (reasoner.getDataPropertyValues(individual, factory.getOWLDataProperty(IlonaIRIs.ONEWAY)).isEmpty()) {
-				// if not oneway, add the gateway to both ways
-				result.add(new Gateway(from, to));
-				result.add(new Gateway(to, from));
-			} else {
-				// if oneway, add only the appropiate edge
-				result.add(new Gateway(from, to));
-			}
+				// check if oneway
+				if (reasoner.getDataPropertyValues(individual, factory.getOWLDataProperty(IlonaIRIs.ONEWAY))
+						.isEmpty()) {
+					// if not oneway, add the gateway to both ways
+					result.add(new Gateway(from, to));
+					result.add(new Gateway(to, from));
+				} else {
+					// if oneway, add only the appropiate edge
+					result.add(new Gateway(from, to));
+				}
 
-		}
+			}
 		}
 		return result;
 	}
 
-	public Set<UUID> getZones(OWLOntology ontology, Set<ZoneRestriction> restrictions){
+	public Set<UUID> getZones(OWLOntology ontology, Set<ZoneRestriction> restrictions) {
 		Set<UUID> result = new HashSet<>();
-		if(restrictions.isEmpty()){
-			result=getAllZoneIDs(ontology);
-		}else{
+		if (restrictions.isEmpty()) {
+			result = getAllZoneIDs(ontology);
+		} else {
+			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+			OWLDataFactory factory = manager.getOWLDataFactory();
+			OWLReasoner reasoner = new Reasoner.ReasonerFactory().createReasoner(ontology);
+			reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
+			QueryEngine engine = new QueryEngine(reasoner, new SimpleShortFormProvider());
+
+			String query = new String("Zone and (");
+			// constructing the query
+			for (ZoneRestriction restriction : restrictions) {
+				query = query.concat(restriction.getStringForm() + " and ");
+			}
+			query = query.substring(0, query.length() - 5);
+			query = query.concat(")");
+			System.out.println(query);
+			Set<OWLNamedIndividual> individuals = engine.getInstances(query, true);
+			for (OWLNamedIndividual zone : individuals) {
+				// get the IDs of the zone
+				Set<OWLLiteral> UUIDs = reasoner.getDataPropertyValues(zone, factory.getOWLDataProperty(IlonaIRIs.ID));
+				for (OWLLiteral literal : UUIDs) {
+					UUID uUID = UUID.fromString(literal.getLiteral());
+					result.add(uUID);
+				}
+			}
+
+		}
+		return result;
+	}
+
+	public UUID getResidenceId(String person) {
+		UUID result = null;
+		OWLOntology ontology = getNavigationOntology();
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
 		OWLReasoner reasoner = new Reasoner.ReasonerFactory().createReasoner(ontology);
 		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-		QueryEngine engine = new QueryEngine(reasoner, new SimpleShortFormProvider());
-		
-		String query = new String("Zone and (");
-		// constructing the query
-				for (ZoneRestriction restriction : restrictions) {
-					query = query.concat(restriction.getStringForm() + " and ");
-				}
-				query = query.substring(0, query.length() - 5);
-				query = query.concat(")");
-				System.out.println(query);
-				Set<OWLNamedIndividual> individuals = engine.getInstances(query, true);
-				for (OWLNamedIndividual zone : individuals) {
-					// get the IDs of the zone
-					Set<OWLLiteral> UUIDs = reasoner.getDataPropertyValues(zone, factory.getOWLDataProperty(IlonaIRIs.ID));
-					for (OWLLiteral literal : UUIDs) {
-						UUID uUID = UUID.fromString(literal.getLiteral());
-						result.add(uUID);
+
+		for (Node<OWLNamedIndividual> node : reasoner.getInstances(factory.getOWLClass(IlonaIRIs.RESIDENT))) {
+			OWLNamedIndividual individual = node.getRepresentativeElement();
+			for (OWLLiteral name : reasoner.getDataPropertyValues(individual,
+					factory.getOWLDataProperty(IlonaIRIs.NAME))) {
+				if(name.getLiteral().equals(person)){
+				for (Node<OWLNamedIndividual> zoneNode : reasoner.getObjectPropertyValues(individual,
+						factory.getOWLObjectProperty(IlonaIRIs.RESIDENCE))) {
+					OWLNamedIndividual zone = zoneNode.getRepresentativeElement();
+					for(OWLLiteral id : reasoner.getDataPropertyValues(zone, factory.getOWLDataProperty(IlonaIRIs.ID))){
+						result = UUID.fromString(id.getLiteral());
 					}
-				}
-	
+
+				}}
+			}
 		}
 		return result;
+
 	}
 }

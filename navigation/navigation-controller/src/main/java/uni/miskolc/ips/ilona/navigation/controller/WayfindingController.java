@@ -52,6 +52,24 @@ public class WayfindingController {
 		return result;
 	}
 	
+	@RequestMapping(value = "/navigation/ontology/getpath", method=RequestMethod.POST, consumes="application/json")
+	public @ResponseBody List<Zone> getNavigationPathToPerson(@RequestBody NavigationPersonRequest parameters) {
+		List<Zone> result = new ArrayList<>();
+		
+		//System.out.println(parameters.getStartName());
+		Zone start = new Zone();
+		start.setId(parameters.getStartID());
+		start.setName(parameters.getStartName());
+		try {
+			result = wayfindingService.generateRoute(start,parameters.getPersonName(),parameters.getRestriction());
+		} catch (NoRouteAvailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+	
 
 	
 	@RequestMapping(value="/navigation/getdummyobject")

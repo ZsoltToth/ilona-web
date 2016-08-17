@@ -26,5 +26,7 @@ public interface WayfindingService {
 
 	public List<Zone> generateRoute(Zone from, Zone to, Set<Restriction> restrictions) throws NoRouteAvailableException;
 
+	List<Zone> generateRoute(Zone from, String person, Set<Restriction> restrictions) throws NoRouteAvailableException;
+
 
 }

@@ -55,6 +55,31 @@ public class WayfindingServiceImpl implements WayfindingService {
 		System.out.println(result.toString());
 		return result;
 	}
+	
+	@Override
+	public List<Zone> generateRoute(Zone from, String person, Set<Restriction> restrictions)
+			throws NoRouteAvailableException {
+		List<Zone> result = new ArrayList<>();
+		ZoneMap map = null;
+		if (restrictions.isEmpty()) {
+			map = ontologyDAO.createGraphWithoutRestrictions();
+		} else {
+			if(getGatewayRestrictions(restrictions)==null){
+				
+			}
+			map = ontologyDAO.createGraph(getGatewayRestrictions(restrictions), getZoneRestrictions(restrictions));
+		}
+		for (UUID id : map.findPath(from.getId(), ontologyDAO.getResidenceId(person))) {
+			try {
+				result.add(ZoneDAO.readZone(id));
+			} catch (RecordNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		System.out.println(result.toString());
+		return result;
+	}
 
 	@Override
 	public List<Zone> generateRoute(Zone from, Zone to) throws NoRouteAvailableException {
