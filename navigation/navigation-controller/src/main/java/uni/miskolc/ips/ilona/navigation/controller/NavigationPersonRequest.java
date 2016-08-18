@@ -12,12 +12,18 @@ public class NavigationPersonRequest {
 	private String startName;
 	private Set<Restriction> restriction;
 
+	
+	
+	public NavigationPersonRequest() {
+		
+	}
+
 	public NavigationPersonRequest(UUID destinationID, String personName, String destinationName,
 			Set<Restriction> restriction) {
 		super();
 		this.startID = destinationID;
-		this.personName = personName;
 		this.startName = destinationName;
+		this.personName = personName;
 		this.restriction = restriction;
 	}
 

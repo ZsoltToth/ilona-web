@@ -52,7 +52,7 @@ public class WayfindingController {
 		return result;
 	}
 	
-	@RequestMapping(value = "/navigation/ontology/getpath", method=RequestMethod.POST, consumes="application/json")
+	@RequestMapping(value = "/navigation/ontology/getperson", method=RequestMethod.POST, consumes="application/json")
 	public @ResponseBody List<Zone> getNavigationPathToPerson(@RequestBody NavigationPersonRequest parameters) {
 		List<Zone> result = new ArrayList<>();
 		
