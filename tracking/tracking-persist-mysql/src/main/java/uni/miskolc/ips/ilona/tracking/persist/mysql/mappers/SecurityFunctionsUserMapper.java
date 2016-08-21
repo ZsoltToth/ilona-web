@@ -5,6 +5,8 @@ import java.util.Date;
 
 import org.apache.ibatis.annotations.Param;
 
+import uni.miskolc.ips.ilona.tracking.persist.mysql.model.PasswordRecoveryTokenMapper;
+
 public interface SecurityFunctionsUserMapper {
 
 	int updatePassword(@Param(value = "userid") String userid, @Param(value = "password") String password);
@@ -25,4 +27,11 @@ public interface SecurityFunctionsUserMapper {
 
 	int updateLockedAndUntilLocked(@Param(value = "userid") String userid,
 			@Param(value = "nonlocked") boolean nonlocked, @Param(value = "lockedUntil") Double lockedUntil);
+
+	int erasePasswordToken(@Param(value = "userid") String userid);
+
+	int storePasswordToken(@Param(value = "userid") String userid, @Param(value = "token") String token,
+			@Param(value = "validuntil") double validUntil);
+
+	PasswordRecoveryTokenMapper readPasswordToken(@Param(value = "userid") String userid);
 }

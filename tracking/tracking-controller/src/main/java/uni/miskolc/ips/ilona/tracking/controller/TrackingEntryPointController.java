@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.annotation.Resource;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.controller.exception.InvalidUserRegistration;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserCreationDTO;
+import uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.PasswordRecoveryManager;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.model.DeviceData;
@@ -60,15 +63,18 @@ public class TrackingEntryPointController {
 
 	private static Logger logger = LogManager.getLogger(TrackingEntryPointController.class);
 
-	@Autowired
+	@Resource(name="UserAndDeviceService")
 	private UserAndDeviceService userDeviceService;
 
-	@Autowired
+	@Resource(name = "trackingPasswordEncoder")
 	private PasswordEncoder passwordEncoder;
 
-	@Autowired
+	@Resource(name = "trackingCentralManager")
 	private TrackingModuleCentralManager centralManager;
-
+	
+	@Resource(name ="passwordRecoveryManager")
+	private PasswordRecoveryManager passwordRecoveryManager;
+	
 	/**
 	 * This method sends back the actual tracking content.<br>
 	 * <dl>
@@ -108,6 +114,8 @@ public class TrackingEntryPointController {
 			return new ModelAndView("tracking/mainpageHome");
 		}
 
+		System.out.println(authentication.getClass().getName());
+		
 		/*
 		 * If the current user is not autthenticated (anonymus) the returned
 		 * page will be the tracking login page.
@@ -255,10 +263,13 @@ public class TrackingEntryPointController {
 	@RequestMapping(value = "/resetpassword", method = { RequestMethod.POST })
 	@ResponseBody
 	public String trackingResetPasswordHandler(@RequestParam(value = "userid", required = false) String userid) {
-		//ModelAndView mav = new ModelAndView("tracking/passwordReset");
+		
 		if(userid == null) {
 			return "Invalid userid!";
 		}
+		
+		passwordRecoveryManager.handlePasswordRecoveryRequest(userid);
+		passwordRecoveryManager.handlePasswordRestore(userid, "token");
 		return "OK!";
 	}
 
@@ -284,6 +295,10 @@ public class TrackingEntryPointController {
 
 	public void setCentralManager(TrackingModuleCentralManager centralManager) {
 		this.centralManager = centralManager;
+	}
+
+	public void setPasswordRecoveryManager(PasswordRecoveryManager passwordRecoveryManager) {
+		this.passwordRecoveryManager = passwordRecoveryManager;
 	}
 
 }

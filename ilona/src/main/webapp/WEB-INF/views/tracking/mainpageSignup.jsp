@@ -24,96 +24,105 @@
 	$('[data-toggle="popover"]').popover();
 	
 	$("#mainpageSignupRegistrationBTN").click(function(event){
-		event.preventDefault();
-		/*
-		 * Clear the error div.
-		 */
-		$("#mainpageSignupErrorDIV").html("");
-		
-		/*
-		 * Validity checking.
-		 */
-		var hadError = 0;
-		var errorText = "";
-		
-		var userid = document.getElementById("mainpageSignupUseridTXT");			
-		if (userid.checkValidity() == false) {
-			errorText += "<p class='text-danger bg-primary'>Invalid userid!</p>";
-			
-			hadError = 1;
-		}
-		
-		var username = document.getElementById("mainpageSignupUsernameTXT");	
-		if (username.checkValidity() == false) {
-			errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
-			hadError = 1;
-		}
-		
-		var password1 = document.getElementById("mainpageSignupPassword1TXT");
-		var password2 = document.getElementById("mainpageSignupPassword2TXT");
-		if (password1.checkValidity() == false) {
-			errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
-			hadError = 1;
-		}
-		if ( password1.value != password2.value) {
-			errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
-			hadError = 1;
-		}
-		
-		var email = document.getElementById("mainpageSignupEmailTXT");
-		if(email.checkValidity()  == false) {
-			errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
-			hadError = 1;
-		}
-		
-		/*
-		 * Bad validity.
-		 */
-		if (Boolean(hadError) == true) {
-			$("#mainpageSignupErrorDIV").html(errorText);
+		try {
+			event.preventDefault();
 			/*
-			 * After good validity.
+			 * Clear the error div.
 			 */
-		} else{
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
-			$.ajax({
-				type : "POST",
-				async : true,
-				url : "<c:url value='/tracking/registeruser'></c:url>",
-				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
-				},
-				data : {
-					userid : $("#mainpageSignupUseridTXT").val(),
-					username : $("#mainpageSignupUsernameTXT").val(),
-					password : $("#mainpageSignupPassword1TXT").val(),
-					email : $("#mainpageSignupEmailTXT").val(),
-				},
-				success : function(result, status, xhr) {
-					$("#mainpageSignupUseridTXT").val("");
-					$("#mainpageSignupUsernameTXT").val("");
-					$("#mainpageSignupPassword1TXT").val("");
-					$("#mainpageSignupPassword2TXT").val("");
-					$("#mainpageSignupEmailTXT").val("");				
-					var resultText = "";
-					for(var i = 0; i < result.length; i++) {						
-						resultText+= "<p class='bg-primary'>" + result[i] +"</p>"
+			$("#mainpageSignupErrorDIV").html("");
+			
+			/*
+			 * Validity checking.
+			 */
+			var hadError = 0;
+			var errorText = "";
+			
+			var userid = document.getElementById("mainpageSignupUseridTXT");			
+			if (userid.checkValidity() == false) {
+				errorText += "<p class='text-danger bg-primary'>Invalid userid!</p>";
+				
+				hadError = 1;
+			}
+			
+			var username = document.getElementById("mainpageSignupUsernameTXT");	
+			if (username.checkValidity() == false) {
+				errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
+				hadError = 1;
+			}
+			
+			var password1 = document.getElementById("mainpageSignupPassword1TXT");
+			var password2 = document.getElementById("mainpageSignupPassword2TXT");
+			if (password1.checkValidity() == false) {
+				errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
+				hadError = 1;
+			}
+			if ( password1.value != password2.value) {
+				errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
+				hadError = 1;
+			}
+			
+			var email = document.getElementById("mainpageSignupEmailTXT");
+			if(email.checkValidity()  == false) {
+				errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
+				hadError = 1;
+			}
+			
+			/*
+			 * Bad validity.
+			 */
+			if (Boolean(hadError) == true) {
+				$("#mainpageSignupErrorDIV").html(errorText);
+				/*
+				 * After good validity.
+				 */
+			} else{
+				var token = $("meta[name='_csrf']").attr("content");
+				var header = $("meta[name='_csrf_header']").attr("content");
+				$.ajax({
+					type : "POST",
+					async : true,
+					url : "<c:url value='/tracking/registeruser'></c:url>",
+					beforeSend : function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+					data : {
+						userid : $("#mainpageSignupUseridTXT").val(),
+						username : $("#mainpageSignupUsernameTXT").val(),
+						password : $("#mainpageSignupPassword1TXT").val(),
+						email : $("#mainpageSignupEmailTXT").val(),
+					},
+					success : function(result, status, xhr) {
+						$("#mainpageSignupUseridTXT").val("");
+						$("#mainpageSignupUsernameTXT").val("");
+						$("#mainpageSignupPassword1TXT").val("");
+						$("#mainpageSignupPassword2TXT").val("");
+						$("#mainpageSignupEmailTXT").val("");				
+						var resultText = "";
+						for(var i = 0; i < result.length; i++) {						
+							resultText+= "<p class='bg-primary'>" + result[i] +"</p>"
+						}
+						$("#mainpageSignupErrorDIV").html(resultText);
+	
+					},
+					error : function(xhr, status, error) {
+						$("#mainpageSignupUseridTXT").val("");
+						$("#mainpageSignupUsernameTXT").val("");
+						$("#mainpageSignupPassword1TXT").val("");
+						$("#mainpageSignupPassword1TXT").val("");
+						$("#mainpageSignupEmailTXT").val("");
+						$("#mainpageSignupErrorDIV").
+						html("<p class='bg-primary'>There has been an error with the service!</p>");
 					}
-					$("#mainpageSignupErrorDIV").html(resultText);
-
-				},
-				error : function(xhr, status, error) {
-					$("#mainpageSignupUseridTXT").val("");
-					$("#mainpageSignupUsernameTXT").val("");
-					$("#mainpageSignupPassword1TXT").val("");
-					$("#mainpageSignupPassword1TXT").val("");
-					$("#mainpageSignupEmailTXT").val("");
-					$("#mainpageSignupErrorDIV").
-					html("<p class='bg-primary'>There has been an error with the service!</p>");
-				}
-			});
-		}			
+				});
+			}
+		} catch(e) {
+			try {
+				$("#mainpageSignupErrorDIV").
+				html("<p class='bg-primary'>There has been an error with the service!</p>");
+			} catch(e) {
+				console.log(e);
+			}
+		}
 	});
 </script>
 

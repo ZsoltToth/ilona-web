@@ -134,7 +134,7 @@
 				</div>
 				<div class="panel-body">
 	
-					<label for="mainpageLoginResetPasswordTXT">Password:						
+					<label for="mainpageLoginResetPasswordTXT">Userid:						
 					</label>
 						
 					<input type="text"

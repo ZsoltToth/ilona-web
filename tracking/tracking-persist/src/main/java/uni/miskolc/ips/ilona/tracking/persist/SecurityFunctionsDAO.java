@@ -29,8 +29,8 @@ public interface SecurityFunctionsDAO {
 	public void updateLockedAndUntilLocked(String userid, Boolean nonLocked, Date lockedUntil, boolean deleteBadLogins)
 			throws UserNotFoundException, OperationExecutionErrorException;
 
-	public void storePasswordResetToken(PasswordRecoveryToken token)
-			throws OperationExecutionErrorException;
+	public void storePasswordResetToken(PasswordRecoveryToken token) throws OperationExecutionErrorException;
 
-	public void restorePasswordResetToken(String token) ;
+	public PasswordRecoveryToken restorePasswordResetToken(PasswordRecoveryToken token)
+			throws OperationExecutionErrorException;
 }

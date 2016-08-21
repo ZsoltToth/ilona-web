@@ -18,6 +18,7 @@ import uni.miskolc.ips.ilona.tracking.persist.SecurityFunctionsDAO;
 import uni.miskolc.ips.ilona.tracking.persist.exception.OperationExecutionErrorException;
 import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
 import uni.miskolc.ips.ilona.tracking.persist.mysql.mappers.SecurityFunctionsUserMapper;
+import uni.miskolc.ips.ilona.tracking.persist.mysql.model.PasswordRecoveryTokenMapper;
 
 public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunctionsDAO {
 
@@ -32,7 +33,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 	public MySqlAndMybatisSecurityFunctionsDAOImpl(final String host, final int port, final String database,
 			final String user, final String password) throws FileNotFoundException {
 		ClassLoader loader = getClass().getClassLoader();
-		InputStream inputStream = loader.getResourceAsStream("mybatis-configuration.xml");
+		InputStream inputStream = loader.getResourceAsStream("mybatis-configurationa.xml");
 
 		String urlPattern = "jdbc:mysql://%s:%s/%s";
 		String connectionURL = String.format(urlPattern, host, port, database);
@@ -226,17 +227,42 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 	public void storePasswordResetToken(PasswordRecoveryToken token) throws OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		try {
+			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
+			mapper.erasePasswordToken(token.getUserid());
+			double dateWithMillis = token.getTokenValidUntil().getTime() * 0.001;
+			mapper.storePasswordToken(token.getUserid(), token.getToken(), dateWithMillis);
+			session.commit();
 
+		} catch (Exception e) {
+			logger.error("Password recovery token storage error: " + e.getMessage());
+			throw new OperationExecutionErrorException("Token storage error!");
 		} finally {
-			// TODO: handle finally clause
+			session.close();
 		}
 
 	}
 
 	@Override
-	public void restorePasswordResetToken(String token) {
-		// TODO Auto-generated method stub
-
+	public PasswordRecoveryToken restorePasswordResetToken(PasswordRecoveryToken token)
+			throws OperationExecutionErrorException {
+		SqlSession session = sessionFactory.openSession();
+		PasswordRecoveryToken recoveryToken = new PasswordRecoveryToken();
+		try {
+			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
+			PasswordRecoveryTokenMapper tokenMapper = mapper.readPasswordToken(token.getUserid());
+			recoveryToken.setUserid(tokenMapper.getUserid());
+			recoveryToken.setToken(tokenMapper.getToken());
+			recoveryToken.setTokenValidUntil(new Date(tokenMapper.getValidUntil()));
+			if (recoveryToken == null) {
+				// throw !!
+			}
+		} catch (Exception e) {
+			logger.error("Password recovery token database error: " + e.getMessage());
+			throw new OperationExecutionErrorException("Password recovery token database error!");
+		} finally {
+			session.close();
+		}
+		return recoveryToken;
 	}
 
 }

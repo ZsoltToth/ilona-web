@@ -63,7 +63,7 @@
 			if(UserEnabled.checked) {
 				enabled1 = true;
 			}
-			if(AdminRole.checkek) {
+			if(AdminRole.checked) {
 				admin1 = true;
 			}
 			

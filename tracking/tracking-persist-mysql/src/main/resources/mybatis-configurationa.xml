@@ -7,6 +7,8 @@
 	<typeAliases>
 		<typeAlias alias="BooleanToIntHander"
 			type="uni.miskolc.ips.ilona.tracking.persist.mysql.typehandlers.BooleanToFromTinyintTypeHandler" />
+		<typeAlias alias="passwordTokenMapper"
+			type="uni.miskolc.ips.ilona.tracking.persist.mysql.model.PasswordRecoveryTokenMapper"/>
 	</typeAliases>
 
 	<typeHandlers>

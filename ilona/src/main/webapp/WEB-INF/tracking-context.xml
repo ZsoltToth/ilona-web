@@ -25,7 +25,7 @@
 	<bean id="CustomAuthProvider"
 		class="uni.miskolc.ips.ilona.tracking.controller.security.CustomAuthenticationProvider">
 		<constructor-arg ref="CustomUserSecurityService"></constructor-arg>
-		<constructor-arg ref="passwordEncoder"></constructor-arg>
+		<constructor-arg ref="trackingPasswordEncoder"></constructor-arg>
 	</bean>
 
 	<bean id="jsonConverter"
@@ -61,7 +61,7 @@
 		<constructor-arg name="password" value="${database.password}" />
 	</bean>
 
-	<bean id="passwordEncoder" autowire="byName"
+	<bean id="trackingPasswordEncoder" autowire="byName"
 		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
 		<constructor-arg name="strength" value="10"></constructor-arg>
 	</bean>
@@ -83,14 +83,33 @@
 		</property>
 	</bean>
 
+	<!-- Password recovery beans -->
+
+	<bean id="passwordTokenGenerator"
+		class="uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.UUIDBasedPasswordTokenGenerator">
+	</bean>
+
+	<bean id="passwordTokenDAO" 
+		class="uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.MysqlMybatisPasswordTokenDAOImpl">
+		<constructor-arg ref="trackingSecurityFunctions"></constructor-arg>
+	</bean>
+	
+	<bean id="passwordRecoveryManager"
+		class="uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.SimplePasswordRecoveryManager">
+		<constructor-arg index="0" ref="passwordTokenDAO"></constructor-arg>
+		<constructor-arg index="1" ref="passwordTokenGenerator"></constructor-arg>		
+	</bean>
+
 	<!-- Security part -->
 	<!-- ========================================================== -->
-	
-	<bean id="AuthEntryPoint" class="uni.miskolc.ips.ilona.tracking.controller.security.AuthEntrypoint"></bean>
-	
-	<bean id="TrackingCentralManager" class="uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager"
+
+	<bean id="AuthEntryPoint"
+		class="uni.miskolc.ips.ilona.tracking.controller.security.AuthEntrypoint"></bean>
+
+	<bean id="trackingCentralManager"
+		class="uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager"
 		lazy-init="false" primary="true" scope="singleton">
-		
+
 	</bean>
 	<!-- url="hera.iit.uni-miskolc.hu" <security:ldap-server root="dc=iit,dc=uni-miskolc,dc=hu" 
 		id="ldapserver" url="ldap://hera.iit.uni-miskolc.hu"/> -->

@@ -13,95 +13,119 @@
 		 * Get tracking login page
 		 */
 		$('#mainpageNavbarGetLoginpageMenuitem').click(function(event) {
-			event.preventDefault();
-			
-			/*
-			 * CSRF token from the parent page.
-			 */
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
-			/*
-			 * Page ajax request.
-			 */
-			$.ajax({
-				type : "POST",
-				async : true,
-				beforeSend : function(xhr) {
-					/*
-					 * Set the csrf token into the header.
-					 */
-					xhr.setRequestHeader(header, token);
-				},
-				url : $("#mainpageNavbarGetLoginpageMenuitem").attr('href'),
-				timeout : 10000,
-				success : function(result, status, xhr) {
-					$("#page-wrapper").html(result);
-				},
-				error : function(xhr, status, error) {
-					$("#mainpageNavbarErrorMenuitem").html("<h2>The tracking service is unreachable!</h2>");
+			try {
+				event.preventDefault();
+				
+				/*
+				 * CSRF token from the parent page.
+				 */
+				var token = $("meta[name='_csrf']").attr("content");
+				var header = $("meta[name='_csrf_header']").attr("content");
+				/*
+				 * Page ajax request.
+				 */
+				$.ajax({
+					type : "POST",
+					async : true,
+					beforeSend : function(xhr) {
+						/*
+						 * Set the csrf token into the header.
+						 */
+						xhr.setRequestHeader(header, token);
+					},
+					url : $("#mainpageNavbarGetLoginpageMenuitem").attr('href'),
+					timeout : 10000,
+					success : function(result, status, xhr) {
+						$("#page-wrapper").html(result);
+					},
+					error : function(xhr, status, error) {
+						$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
+					}
+				});
+			} catch(e) {
+				try {
+					$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
+				} catch(e) {
+					console.log(e);
 				}
-			});
+			}
 		});
 
 		/*
 			Get the tracking main page and put the content into the main content div.
 		 */
 		$('#mainpageNavbarGetHomepageMenuitem').click(function(event) {
-			event.preventDefault();
-			/*
-			 * CSRF token from the parent page.
-			 */
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
-			/*
-			 * Page ajax request.
-			 */
-			$.ajax({
-				type : "POST",
-				async : true,
-				beforeSend : function(xhr) {
-					/*
-					 * Set the csrf token into the header.
-					 */
-					xhr.setRequestHeader(header, token);
-				},
-				url : $("#mainpageNavbarGetHomepageMenuitem").attr('href'),
-				timeout : 10000,
-				success : function(result, status, xhr) {
-					$("#page-wrapper").html(result);
-				},
-				error : function(xhr, result, error) {
-					$("#mainpageNavbarErrorMenuitem").html("<h2>The tracking service is unreachable!</h2>");
+			try {
+				event.preventDefault();
+				/*
+				 * CSRF token from the parent page.
+				 */
+				var token = $("meta[name='_csrf']").attr("content");
+				var header = $("meta[name='_csrf_header']").attr("content");
+				/*
+				 * Page ajax request.
+				 */
+				$.ajax({
+					type : "POST",
+					async : true,
+					beforeSend : function(xhr) {
+						/*
+						 * Set the csrf token into the header.
+						 */
+						xhr.setRequestHeader(header, token);
+					},
+					url : $("#mainpageNavbarGetHomepageMenuitem").attr('href'),
+					timeout : 10000,
+					success : function(result, status, xhr) {
+						$("#page-wrapper").html(result);
+					},
+					error : function(xhr, result, error) {
+						$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
+					}
+				});
+			} catch(e) {
+				try {
+					$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
+				} catch(e) {
+					console.log(e);
 				}
-			});
+			}
 		});
 
 		$("#mainpageNavbarGetSignuppageMenuitem").click(function(event) {
-			event.preventDefault();
-			/*
-			 * CSRF token from the parent page.
-			 */
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
-			
-			$.ajax({
-				type : "POST",
-				async : true,
-				url : $("#mainpageNavbarGetSignuppageMenuitem").attr("href"),
-				timeout : 10000,
-				beforeSend : function(xhr) {
-					/*
-					 * Set the csrf token into the header.
-					 */
-					xhr.setRequestHeader(header, token);
-				},
-				success : function(result, status, xhr) {
-					$("#page-wrapper").html(result);
-				},
-				error : function(xhr, status, error) {
-					$("#mainpageNavbarErrorMenuitem").html("<h2>The tracking service is unreachable!</h2>");
+			try {							
+				event.preventDefault();
+				/*
+				 * CSRF token from the parent page.
+				 */
+				var token = $("meta[name='_csrf']").attr("content");
+				var header = $("meta[name='_csrf_header']").attr("content");
+				
+				$.ajax({
+					type : "POST",
+					async : true,
+					url : $("#mainpageNavbarGetSignuppageMenuitem").attr("href"),
+					timeout : 10000,
+					beforeSend : function(xhr) {
+						/*
+						 * Set the csrf token into the header.
+						 */
+						xhr.setRequestHeader(header, token);
+					},
+					success : function(result, status, xhr) {
+						$("#page-wrapper").html(result);
+					},
+					error : function(xhr, status, error) {
+						$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
+					}
+				});
+			} catch(e) {
+				try {
+					$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
+				} catch(e) {
+					console.log(e);
 				}
-			});
+			}
 		});
 
 </script>
@@ -138,5 +162,5 @@
 </nav>
 
 <div>
-	<p class="bg-primary text-center" id="mainpageNavbarErrorMenuitem"></p>
+	<p class="bg-primary text-center" id="mainpageNavbarErrorOutputParagh"></p>
 </div>

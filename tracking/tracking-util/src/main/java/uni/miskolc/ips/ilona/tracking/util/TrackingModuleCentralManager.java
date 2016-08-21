@@ -83,11 +83,15 @@ public class TrackingModuleCentralManager {
 	 */
 	private static long lockedTimeAfterBadLogins = 3600000L;
 
-	
 	private static boolean accountEnabledCheckState = true;
 	
 	private static boolean accountLockedCheckState = true;
 
+	/*
+	 * Default: one day
+	 */
+	private static long passwordRecoveryTokenValidityTime = 86_400_000L;
+	
 	public static long getCredentialsValidityPeriod() {
 		synchronized (credentialsValidityPeriodLock) {
 			return credentialsValidityPeriod;
@@ -101,4 +105,5 @@ public class TrackingModuleCentralManager {
 		}		
 	}
 
+	
 }
