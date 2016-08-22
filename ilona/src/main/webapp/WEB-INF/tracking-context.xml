@@ -78,7 +78,7 @@
 				<prop key="mail.transport.protocol">smtp</prop>
 				<prop key="mail.smtp.auth">true</prop>
 				<prop key="mail.smtp.starttls.enable">true</prop>
-				<prop key="mail.debug">true</prop>
+				<prop key="mail.debug">false</prop>
 			</props>
 		</property>
 	</bean>
@@ -89,15 +89,28 @@
 		class="uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.UUIDBasedPasswordTokenGenerator">
 	</bean>
 
-	<bean id="passwordTokenDAO" 
+	<bean id="passwordTokenDAO"
 		class="uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.MysqlMybatisPasswordTokenDAOImpl">
 		<constructor-arg ref="trackingSecurityFunctions"></constructor-arg>
 	</bean>
-	
+
+	<bean id="passwordTokenSender"
+		class="uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.EmailBasedTokenSenderImpl">
+		<constructor-arg index="0" ref="mailSender"></constructor-arg>
+	</bean>
+
+	<bean id="passwordGenerator"
+		class="uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.SimpleUUIDBasedPasswordGenerator"></bean>
+
 	<bean id="passwordRecoveryManager"
 		class="uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.SimplePasswordRecoveryManager">
 		<constructor-arg index="0" ref="passwordTokenDAO"></constructor-arg>
-		<constructor-arg index="1" ref="passwordTokenGenerator"></constructor-arg>		
+		<constructor-arg index="1" ref="passwordTokenGenerator"></constructor-arg>
+		<constructor-arg index="2" ref="passwordTokenSender"></constructor-arg>
+		<constructor-arg index="3" ref="UserAndDeviceService"></constructor-arg>
+		<constructor-arg index="4" ref="trackingPasswordEncoder"></constructor-arg>
+		<constructor-arg index="5" ref="trackingCentralManager"></constructor-arg>
+		<constructor-arg index="6" ref="passwordGenerator"></constructor-arg>
 	</bean>
 
 	<!-- Security part -->

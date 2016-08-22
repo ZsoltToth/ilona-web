@@ -1,5 +1,10 @@
 package uni.miskolc.ips.ilona.tracking.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -10,12 +15,16 @@ import java.util.Iterator;
  * @author Patrik / A5USL0
  *
  */
-public class UserData {
+public class UserData implements Comparable<UserData>, Serializable, Cloneable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/*
 	 * User base fields.
 	 */
-
 	/**
 	 * A unique id for the the current user.
 	 */
@@ -27,7 +36,7 @@ public class UserData {
 	private String username;
 
 	/**
-	 * This field is user for password recovery,
+	 * This field is used for password recovery,
 	 */
 	private String email;
 
@@ -51,7 +60,7 @@ public class UserData {
 	private Collection<String> roles;
 
 	/**
-	 * Utolsó belépési dátum => hosszú idő óta nem lépett be => lejárt account
+	 * 
 	 */
 	private Date lastLoginDate;
 
@@ -62,12 +71,12 @@ public class UserData {
 
 	/**
 	 * If the nonLocked is false, the account is locked until this date. The
-	 * length of the lock is defined in the TracingCentral
+	 * length of the lock is defined in the TracingCentralManager class.
 	 */
 	private Date lockedUntil;
 
 	/**
-	 * nincs lockolvan az adott adat!
+	 * 
 	 */
 	private boolean nonLocked;
 
@@ -297,11 +306,184 @@ public class UserData {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((badLogins == null) ? 0 : badLogins.hashCode());
+		result = prime * result + ((credentialNonExpiredUntil == null) ? 0 : credentialNonExpiredUntil.hashCode());
+		result = prime * result + ((devices == null) ? 0 : devices.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + (enabled ? 1231 : 1237);
+		result = prime * result + ((lastLoginDate == null) ? 0 : lastLoginDate.hashCode());
+		result = prime * result + ((lockedUntil == null) ? 0 : lockedUntil.hashCode());
+		result = prime * result + (nonLocked ? 1231 : 1237);
+		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((roles == null) ? 0 : roles.hashCode());
+		result = prime * result + ((userid == null) ? 0 : userid.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserData other = (UserData) obj;
+		if (badLogins == null) {
+			if (other.badLogins != null)
+				return false;
+		} else if (!badLogins.equals(other.badLogins))
+			return false;
+		if (credentialNonExpiredUntil == null) {
+			if (other.credentialNonExpiredUntil != null)
+				return false;
+		} else if (!credentialNonExpiredUntil.equals(other.credentialNonExpiredUntil))
+			return false;
+		if (devices == null) {
+			if (other.devices != null)
+				return false;
+		} else if (!devices.equals(other.devices))
+			return false;
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equals(other.email))
+			return false;
+		if (enabled != other.enabled)
+			return false;
+		if (lastLoginDate == null) {
+			if (other.lastLoginDate != null)
+				return false;
+		} else if (!lastLoginDate.equals(other.lastLoginDate))
+			return false;
+		if (lockedUntil == null) {
+			if (other.lockedUntil != null)
+				return false;
+		} else if (!lockedUntil.equals(other.lockedUntil))
+			return false;
+		if (nonLocked != other.nonLocked)
+			return false;
+		if (password == null) {
+			if (other.password != null)
+				return false;
+		} else if (!password.equals(other.password))
+			return false;
+		if (roles == null) {
+			if (other.roles != null)
+				return false;
+		} else if (!roles.equals(other.roles))
+			return false;
+		if (userid == null) {
+			if (other.userid != null)
+				return false;
+		} else if (!userid.equals(other.userid))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public UserData shallowCopy() {
+		try {
+			return (UserData) this.clone();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public UserData deepCopy() {
+		ByteArrayOutputStream bos = null;
+		ObjectOutputStream out = null;
+		ObjectInputStream ois = null;
+		ByteArrayInputStream bis = null;
+		UserData userData = null;
+
+		try {
+			/*
+			 * Serialization part.
+			 */
+			bos = new ByteArrayOutputStream();
+			out = new ObjectOutputStream(bos);
+			out.writeObject(this);
+			out.flush();
+			// out.close();
+
+			/*
+			 * Deserialization part.
+			 */
+			bis = new ByteArrayInputStream(bos.toByteArray());
+			ois = new ObjectInputStream(bis);
+			userData = (UserData) ois.readObject();
+
+		} catch (Exception e) {
+			userData = null;
+
+		} finally {
+			if (bos != null) {
+				try {
+					bos.close();
+				} catch (Exception a) {
+
+				}
+			}
+
+			if (out != null) {
+				try {
+					out.close();
+				} catch (Exception a) {
+
+				}
+			}
+
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (Exception a) {
+
+				}
+			}
+
+			if (bis != null) {
+				try {
+					bis.close();
+				} catch (Exception a) {
+
+				}
+			}
+		}
+
+		return userData;
+	}
+
+	@Override
 	public String toString() {
-		return "UserData [userid=" + userid + ", username=" + username + ", email=" + email + ", password=" + password
-				+ ", enabled=" + enabled + ", roles=" + roles + ", lastLoginDate=" + lastLoginDate
+		return "UserData [userid=" + userid + ", username=" + username + ", email=" + email + ", password="
+				+ "[PROTECTED]" + ", enabled=" + enabled + ", roles=" + roles + ", lastLoginDate=" + lastLoginDate
 				+ ", credentialNonExpiredUntil=" + credentialNonExpiredUntil + ", lockedUntil=" + lockedUntil
 				+ ", nonLocked=" + nonLocked + ", badLogins=" + badLogins + ", devices=" + devices + "]";
+	}
+
+	@Override
+	public int compareTo(UserData o) {
+		if (o == null) {
+			return 1;
+		}
+
+		if (!(o instanceof UserData)) {
+			return 1;
+		}
+		return this.userid.compareTo(o.userid);
 	}
 
 }

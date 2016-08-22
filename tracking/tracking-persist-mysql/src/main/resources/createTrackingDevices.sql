@@ -1,5 +1,5 @@
 create table if not exists TrackingDevices(
-	ownerid varchar(10) not null,
+	ownerid varchar(20) not null,
     deviceid varchar(50) not null,
     devicename varchar(50) not null,
     devicetype varchar(20) not null,

@@ -1,5 +1,10 @@
 package uni.miskolc.ips.ilona.tracking.persist.mysql.model;
 
+/**
+ * 
+ * @author Patrik / A5USL0
+ *
+ */
 public class PasswordRecoveryTokenMapper {
 
 	private String userid;

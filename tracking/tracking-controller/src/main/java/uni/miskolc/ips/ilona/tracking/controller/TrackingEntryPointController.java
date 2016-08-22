@@ -63,7 +63,7 @@ public class TrackingEntryPointController {
 
 	private static Logger logger = LogManager.getLogger(TrackingEntryPointController.class);
 
-	@Resource(name="UserAndDeviceService")
+	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userDeviceService;
 
 	@Resource(name = "trackingPasswordEncoder")
@@ -71,10 +71,10 @@ public class TrackingEntryPointController {
 
 	@Resource(name = "trackingCentralManager")
 	private TrackingModuleCentralManager centralManager;
-	
-	@Resource(name ="passwordRecoveryManager")
+
+	@Resource(name = "passwordRecoveryManager")
 	private PasswordRecoveryManager passwordRecoveryManager;
-	
+
 	/**
 	 * This method sends back the actual tracking content.<br>
 	 * <dl>
@@ -115,7 +115,7 @@ public class TrackingEntryPointController {
 		}
 
 		System.out.println(authentication.getClass().getName());
-		
+
 		/*
 		 * If the current user is not autthenticated (anonymus) the returned
 		 * page will be the tracking login page.
@@ -263,14 +263,29 @@ public class TrackingEntryPointController {
 	@RequestMapping(value = "/resetpassword", method = { RequestMethod.POST })
 	@ResponseBody
 	public String trackingResetPasswordHandler(@RequestParam(value = "userid", required = false) String userid) {
-		
-		if(userid == null) {
+
+		if (userid == null) {
 			return "Invalid userid!";
 		}
-		
-		passwordRecoveryManager.handlePasswordRecoveryRequest(userid);
-		passwordRecoveryManager.handlePasswordRestore(userid, "token");
+		try {
+			passwordRecoveryManager.handlePasswordRecoveryRequest(userid);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return "OK!";
+	}
+
+	@RequestMapping(value = "/passwordrequestwithtoken", method = { RequestMethod.POST })
+	@ResponseBody
+	public String resetPasswordWithTokenHandler(@RequestParam("userid") String userid,
+			@RequestParam("token") String token) {
+		try {
+			passwordRecoveryManager.handlePasswordRestore(userid, token);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@ExceptionHandler(value = { InvalidUserRegistration.class })

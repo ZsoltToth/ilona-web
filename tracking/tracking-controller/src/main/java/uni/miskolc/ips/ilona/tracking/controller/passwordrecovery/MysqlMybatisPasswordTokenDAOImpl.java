@@ -1,9 +1,16 @@
 package uni.miskolc.ips.ilona.tracking.controller.passwordrecovery;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import uni.miskolc.ips.ilona.tracking.controller.exception.PasswordRecoveryTokenRestoreErrorException;
+import uni.miskolc.ips.ilona.tracking.controller.exception.PasswordRecoveryTokenStorageErrorException;
 import uni.miskolc.ips.ilona.tracking.model.PasswordRecoveryToken;
 import uni.miskolc.ips.ilona.tracking.persist.SecurityFunctionsDAO;
 
 public class MysqlMybatisPasswordTokenDAOImpl implements PasswordTokenDAO {
+
+	private static Logger logger = LogManager.getLogger(MysqlMybatisPasswordTokenDAOImpl.class);
 
 	private SecurityFunctionsDAO tokenRecoveryManager;
 
@@ -16,23 +23,43 @@ public class MysqlMybatisPasswordTokenDAOImpl implements PasswordTokenDAO {
 	}
 
 	@Override
-	public void storePasswordToken(PasswordRecoveryToken token) {
+	public void storePasswordToken(PasswordRecoveryToken token) throws PasswordRecoveryTokenStorageErrorException {
 		try {
 			tokenRecoveryManager.storePasswordResetToken(token);
 		} catch (Exception e) {
-			e.printStackTrace();
+			String messageUserid = "NULL";
+			String messageToken = "NULL";
+			if (token != null) {
+				messageUserid = token.getUserid();
+				messageToken = token.getToken();
+			}
+			logger.error("Recovery token storage failed! userid: " + messageUserid + " token: " + messageToken
+					+ " Error: " + e.getMessage());
+			throw new PasswordRecoveryTokenStorageErrorException("Recovery token storage failed! userid: "
+					+ messageUserid + " token: " + messageToken + " Error: " + e.getMessage(), e);
 		}
 
 	}
 
 	@Override
-	public PasswordRecoveryToken loadPasswordToken(PasswordRecoveryToken token) {
+	public PasswordRecoveryToken loadPasswordToken(PasswordRecoveryToken passwordToken)
+			throws PasswordRecoveryTokenRestoreErrorException {
+		PasswordRecoveryToken token = null;
 		try {
-			return tokenRecoveryManager.restorePasswordResetToken(token);
+			token = tokenRecoveryManager.restorePasswordResetToken(passwordToken);
 		} catch (Exception e) {
-			e.printStackTrace();
+			String messageUserid = "NULL";
+			String messageToken = "NULL";
+			if (token != null) {
+				messageUserid = token.getUserid();
+				messageToken = token.getToken();
+			}
+			logger.error("Recovery token restore failed! userid: " + messageUserid + " token: " + messageToken
+					+ " Error: " + e.getMessage());
+			throw new PasswordRecoveryTokenRestoreErrorException("Recovery token restore failed! userid: "
+					+ messageUserid + " token: " + messageToken + " Error: " + e.getMessage(), e);
 		}
-		return null;
+		return token;
 	}
 
 }

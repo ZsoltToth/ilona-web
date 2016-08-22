@@ -40,30 +40,28 @@ public class TrackingModuleCentralManager {
 	/*
 	 * authorities ellenőrzése??
 	 */
-	
+
 	/*
-	 * Time intervals in milliseconds:
-	 * 1 hour: 3600000L
-	 * 1 day: 86400000L
-	 * 1 week: 604800000L
-	 * 1 month: 2678400000L
-	 * 1 year: 31536000000L
+	 * Time intervals in milliseconds: 1 hour: 3600000L 1 day: 86400000L 1 week:
+	 * 604800000L 1 month: 2678400000L 1 year: 31536000000L
 	 */
 	public static final long oneHourInMilliseconds = 3_600_000L;
-	
+
 	public static final long oneDayInMiliseconds = 86_400_000L;
-	
+
 	public static final long oneWeekInMilliseconds = 604_800_000L;
-	
+
 	public static final long oneMonthInMilliseconds = 2_678_400_000L;
-	
+
 	public static final long oneYearInMilliseconds = 31_536_000_000L;
-	
+
 	/*
 	 * Threading lock tokens.
 	 */
-	
-	private static Object credentialsValidityPeriodLock = new Object();
+
+	private Object credentialsValidityPeriodLock = new Object();
+
+	private Object passwordRecoveryTokenValidityTimeLock = new Object();
 	/*
 	 * Ezt az egész osztályt több szálból is elérik, bár egy szerű doglokat
 	 * tartalmaz Szálbiztosság tétel.
@@ -74,7 +72,7 @@ public class TrackingModuleCentralManager {
 	 * Credentials validity time in milliseconds.
 	 */
 	private static long credentialsValidityPeriod = 31536000000L;
-	
+
 	/////////////////////////////////////////////////////////////////////////
 	private static long badLoginsUpperBound = 10;
 
@@ -84,26 +82,38 @@ public class TrackingModuleCentralManager {
 	private static long lockedTimeAfterBadLogins = 3600000L;
 
 	private static boolean accountEnabledCheckState = true;
-	
+
 	private static boolean accountLockedCheckState = true;
 
 	/*
 	 * Default: one day
 	 */
-	private static long passwordRecoveryTokenValidityTime = 86_400_000L;
-	
-	public static long getCredentialsValidityPeriod() {
+	private long passwordRecoveryTokenValidityTime = 86_400_000L;
+
+	public long getCredentialsValidityPeriod() {
 		synchronized (credentialsValidityPeriodLock) {
 			return credentialsValidityPeriod;
 		}
-		
+
 	}
 
-	public static void setCredentialsValidityPeriod(long credentialsValidityPeriod) {
+	public void setCredentialsValidityPeriod(long credentialsValidityPeriod) {
 		synchronized (credentialsValidityPeriodLock) {
 			TrackingModuleCentralManager.credentialsValidityPeriod = credentialsValidityPeriod;
-		}		
+		}
 	}
 
-	
+	public long getPasswordRecoveryTokenValidityTime() {
+		synchronized (passwordRecoveryTokenValidityTimeLock) {
+			return passwordRecoveryTokenValidityTime;
+		}
+
+	}
+
+	public void setPasswordRecoveryTokenValidityTime(long passwordRecoveryTokenValidityTime) {
+		synchronized (passwordRecoveryTokenValidityTimeLock) {
+			passwordRecoveryTokenValidityTime = passwordRecoveryTokenValidityTime;
+		}
+	}
+
 }

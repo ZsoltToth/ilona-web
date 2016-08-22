@@ -246,7 +246,7 @@ public class UserDetails implements Serializable, Cloneable {
 				}
 			}
 
-			if (bis == null) {
+			if (bis != null) {
 				try {
 					bis.close();
 				} catch (Exception a) {

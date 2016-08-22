@@ -13,9 +13,12 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+
 import uni.miskolc.ips.ilona.tracking.model.PasswordRecoveryToken;
 import uni.miskolc.ips.ilona.tracking.persist.SecurityFunctionsDAO;
 import uni.miskolc.ips.ilona.tracking.persist.exception.OperationExecutionErrorException;
+import uni.miskolc.ips.ilona.tracking.persist.exception.PasswordRecoveryTokenNotFoundException;
 import uni.miskolc.ips.ilona.tracking.persist.exception.UserNotFoundException;
 import uni.miskolc.ips.ilona.tracking.persist.mysql.mappers.SecurityFunctionsUserMapper;
 import uni.miskolc.ips.ilona.tracking.persist.mysql.model.PasswordRecoveryTokenMapper;
@@ -54,7 +57,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
 			int updated = mapper.updatePassword(userid, hashedPassword);
 			if (updated == 0) {
-				throw new UserNotFoundException();
+				throw new UserNotFoundException("User not found!");
 			}
 			session.commit();
 		} catch (Exception e) {
@@ -70,14 +73,14 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 	}
 
 	@Override
-	public void updateEnabled(String userid, Boolean enabled)
+	public void updateEnabled(String userid, boolean enabled)
 			throws UserNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		try {
 			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
 			int updated = mapper.updateEnabled(userid, enabled);
 			if (updated == 0) {
-				throw new UserNotFoundException();
+				throw new UserNotFoundException("User not found!");
 			}
 			session.commit();
 		} catch (Exception e) {
@@ -101,7 +104,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
 			int updated = mapper.updateAccountExpiration(userid, expiration);
 			if (updated == 0) {
-				throw new UserNotFoundException();
+				throw new UserNotFoundException("User not found!");
 			}
 			session.commit();
 		} catch (Exception e) {
@@ -124,15 +127,16 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
 			int updated = mapper.eraseRoles(userid);
 			if (updated == 0) {
-				throw new UserNotFoundException();
+				throw new UserNotFoundException("User not found!");
 			}
 			updated = mapper.insertRoles(userid, roles);
+			// throw integrity Constraint?!
 			if (updated == 0) {
 				throw new OperationExecutionErrorException();
 			}
 			session.commit();
 		} catch (Exception e) {
-			if (e instanceof UserNotFoundException) {
+			if (e instanceof UserNotFoundException || e instanceof MySQLIntegrityConstraintViolationException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
 				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
@@ -144,25 +148,20 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 	}
 
 	@Override
-	public void eraseBadLogins(String userid) throws UserNotFoundException, OperationExecutionErrorException {
+	public int eraseBadLogins(String userid) throws UserNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
+		int affectedRows = 0;
 		try {
 			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
-			int updated = mapper.eraseBadLogins(userid);
-			if (updated == 0) {
-				throw new UserNotFoundException();
-			}
+			affectedRows = mapper.eraseBadLogins(userid);
 			session.commit();
 		} catch (Exception e) {
-			if (e instanceof UserNotFoundException) {
-				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
-				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
-			}
 			logger.error("Error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Error: " + e.getMessage());
 		} finally {
 			session.close();
 		}
+		return affectedRows;
 	}
 
 	@Override
@@ -171,21 +170,17 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 		SqlSession session = sessionFactory.openSession();
 		try {
 			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
-			int updated = mapper.eraseBadLogins(userid);
-			if (updated == 0) {
-				throw new UserNotFoundException();
-			}
-			Collection<Double> millisecondsDate = new ArrayList<Double>();
-			for (Date date : badLogins) {
-				millisecondsDate.add(date.getTime() * 0.001);
-			}
-			updated = mapper.insertBadLogins(userid, millisecondsDate);
-			if (updated == 0) {
-				throw new OperationExecutionErrorException();
+			mapper.eraseBadLogins(userid);
+			if (badLogins != null && badLogins.size() != 0) {
+				Collection<Double> millisecondsDate = new ArrayList<Double>();
+				for (Date date : badLogins) {
+					millisecondsDate.add(date.getTime() * 0.001);
+				}
+				mapper.insertBadLogins(userid, millisecondsDate);
 			}
 			session.commit();
 		} catch (Exception e) {
-			if (e instanceof UserNotFoundException) {
+			if (e instanceof MySQLIntegrityConstraintViolationException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
 				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
@@ -197,7 +192,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 	}
 
 	@Override
-	public void updateLockedAndUntilLocked(String userid, Boolean nonLocked, Date lockedUntil, boolean deleteBadLogins)
+	public void updateLockedAndUntilLocked(String userid, boolean nonLocked, Date lockedUntil, boolean deleteBadLogins)
 			throws UserNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		try {
@@ -205,7 +200,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			Double millisecDate = lockedUntil.getTime() * 0.001;
 			int updated = mapper.updateLockedAndUntilLocked(userid, nonLocked, millisecDate);
 			if (updated == 0) {
-				throw new UserNotFoundException();
+				throw new UserNotFoundException("User not found!");
 			}
 			if (deleteBadLogins == true) {
 				mapper.eraseBadLogins(userid);
@@ -234,6 +229,16 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			session.commit();
 
 		} catch (Exception e) {
+			if (e instanceof MySQLIntegrityConstraintViolationException) {
+				String messageToken = "NULL";
+				String messageUserid = "NULL";
+				if (token != null) {
+					messageToken = token.getToken();
+					messageUserid = token.getUserid();
+				}
+				logger.error("There is no user with id: " + messageUserid + " token: " + messageToken + e.getMessage());
+				throw new OperationExecutionErrorException("Password recovery token storage error:" + e.getMessage());
+			}
 			logger.error("Password recovery token storage error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Token storage error!");
 		} finally {
@@ -244,19 +249,31 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 
 	@Override
 	public PasswordRecoveryToken restorePasswordResetToken(PasswordRecoveryToken token)
-			throws OperationExecutionErrorException {
+			throws PasswordRecoveryTokenNotFoundException, OperationExecutionErrorException {
 		SqlSession session = sessionFactory.openSession();
 		PasswordRecoveryToken recoveryToken = new PasswordRecoveryToken();
 		try {
 			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
 			PasswordRecoveryTokenMapper tokenMapper = mapper.readPasswordToken(token.getUserid());
+
+			if (tokenMapper == null) {
+				throw new PasswordRecoveryTokenNotFoundException("Token not found!");
+			}
+
 			recoveryToken.setUserid(tokenMapper.getUserid());
 			recoveryToken.setToken(tokenMapper.getToken());
 			recoveryToken.setTokenValidUntil(new Date(tokenMapper.getValidUntil()));
-			if (recoveryToken == null) {
-				// throw !!
-			}
+
 		} catch (Exception e) {
+			if (e instanceof PasswordRecoveryTokenNotFoundException) {
+				String messageToken = "NULL";
+				String messageUserid = "NULL";
+				if (token != null) {
+					messageToken = token.getToken();
+					messageUserid = token.getUserid();
+				}
+				logger.error("Password recovery token not found: userid: " + messageUserid + " token: " + messageToken);
+			}
 			logger.error("Password recovery token database error: " + e.getMessage());
 			throw new OperationExecutionErrorException("Password recovery token database error!");
 		} finally {
