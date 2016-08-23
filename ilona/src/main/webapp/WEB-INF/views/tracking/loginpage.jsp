@@ -19,6 +19,19 @@
 			$("#errorContent").html("");
 			var token = $("meta[name='_csrf']").attr("content");
 			var header = $("meta[name='_csrf_header']").attr("content");
+			
+			var userid = $("#mainpageLoginUseridTXT").val();
+			if(userid == null || userid == "") {
+				$("#mainpageLoginErrorContent").html("Userid is invalid!");
+				return;
+			}
+			
+			var password = $("#mainpageLoginPasswordTXT").val();
+			if(password == null || password == "") {
+				$("#mainpageLoginErrorContent").html("Password is invalid!");
+				return;
+			}
+			
 			var rememberMe = document.getElementById("mainpageLoginRemeberMeCHB");
 			var rememberMevalue = false;
 			if(rememberMe.checked) {
@@ -31,8 +44,8 @@
 					xhr.setRequestHeader(header, token);
 				},
 				data : {
-					username : $("#mainpageLoginUseridTXT").val(),
-					password : $("#mainpageLoginPasswordTXT").val(),
+					username : userid,
+					password : password,
 					rememberme : rememberMevalue
 				},
 				url : "<c:url value='/tracking/processlogin'></c:url>",
@@ -49,8 +62,8 @@
 		} catch(err) {
 			try {
 				$("#mainpageLoginErrorContent").html("Service is unavailable!");
-			} catch(err) {
-				
+			} catch(finalError) {
+				console.log(finalError);
 			}
 		}
 	});
@@ -60,9 +73,9 @@
 			$("#errorContent").html("");
 			var token = $("meta[name='_csrf']").attr("content");
 			var header = $("meta[name='_csrf_header']").attr("content");
-			var password = $("#mainpageLoginResetPasswordTXT").val();
+			var userid = $("#mainpageLoginResetPasswordUseridTXT").val();
 			
-			if(password == null || password == "") {
+			if(userid == null || userid == "") {
 				$("#mainpageLoginPasswordResetErrorParagh").html("Password value error!");
 				return;
 			}
@@ -74,7 +87,7 @@
 				},
 				url : "<c:url value='/tracking/resetpassword'></c:url>",
 				data : {
-					userid : password
+					userid : userid
 				},
 				timeout : 10000,
 				error : function(xhr, status, error) {
@@ -101,8 +114,8 @@
 			var token = $("meta[name='_csrf']").attr("content");
 			var header = $("meta[name='_csrf_header']").attr("content");
 			
-			var userid = $("#mainpageLoginRestorePasswordWithTokenUseridTXT").val();
-			var passwordToken = $("#mainpageLoginRestorePasswordWithTokenTokenTXT").val();
+			var userid = $("#mainpageLoginRestorePasswordWithTokenUseridTXT").val();			
+			var passwordToken = $("#mainpageLoginRestorePasswordWithTokenTokenTXT").val();			
 			
 			if(userid == null || userid == "") {
 				$("#mainpageLoginPasswordResetWithTokenErrorParagh").html("Userid is invalid!");
@@ -133,7 +146,6 @@
 				error : function(xhr, status, error) {
 					$("#mainpageLoginRestorePasswordWithTokenUseridTXT").val("");
 					$("#mainpageLoginRestorePasswordWithTokenTokenTXT").val("");
-					alert(""  + status + error);
 					$("#mainpageLoginPasswordResetWithTokenErrorParagh").html("Service error!");
 				},
 				success : function(result, status, xhr) {
@@ -212,16 +224,16 @@
 		<div class="col-lg-6">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">ILONA - Password reset!</h3>
+					<h3 class="panel-title">Password reset request!</h3>
 				</div>
 				<div class="panel-body">
 	
-					<label for="mainpageLoginResetPasswordTXT">Userid:						
+					<label for="mainpageLoginResetPasswordUseridTXT">Userid:						
 					</label>
 						
 					<input type="text"
 						class="form-control"
-						id="mainpageLoginResetPasswordTXT"
+						id="mainpageLoginResetPasswordUseridTXT"
 						required="required"
 						placeholder="Please type in your userid!"
 						name="password">  <br/>
@@ -238,7 +250,7 @@
 		<div class="col-lg-6">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h3 class="panel-title">ILONA - Password reset!</h3>
+					<h3 class="panel-title">Password restore with token!</h3>
 				</div>
 				<div class="panel-body">
 	

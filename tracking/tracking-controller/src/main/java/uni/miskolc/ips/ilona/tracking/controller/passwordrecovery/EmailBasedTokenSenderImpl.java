@@ -2,15 +2,16 @@ package uni.miskolc.ips.ilona.tracking.controller.passwordrecovery;
 
 import javax.mail.internet.MimeMessage;
 
-import org.springframework.mail.SimpleMailMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
 import uni.miskolc.ips.ilona.tracking.controller.exception.PasswordRecoveryTokenSenderException;
-import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
 
 public class EmailBasedTokenSenderImpl implements PasswordTokenSender {
+
+	private static Logger logger = LogManager.getLogger(EmailBasedTokenSenderImpl.class);
 
 	private JavaMailSender mailSender;
 
@@ -31,7 +32,7 @@ public class EmailBasedTokenSenderImpl implements PasswordTokenSender {
 			mailSender.send(message);
 
 		} catch (Exception e) {
-			// logger.error("");
+			logger.error("Email sending failed! userid: " + userid + " token: " + token + "Error: " + e.getMessage());
 			throw new PasswordRecoveryTokenSenderException("Email send error!", e);
 		}
 
@@ -51,7 +52,8 @@ public class EmailBasedTokenSenderImpl implements PasswordTokenSender {
 			mailSender.send(message);
 
 		} catch (Exception e) {
-			// logger.error("");
+			logger.error(
+					"Email sending failed! userid: " + userid + " address: " + address + "Error: " + e.getMessage());
 			throw new PasswordRecoveryTokenSenderException("Email send error!", e);
 		}
 	}

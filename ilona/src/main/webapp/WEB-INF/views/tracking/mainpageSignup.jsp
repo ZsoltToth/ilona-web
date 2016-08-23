@@ -99,7 +99,7 @@
 						$("#mainpageSignupEmailTXT").val("");				
 						var resultText = "";
 						for(var i = 0; i < result.length; i++) {						
-							resultText+= "<p class='bg-primary'>" + result[i] +"</p>"
+							resultText+= "<p class='bg-primary'>" + result[i] + "</p>";
 						}
 						$("#mainpageSignupErrorDIV").html(resultText);
 	
@@ -138,8 +138,12 @@
 				<div class="panel-body">
 						<div id="mainpageSignupErrorDIV">
 							
-						</div>				
-						<label for="mainpageSignupUseridTXT">Userid: <br /> For more information:
+						</div>
+							
+						<label for="mainpageSignupUseridTXT">Userid: <br />
+							<a href="#mainpageSignupUseridDropdown" 
+								data-toggle="collapse">Click for more information:
+							</a>
 							<span data-toggle="popover"
 								data-html="true"
 								data-trigger="hover"
@@ -147,7 +151,11 @@
 								title="The userid can contain the following elements:"
 								class="fa  fa-info-circle">
 							</span>
+								
 						</label>
+						<p id="mainpageSignupUseridDropdown" class="collapse">
+							${useridRestriction}
+						</p>
 							
 						<input type="text"
 							class="form-control"
@@ -157,7 +165,11 @@
 							pattern="${useridPattern}"
 							name="userid"> <br />
 							
-						<label for="mainpageSignupUsernameTXT">Username: <br /> For more information:
+							
+						<label for="mainpageSignupUsernameTXT">Username: <br />
+							<a href="#mainpageSignupUsernameDropdown" 
+								data-toggle="collapse">Click for more information:
+							</a>
 							<span data-toggle="popover"
 								data-html="true"
 								data-trigger="hover"
@@ -166,6 +178,9 @@
 								class="fa  fa-info-circle">
 							</span>
 						</label>
+						<p id="mainpageSignupUsernameDropdown" class="collapse">
+							${usernameRestriction}
+						</p>
 							
 						<input type="text"
 							class="form-control"
@@ -175,7 +190,10 @@
 							pattern="${usernamePattern}"
 							name="username" > <br />
 							
-						<label for="mainpageSignupPassword1TXT">Password: <br /> For more information:
+						<label for="mainpageSignupPassword1TXT">Password: <br />
+							<a href="#mainpageSignupPasswordDropdown" 
+								data-toggle="collapse">Click for more information:
+							</a>
 							<span data-toggle="popover"
 								data-html="true" 
 								data-trigger="hover"
@@ -184,6 +202,9 @@
 								class="fa  fa-info-circle">
 							</span>
 						</label>
+						<p id="mainpageSignupPasswordDropdown" class="collapse">
+							${passwordRestriction}
+						</p>
 						
 						<input type="password"
 							class="form-control"
@@ -201,7 +222,10 @@
 							pattern="[a-zA-Z0-9,.-_?]{6,30}"
 							name="password"> <br />
 							
-						<label for="mainpageSignupEmailTXT">Email address: <br /> For more information:
+						<label for="mainpageSignupEmailTXT">Email address: <br />
+							<a href="#mainpageSignupEmailDropdown" 
+								data-toggle="collapse">Click for more information:
+							</a>
 							<span data-toggle="popover"
 								data-html="true"
 								data-trigger="hover"
@@ -209,6 +233,9 @@
 								class="fa  fa-info-circle">
 							</span>
 						</label>
+						<p id="mainpageSignupEmailDropdown" class="collapse">
+							${emailRestriction}
+						</p>
 							
 						<input type="email"
 							class="form-control"

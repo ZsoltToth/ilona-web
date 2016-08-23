@@ -42,11 +42,11 @@
 						$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
 					}
 				});
-			} catch(e) {
+			} catch(error) {
 				try {
 					$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
-				} catch(e) {
-					console.log(e);
+				} catch(finalError) {
+					console.log(finalError);
 				}
 			}
 		});
@@ -83,11 +83,11 @@
 						$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
 					}
 				});
-			} catch(e) {
+			} catch(error) {
 				try {
 					$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
-				} catch(e) {
-					console.log(e);
+				} catch(finalError) {
+					console.log(finalError);
 				}
 			}
 		});
@@ -119,11 +119,11 @@
 						$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
 					}
 				});
-			} catch(e) {
+			} catch(error) {
 				try {
 					$("#mainpageNavbarErrorOutputParagh").html("<h2>The tracking service is unreachable!</h2>");
-				} catch(e) {
-					console.log(e);
+				} catch(finalError) {
+					console.log(finalError);
 				}
 			}
 		});

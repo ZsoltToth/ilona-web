@@ -13,7 +13,8 @@
 	</resultMap>
 
 	<select id="readPasswordToken" resultMap="passwordTokenResultMapper">
-		select userid, recoverytoken, round(unix_timestamp(validuntil)*1000) as validuntil from PasswordRecoveryTokens; 
+		select userid, recoverytoken, round(unix_timestamp(validuntil)*1000) as validuntil from PasswordRecoveryTokens
+		 where userid = #{userid}; 
 	</select>
 
 	<insert id="insertRoles">

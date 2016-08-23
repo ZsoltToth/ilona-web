@@ -3,6 +3,8 @@ package uni.miskolc.ips.ilona.tracking.controller.user;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,10 +31,10 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 @RequestMapping(value = "/tracking/user")
 public class UserAccountManagementController {
 
-	@Autowired
+	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userDeviceService;
 
-	@Autowired
+	@Resource(name = "trackingPasswordEncoder")
 	private PasswordEncoder passwordEncoder;
 
 	@RequestMapping(value = "/accountmanagement", method = { RequestMethod.POST })

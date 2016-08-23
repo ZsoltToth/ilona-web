@@ -15,7 +15,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
@@ -69,7 +69,7 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			session.commit();
 
 		} catch (Exception e) {
-			if (e instanceof MySQLIntegrityConstraintViolationException) {
+			if (e.getCause() instanceof MySQLIntegrityConstraintViolationException) {
 				String userid = "NULL";
 				if (user != null) {
 					userid = user.getUserid();
@@ -233,7 +233,7 @@ public class MySqlAndMybatisUserAndDeviceDAOImplementation implements UserAndDev
 			mapper.storeDevice(device, user);
 			session.commit();
 		} catch (Exception e) {
-			if (e instanceof MySQLIntegrityConstraintViolationException) {
+			if (e.getCause() instanceof MySQLIntegrityConstraintViolationException) {
 				String deviceid = "NULL";
 				if (device != null) {
 					deviceid = device.getDeviceid();

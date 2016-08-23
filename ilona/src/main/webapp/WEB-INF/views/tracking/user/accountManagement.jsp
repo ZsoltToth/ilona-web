@@ -13,129 +13,152 @@
 
 <script type="text/javascript">
 
+	var userAccManSavedUsername = $("#userAccManUsernameTXT").val();
+	var userAccManSavedEmail = $("#userAccManEmailTXT").val();
+
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
 
 	$("#userAccManUpdateDetailsBTN").click(function(event){
-		event.preventDefault();
-		/*
-		 * get CSTF Token
-		 */
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		
-		/*
-		 * Validity 
-		 */
-		$("#userAccManUpdateDetailsErrorDIV").html("");
-		$("#userAccManUserChangeErrorSpan").html("");
-		var hadError = 0;
-		var errorText = "";
-						
-		var username = document.getElementById("userAccManUsernameTXT");	
-		if (username.checkValidity() == false) {
-			errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
-			hadError = 1;
-		}
-				
-		var email = document.getElementById("userAccManEmailTXT");
-		if(email.checkValidity()  == false) {
-			errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
-			hadError = 1;
-		}
-		
-		if (Boolean(hadError) == true) {
-			$("#userAccManUpdateDetailsErrorDIV").html(errorText);
-		} else {
-			$.ajax({
-				type : "POST",
-				async : true,
-				url : "<c:url value='/tracking/user/accountmanagement/changeuserdetails'></c:url>",
-				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
-				},
-				data : {
-					userid : $("#userAccManUseridTXT").val(),
-					username : $("#userAccManUsernameTXT").val(),
-					email : $("#userAccManEmailTXT").val()
-				},
-				success : function(result, status, xhr) {
-					/*
-					 * Write the response JSON into the text fields.
-					 */
-					$("#userAccManUsernameTXT").val(result.username);
-					$("#userAccManEmailTXT").val(result.email);
-					$("#userAccManUserChangeErrorSpan").html("Account updated successfully!");
-				},
-				error : function(xhr, status, error) {
-					try {
-						var Errors = JSON.parse(xhr.responseText);
-					} catch(err) {
+		try {
+			event.preventDefault();
+			/*
+			 * get CSTF Token
+			 */
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			
+			/*
+			 * Validity 
+			 */
+			$("#userAccManUpdateDetailsErrorDIV").html("");
+			$("#userAccManUserChangeErrorSpan").html("");
+			var hadError = 0;
+			var errorText = "";
+			
+			var username = document.getElementById("userAccManUsernameTXT");	
+			if (username.checkValidity() == false) {
+				errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
+				hadError = 1;
+			}
+					
+			var email = document.getElementById("userAccManEmailTXT");
+			if(email.checkValidity()  == false) {
+				errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
+				hadError = 1;
+			}
+			
+			if (Boolean(hadError) == true) {
+				$("#userAccManUsernameTXT").val(userAccManSavedUsername);
+				$("#userAccManEmailTXT").val(userAccManSavedEmail);
+				$("#userAccManUpdateDetailsErrorDIV").html(errorText);
+			} else {
+				$.ajax({
+					type : "POST",
+					async : true,
+					url : "<c:url value='/tracking/user/accountmanagement/changeuserdetails'></c:url>",
+					beforeSend : function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+					data : {
+						userid : $("#userAccManUseridTXT").val(),
+						username : $("#userAccManUsernameTXT").val(),
+						email : $("#userAccManEmailTXT").val()
+					},
+					success : function(result, status, xhr) {
 						/*
-						 * If the error was not from the controller 
+						 * Write the response JSON into the text fields.
 						 */
-						$("#userAccManUpdateDetailsErrorDIV").html("<p class='text-danger bg-primary'>Tracking service is offline!</p>");
-					}
-					if(Errors instanceof Array) {						
-						var errorHtml = "";
-						for(var i = 0; i < Errors.length; i++) {
-							errorHtml += "<p class='text-danger bg-primary'>" + Errors[i] +"</p>"
+						userAccManSavedUsername = $("#userAccManUsernameTXT").val();
+						userAccManSavedEmail = $("#userAccManEmailTXT").val();
+						$("#userAccManUserChangeErrorSpan").html("Account updated successfully!");
+					},
+					error : function(xhr, status, error) {
+						try {
+							$("#userAccManUsernameTXT").val(userAccManSavedUsername);
+							$("#userAccManEmailTXT").val(userAccManSavedEmail);						
+							var Errors = JSON.parse(xhr.responseText);
+						} catch(err) {
+							/*
+							 * If the error was not from the controller 
+							 */
+							$("#userAccManUpdateDetailsErrorDIV").html("<p class='text-danger bg-primary'>Tracking service is offline!</p>");
+							return;
 						}
-						$("#userAccManUpdateDetailsErrorDIV").html(errorHtml);
-					}					
-				}
-			});
+						if(Errors instanceof Array) {						
+							var errorHtml = "";
+							for(var i = 0; i < Errors.length; i++) {
+								errorHtml += "<p class='text-danger bg-primary'>" + Errors[i] +"</p>"
+							}
+							$("#userAccManUpdateDetailsErrorDIV").html(errorHtml);
+						}					
+					}
+				});
+			}
+		} catch(err) {
+			try {
+				$("#userAccManUpdateDetailsErrorDIV").html("<p class='text-danger bg-primary'>Service error!</p>");
+			} catch(error) {
+				console.log(error);
+			}
 		}
-		
 	});
 	
 	$("#userAccManChangePasswordBTN").click(function(event){
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		
-		$("#userAccManChangePasswordErrorsDIV").html("");
-		var hadError = 0;
-		var errorText = "";
-		var password1 = document.getElementById("userAccManPassword1TXT");
-		var password2 = document.getElementById("userAccManPassword2TXT");
-		
-		if (password1.checkValidity() == false) {
-			errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
-			hadError = 1;
-		}
-		
-		if ( password1.value != password2.value) {
-			errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
-			hadError = 1;
-		}
-
-		if(Boolean(hadError) == true) {
-			$("#userAccManChangePasswordErrorsDIV").html(errorText);
-		} else {
-			$.ajax({
-				type : "POST",
-				async : true,
-				url : "<c:url value='/tracking/user/accountmanagement/changepassword'></c:url>",
-				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
-				},
-				data : {
-					userid : $("#userAccManUseridTXT").val(),
-					password : $("#userAccManPassword1TXT").val()
-				},
-				success : function(result, status, xhr) {
-					var ResultText = "";
-					for(var i = 0; i < result.length; i++) {
-						ResultText += "<p class='text-danger bg-primary'>" + result[i] + "</p>";
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			
+			$("#userAccManChangePasswordErrorsDIV").html("");
+			var hadError = 0;
+			var errorText = "";
+			var password1 = document.getElementById("userAccManPassword1TXT");
+			var password2 = document.getElementById("userAccManPassword2TXT");
+			
+			if (password1.checkValidity() == false) {
+				errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
+				hadError = 1;
+			}
+			
+			if ( password1.value != password2.value) {
+				errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
+				hadError = 1;
+			}
+	
+			if(Boolean(hadError) == true) {
+				$("#userAccManChangePasswordErrorsDIV").html(errorText);
+			} else {
+				$.ajax({
+					type : "POST",
+					async : true,
+					url : "<c:url value='/tracking/user/accountmanagement/changepassword'></c:url>",
+					beforeSend : function(xhr) {
+						xhr.setRequestHeader(header, token);
+					},
+					data : {
+						userid : $("#userAccManUseridTXT").val(),
+						password : $("#userAccManPassword1TXT").val()
+					},
+					success : function(result, status, xhr) {
+						var ResultText = "";
+						for(var i = 0; i < result.length; i++) {
+							ResultText += "<p class='text-danger bg-primary'>" + result[i] + "</p>";
+						}
+						$("#userAccManChangePasswordErrorsDIV").html(ResultText);
+					},
+					error : function(xhr, status, error) {
+						$("#userAccManChangePasswordErrorsDIV").html("<p class='text-danger bg-primary'>Tracking service error!</p>"+error);
 					}
-					$("#userAccManChangePasswordErrorsDIV").html(ResultText);
-				},
-				error : function(xhr, status, error) {
-					$("#userAccManChangePasswordErrorsDIV").html("<p class='text-danger bg-primary'>Tracking service error!</p>"+error);
-				}
-			});
-		}		
+				});
+			}
+		} catch(err) {
+			try {
+				$("#userAccManChangePasswordErrorsDIV").html("<p class='text-danger bg-primary'>Tracking service error!</p>"+error);
+			} catch(error) {
+				console.log(error);
+			}
+		}
 	});
 </script>
 
@@ -161,7 +184,10 @@
 						class="form-control"
 						value="${useridValue}"><br/>
 					
-					<label for="userAccManUsernameTXT" id="userAccManUsernameTXTLabel">Username:
+					<label for="userAccManUsernameTXT" id="userAccManUsernameTXTLabel">Username: <br />
+						<a href="#userAccManUsernameDropdown" 
+								data-toggle="collapse">Click for more information:
+						</a>
 						<span data-toggle="popover"
 							data-html="true"
 							data-trigger="hover"
@@ -170,6 +196,10 @@
 							class="fa  fa-info-circle">
 						</span>
 					</label>
+					<p id="userAccManUsernameDropdown" class="collapse">
+						${usernameRestriction}
+					</p>
+					
 					<input type="text" 
 						id="userAccManUsernameTXT" 
 						class="form-control"
@@ -178,7 +208,10 @@
 						value="${usernameValue}"><br />
 		
 					<label for="userAccManEmailTXT" id="userAccManEmailTXTLabel">
-						Email address:
+						Email address: <br />
+						<a href="#userAccManEmailDropdown" 
+								data-toggle="collapse">Click for more information:
+						</a>
 						<span data-toggle="popover"
 							data-html="true"
 							data-trigger="hover"
@@ -187,6 +220,10 @@
 							class="fa  fa-info-circle">
 						</span>
 					</label>
+					<p id="userAccManEmailDropdown" class="collapse">
+						${emailRestriction}
+					</p>
+					
 					<input type="text"
 						id="userAccManEmailTXT" 
 						class="form-control" 
@@ -215,7 +252,10 @@
 				
 				<div class="panel-body">
 					<label for="userAccManPassword1TXT" id="userAccManPassword1TXTLabel">
-						Password:
+						Password: <br />
+						<a href="#userAccManPasswordDropdown" 
+								data-toggle="collapse">Click for more information:
+						</a>
 						<span data-toggle="popover"
 							data-html="true"
 							data-trigger="hover"
@@ -224,6 +264,10 @@
 							class="fa  fa-info-circle">
 						</span>
 					</label>
+					<p id="userAccManPasswordDropdown" class="collapse">
+						${passwordRestriction}
+					</p>
+					
 					<input type="password"
 						id="userAccManPassword1TXT"
 						class="form-control"

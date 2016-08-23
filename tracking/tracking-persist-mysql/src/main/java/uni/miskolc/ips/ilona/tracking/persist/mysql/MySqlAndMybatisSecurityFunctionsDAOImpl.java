@@ -13,7 +13,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 import uni.miskolc.ips.ilona.tracking.model.PasswordRecoveryToken;
 import uni.miskolc.ips.ilona.tracking.persist.SecurityFunctionsDAO;
@@ -136,7 +136,8 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			}
 			session.commit();
 		} catch (Exception e) {
-			if (e instanceof UserNotFoundException || e instanceof MySQLIntegrityConstraintViolationException) {
+			if (e instanceof UserNotFoundException
+					|| e.getCause() instanceof MySQLIntegrityConstraintViolationException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
 				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
@@ -180,7 +181,7 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			}
 			session.commit();
 		} catch (Exception e) {
-			if (e instanceof MySQLIntegrityConstraintViolationException) {
+			if (e.getCause() instanceof MySQLIntegrityConstraintViolationException) {
 				logger.error("User has not found with id: " + userid + "  Error: " + e.getMessage());
 				throw new UserNotFoundException("User has not found with id: " + userid + "  Error: " + e.getMessage());
 			}
@@ -229,18 +230,19 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			session.commit();
 
 		} catch (Exception e) {
-			if (e instanceof MySQLIntegrityConstraintViolationException) {
-				String messageToken = "NULL";
-				String messageUserid = "NULL";
-				if (token != null) {
-					messageToken = token.getToken();
-					messageUserid = token.getUserid();
-				}
-				logger.error("There is no user with id: " + messageUserid + " token: " + messageToken + e.getMessage());
+			String tokenMessage = "Token is null!";
+			if (token != null) {
+				tokenMessage = token.toString();
+			}
+			if (e.getCause() instanceof MySQLIntegrityConstraintViolationException) {
+				logger.error(
+						"There is no user with this id! Token details: " + tokenMessage + " Error: " + e.getMessage());
 				throw new OperationExecutionErrorException("Password recovery token storage error:" + e.getMessage());
 			}
-			logger.error("Password recovery token storage error: " + e.getMessage());
-			throw new OperationExecutionErrorException("Token storage error!");
+			logger.error("Password recovery token storage error! Token details: " + tokenMessage + " Error: "
+					+ e.getMessage());
+			throw new OperationExecutionErrorException("Password recovery token storage error! Token details: "
+					+ tokenMessage + " Error: " + e.getMessage(), e);
 		} finally {
 			session.close();
 		}
@@ -265,21 +267,40 @@ public class MySqlAndMybatisSecurityFunctionsDAOImpl implements SecurityFunction
 			recoveryToken.setTokenValidUntil(new Date(tokenMapper.getValidUntil()));
 
 		} catch (Exception e) {
-			if (e instanceof PasswordRecoveryTokenNotFoundException) {
-				String messageToken = "NULL";
-				String messageUserid = "NULL";
-				if (token != null) {
-					messageToken = token.getToken();
-					messageUserid = token.getUserid();
-				}
-				logger.error("Password recovery token not found: userid: " + messageUserid + " token: " + messageToken);
+			String tokenMessage = "Token is null!";
+			if (token != null) {
+				tokenMessage = token.toString();
 			}
-			logger.error("Password recovery token database error: " + e.getMessage());
-			throw new OperationExecutionErrorException("Password recovery token database error!");
+			if (e instanceof PasswordRecoveryTokenNotFoundException) {
+
+				logger.error("Password recovery token not found: Token details:" + tokenMessage + " Error: "
+						+ e.getMessage());
+				throw new OperationExecutionErrorException("Password recovery token not found: Token details:"
+						+ tokenMessage + " Error: " + e.getMessage(), e);
+			}
+			logger.error(
+					"Password recovery database error: Token details:" + tokenMessage + " Error: " + e.getMessage());
+			throw new OperationExecutionErrorException(
+					"Password recovery token not found: Token details:" + tokenMessage + " Error: " + e.getMessage(),
+					e);
 		} finally {
 			session.close();
 		}
 		return recoveryToken;
+	}
+
+	@Override
+	public void deletePasswordRecoveryToken(String userid) throws OperationExecutionErrorException {
+		SqlSession session = sessionFactory.openSession();
+		try {
+			SecurityFunctionsUserMapper mapper = session.getMapper(SecurityFunctionsUserMapper.class);
+			mapper.erasePasswordToken(userid);
+			session.commit();
+		} catch (Exception e) {
+			logger.error("Password recovery token database error: " + e.getMessage());
+			throw new OperationExecutionErrorException("Password recovery token database error: " + e.getMessage(), e);
+		}
+
 	}
 
 }

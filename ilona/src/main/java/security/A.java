@@ -3,6 +3,7 @@ package security;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,8 +22,13 @@ public class A {
 		SecureRandom random = new SecureRandom();
 		System.out.println((new BigInteger(120, random)).toString());
 		
-		System.out.println(UUID.randomUUID().toString().replaceAll("-", ""));
+		System.out.println(UUID.randomUUID().toString().replaceAll("-", "").length());
 		GrantedAuthority ga = new SimpleGrantedAuthority("ROLE_ADMIN");
+		
+		String regex = "^(?=.{5,50}$)([a-zA-Z0-9]{1}[_:-]{0,1}){1,49}[a-zA-Z0-9]{1}$"; // device id
+		String regex2 = "^(?=.{5,50}$)([a-zA-Z0-9]{1}[ ]{0,1}){1,49}[a-zA-Z0-9]{1}$"; // device name
+		String regex3 = "^(?=.{1,30}$)([a-zA-Z0-9]{1}[_- ]{0,1}){1,29}[a-zA-Z0-9]{1}$";
+		System.out.println("valid: " + Pattern.matches(regex3, "Samsung Galaxy SG-9999 ab"));
 		
 		
 		

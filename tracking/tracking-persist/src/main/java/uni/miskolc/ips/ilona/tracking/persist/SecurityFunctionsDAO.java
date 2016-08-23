@@ -34,4 +34,6 @@ public interface SecurityFunctionsDAO {
 
 	public PasswordRecoveryToken restorePasswordResetToken(PasswordRecoveryToken token)
 			throws PasswordRecoveryTokenNotFoundException, OperationExecutionErrorException;
+
+	public void deletePasswordRecoveryToken(String userid) throws OperationExecutionErrorException;
 }

@@ -8,14 +8,11 @@ import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import uni.miskolc.ips.ilona.tracking.controller.exception.InvalidUserRegistration;
+import uni.miskolc.ips.ilona.tracking.controller.exception.PasswordRecoveryTokenValidityErrorException;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserCreationDTO;
 import uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.PasswordRecoveryManager;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
@@ -141,9 +138,19 @@ public class TrackingEntryPointController {
 		}
 
 		/**
-		 * Return user page
+		 * Check for user rights
 		 */
-		return new ModelAndView("tracking/user/userMainpage");
+		for (GrantedAuthority auth : authentication.getAuthorities()) {
+			if (auth.getAuthority().equals("ROLE_USER")) {
+				logger.info("User page authentication request!" + authentication.getName());
+				return new ModelAndView("tracking/user/userMainpage");
+			}
+		}
+
+		/**
+		 * Other role?
+		 */
+		return new ModelAndView("tracking/mainpageHome");
 	}
 
 	/**
@@ -188,8 +195,7 @@ public class TrackingEntryPointController {
 
 	@RequestMapping(value = "/registeruser", method = { RequestMethod.POST })
 	@ResponseBody
-	public Collection<String> registerUser(@ModelAttribute(name = "user") UserCreationDTO user)
-			throws InvalidUserRegistration {
+	public Collection<String> registerUser(@ModelAttribute(name = "user") UserCreationDTO user) {
 		// ModelAndView mav = new ModelAndView("tracking/mainpageSignup");
 		/*
 		 * Validity check.
@@ -239,7 +245,7 @@ public class TrackingEntryPointController {
 				 */
 				this.userDeviceService.createUser(userDB);
 			} catch (DuplicatedUserException e) {
-				logger.error("Duplicated userid: " + user.getUserid() + "  Error: " + e.getMessage());
+				logger.error("Duplicated userid: " + user.getUserid());
 				returnValues.add("Duplicated user with this userid: " + user.getUserid());
 				return returnValues;
 			} catch (ServiceGeneralErrorException e) {
@@ -270,10 +276,11 @@ public class TrackingEntryPointController {
 		try {
 			passwordRecoveryManager.handlePasswordRecoveryRequest(userid);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("Password recovery has failed! userid: " + userid);
+			return "Password recovery has failed!";
 		}
 
-		return "OK!";
+		return "Password request has been sent successfully!";
 	}
 
 	@RequestMapping(value = "/passwordrequestwithtoken", method = { RequestMethod.POST })
@@ -282,22 +289,14 @@ public class TrackingEntryPointController {
 			@RequestParam("token") String token) {
 		try {
 			passwordRecoveryManager.handlePasswordRestore(userid, token);
-		} catch(Exception e) {
-			e.printStackTrace();
+		} catch (PasswordRecoveryTokenValidityErrorException e) {
+			logger.info("Password recovery token validity error! userid: " + userid + " token: " + token);
+			return "Password token validity error!";
+		} catch (Exception e) {
+			logger.info("Password recovery error! userid: " + userid + " token: " + token);
+			return "Password recovery error!";
 		}
-		return null;
-	}
-
-	@ExceptionHandler(value = { InvalidUserRegistration.class })
-	public ModelAndView userRegistrationInvalidityHandler(Throwable error) {
-		if (error instanceof InvalidUserRegistration) {
-			InvalidUserRegistration invReg = (InvalidUserRegistration) error;
-			ModelAndView mav = new ModelAndView("/tracking/mainpageSignup");
-			mav.addObject("errors", invReg.getValidityErrors().getErrors());
-			return mav;
-		} else {
-			return new ModelAndView("tracking/mainpageSignup");
-		}
+		return "The new password has been sent!";
 	}
 
 	public void setUserDeviceService(UserAndDeviceService userDeviceService) {

@@ -163,10 +163,29 @@
 							<c:forEach var="device" items="${devices}" >
 								<tr>
 									<td>${device.deviceid}</td>
-									<td><input type="text" value="${device.deviceName}" id="devName${device.deviceid}" onchange="showModification();"></td>
-									<td><input type="text" value="${device.deviceType}" id="devType${device.deviceid}" class="deviceTypeNameClass"></td>
-									<td><input type="text" value="${device.deviceTypeName}" id="devTypeName${device.deviceid}"></td>
-									<td><a href="${device.deviceid}" class="listDevicesDeleteDevice">Delete device <span class="glyphicon glyphicon-ban-circle "></span></a></td>
+									<td>
+										<input type="text" 
+											value="${device.deviceName}" 
+											id="devName${device.deviceid}" 
+											onchange="showModification();">
+									</td>
+									<td>
+										<input type="text" 
+											value="${device.deviceType}" 
+											id="devType${device.deviceid}" 
+											class="deviceTypeNameClass">
+									</td>
+									<td>
+										<input type="text" 
+											value="${device.deviceTypeName}" 
+											id="devTypeName${device.deviceid}">
+									</td>
+									<td>
+										<a href="${device.deviceid}" 
+											class="listDevicesDeleteDevice">Delete device 
+											<span class="glyphicon glyphicon-ban-circle "></span>
+										</a>
+									</td>
 									<td><a style="visibility:hidden" 
 										href="${device.deviceid}" 
 										class="listDevicesUpdateDevice">Confirm modifications 

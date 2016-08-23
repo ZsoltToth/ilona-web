@@ -13,6 +13,10 @@
 
 <jsp:directive.include file="userNavbar.jsp" />
 
-<div>
-	Ez jelenik meg!
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-lg-12">
+			Ez jelenik meg!
+		</div>	
+	</div>	
 </div>

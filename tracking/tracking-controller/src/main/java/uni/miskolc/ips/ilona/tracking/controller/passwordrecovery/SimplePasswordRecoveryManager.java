@@ -58,9 +58,8 @@ public class SimplePasswordRecoveryManager implements PasswordRecoveryManager {
 			UserData user = userDeviceService.getUser(userid);
 			this.tokenSender.sendToken(userid, passwordToken, user.getEmail());
 		} catch (Exception e) {
-			logger.error("Token storage request failed! userid: " + userid + " Error: " + e.getMessage());
-			throw new PasswordRecoveryException(
-					"Token storage request failed! userid: " + userid + " Error: " + e.getMessage(), e);
+			logger.error("Token storage request failed! userid: " + userid);
+			throw new PasswordRecoveryException("Token storage request failed! userid: " + userid, e);
 		}
 	}
 
@@ -76,16 +75,17 @@ public class SimplePasswordRecoveryManager implements PasswordRecoveryManager {
 				throw new PasswordRecoveryTokenValidityErrorException("Validity error!");
 			}
 			if (!tok.getToken().equals(token)) {
-				throw new PasswordRecoveryTokenValidityErrorException("validity error!");
+				throw new PasswordRecoveryTokenValidityErrorException("Validity error!");
 			}
 			UserData user = userDeviceService.getUser(userid);
 			String oldPassword = user.getPassword();
-			String newPassword = passwordGenerator.generatePassword();
+			String newPassword = passwordGenerator.generatePassword(10);
 			String hashedPassword = passwordEncoder.encode(newPassword);
 			user.setPassword(hashedPassword);
 			userDeviceService.updateUser(user);
 			try {
 				tokenSender.sendNewPassword(userid, newPassword, user.getEmail());
+				tokenDAO.deletePasswordRecoveryToken(userid);
 			} catch (Exception e) {
 				user.setPassword(oldPassword);
 				userDeviceService.updateUser(user);
@@ -94,18 +94,15 @@ public class SimplePasswordRecoveryManager implements PasswordRecoveryManager {
 
 		} catch (Exception e) {
 			if (e instanceof PasswordRecoveryTokenValidityErrorException) {
-				logger.error("Token restore request failed, token validity expired! userid: " + userid + " token:"
-						+ token + " Error: " + e.getMessage());
+				logger.error(
+						"Token restore request failed, token validity expired! userid: " + userid + " token:" + token);
 				throw new PasswordRecoveryTokenValidityErrorException(
-						"Token restore request failed, token validity expired! userid: " + userid + " token:" + token
-								+ " Error: " + e.getMessage(),
+						"Token restore request failed, token validity expired! userid: " + userid + " token:" + token,
 						e);
 			}
 
-			logger.error("Token restore request failed! userid: " + userid + " token:" + token + " Error: "
-					+ e.getMessage());
-			throw new PasswordRecoveryException(
-					"Token storage request failed! userid: " + userid + " token:" + token + " Error: " + e.getMessage(),
+			logger.error("Token restore request failed! userid: " + userid + " token:" + token);
+			throw new PasswordRecoveryException("Token storage request failed! userid: " + userid + " token:" + token,
 					e);
 		}
 

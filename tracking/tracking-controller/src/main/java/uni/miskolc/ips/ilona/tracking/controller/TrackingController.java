@@ -1,11 +1,7 @@
 package uni.miskolc.ips.ilona.tracking.controller;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
-
-import javax.servlet.ServletContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,10 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import uni.miskolc.ips.ilona.tracking.model.DeviceData;
-import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.model.UserDetails;
 import uni.miskolc.ips.ilona.tracking.persist.UserAndDeviceDAO;
+
 /**
  * Tracking module
  * 
@@ -41,7 +36,7 @@ public class TrackingController {
 
 	@Autowired
 	private UserAndDeviceDAO dao;
-	
+
 	@Autowired
 	BCryptPasswordEncoder passwordencoder;
 	// @Autowired
@@ -54,8 +49,8 @@ public class TrackingController {
 	 * @return The tracking index jsp page.
 	 */
 	@RequestMapping(value = "/index", method = { RequestMethod.GET, RequestMethod.POST })
-	public  ModelAndView loadingStartpage() {
-		//logger.error("Tracking index page request.");
+	public ModelAndView loadingStartpage() {
+		// logger.error("Tracking index page request.");
 		// ModelAndView back = new ModelAndView("trackingIndex");
 		ModelAndView mav = new ModelAndView();
 		// mav.addObject("message",
@@ -108,22 +103,7 @@ public class TrackingController {
 		return "Tracking/TrackingLoginPage";
 	}
 
-	/*
-	 * @RequestMapping(value = "/createuserpage", method = RequestMethod.GET)
-	 * public ModelAndView createuserpage() { return new
-	 * ModelAndView("CreateTrackingUser"); }
-	 */
-	/*
-	 * @RequestMapping(value = "/createuser/{username}/{password}/{enabled}",
-	 * method = { RequestMethod.POST }) public ModelAndView
-	 * userCreateProcess(@RequestParam(value = "username", required=false)
-	 * String username,
-	 * 
-	 * @RequestParam(value = "password") String password, @RequestParam(value =
-	 * "enabled") boolean enabled) { System.out.println("user: " + username +
-	 * "  password: " + password + "  enabled:" + enabled); return new
-	 * ModelAndView(""); }
-	 */
+
 	@RequestMapping(value = "/createuser1", method = { RequestMethod.GET, RequestMethod.POST })
 	@ResponseBody
 	public List<UserDetails> userCreateProcess(@RequestParam(value = "roleadmin", required = false) String roleadmin,
@@ -151,20 +131,10 @@ public class TrackingController {
 		return "redirect:/tracking/index";
 	}
 
-	/**
-	 * CSAK PRÓBÁLGATÁSRA!!!
-	 * 
-	 * @return
-	 */
 	@RequestMapping(value = "/probalgatasok", method = { RequestMethod.GET, RequestMethod.POST })
 	public ModelAndView progaltasokToltese(@ModelAttribute("roleadmin") String roleadmin,
 			@ModelAttribute("userid") String userid, Model model, HttpEntity<byte[]> httpEntity) {
-	
-		
-		
-		
-		
-		
+
 		return new ModelAndView("Probalgatasok");
 	}
 
@@ -174,41 +144,6 @@ public class TrackingController {
 
 	public UserAndDeviceDAO getDao() {
 		return dao;
-	}
-
-	
-	
-	/*
-	 * @RequestMapping(value = "/getUser/{userID}", method = RequestMethod.GET)
-	 * 
-	 * @ResponseBody public UserData getUser(@RequestParam(value="userID",
-	 * required=true)String userID) { UserData data = null;
-	 * 
-	 * try { trackingLoginService.getUser(userID); } catch
-	 * (DatabaseUnavailableException e) {
-	 * 
-	 * e.printStackTrace(); } catch (NoSuchUserException e) {
-	 * 
-	 * e.printStackTrace(); } catch (UnenabledUserException e) {
-	 * 
-	 * e.printStackTrace(); } return data; }
-	 * 
-	 * @RequestMapping(value = "/createUser", method = RequestMethod.POST)
-	 * public ModelAndView createUser(@RequestBody(required = true) UserData
-	 * userData) { ModelAndView mav = null; try {
-	 * trackingLoginService.createUser(userData); } catch
-	 * (DatabaseUnavailableException e) { mav = new
-	 * ModelAndView("tracking_registration"); mav.addObject("message",
-	 * "Az adatbazis nem elerheto!"); return mav; //e.printStackTrace(); } catch
-	 * (InvalidDataException e) { mav = new
-	 * ModelAndView("tracking_registration"); mav.addObject("message",
-	 * "Hibas adat(ok)!"); return mav; //e.printStackTrace(); } catch
-	 * (DuplicatedUserException e) { mav = new
-	 * ModelAndView("tracking_registration"); mav.addObject("message",
-	 * "Mar van ilyen felhasznalo!"); return mav; //e.printStackTrace(); } //
-	 * after successful registration tracking main page? mav = new
-	 * ModelAndView("tracking_index"); mav.addObject("message",
-	 * "Sikeres regisztracio"); return mav; }
-	 */
+	}	
 
 }

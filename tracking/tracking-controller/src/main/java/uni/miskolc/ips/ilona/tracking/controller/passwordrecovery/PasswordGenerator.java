@@ -2,5 +2,5 @@ package uni.miskolc.ips.ilona.tracking.controller.passwordrecovery;
 
 public interface PasswordGenerator {
 
-	String generatePassword();
+	String generatePassword(int length);
 }
