@@ -4,15 +4,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import uni.miskolc.ips.ilona.tracking.controller.model.ExecutionResultDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserBaseDetailsDTO;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
@@ -20,6 +23,7 @@ import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedUserException;
+import uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 /**
@@ -31,11 +35,14 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 @RequestMapping(value = "/tracking/admin")
 public class AdminpageController {
 
-	@Autowired
+	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userDeviceService;
 
-	@Autowired
+	@Resource(name = "trackingPasswordEncoder")
 	private PasswordEncoder encoder;
+
+	@Resource(name = "trackingCentralManager")
+	private TrackingModuleCentralManager centralManager;
 
 	@RequestMapping(value = "/homepage", method = { RequestMethod.POST })
 	public ModelAndView createAdminHomepage() {
@@ -62,10 +69,14 @@ public class AdminpageController {
 	}
 
 	@RequestMapping(value = "registeruser", method = { RequestMethod.POST })
-	public ModelAndView registerUserByAdmin(@ModelAttribute() UserBaseDetailsDTO user) {
-		ModelAndView mav = new ModelAndView("tracking/admin/createuser");
+	@ResponseBody
+	public ExecutionResultDTO registerUserByAdmin(@ModelAttribute() UserBaseDetailsDTO user) {
+		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
 
-		System.out.println(user.toString());
+		if (user == null) {
+			result.addMessage("User is null!");
+			return result;
+		}
 
 		ValidityStatusHolder errors = new ValidityStatusHolder();
 		errors.appendValidityStatusHolder(ValidateUserData.validateUserid(user.getUserid()));
@@ -73,41 +84,35 @@ public class AdminpageController {
 		errors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
 		errors.appendValidityStatusHolder(ValidateUserData.validateEmail(user.getEmail()));
 
-		/*
-		 * if user's parameters are not valid.
-		 */
-		if (errors.isValid()) {
+		if (!errors.isValid()) {
+			result.setMessages(errors.getErrors());
+			return result;
+		}
 
+		try {
 			List<String> userRoles = new ArrayList<String>();
 			userRoles.add("ROLE_USER");
 			if (user.isAdminRole() == true) {
 				userRoles.add("ROLE_ADMIN");
 			}
-
 			List<Date> badLogins = new ArrayList<Date>();
 			List<DeviceData> devices = new ArrayList<DeviceData>();
-
-			Date credentialsValidUntil = new Date(new Date().getTime() + 31556952000L); // one
-																						// year
-
+			Date credentialsValidUntil = new Date(new Date().getTime() + centralManager.getCredentialsValidityPeriod());
 			String hashedPassword = encoder.encode(user.getPassword());
 			UserData userFull = new UserData(user.getUserid(), user.getUsername(), user.getEmail(), hashedPassword,
 					user.isEnabled(), userRoles, new Date(), credentialsValidUntil, new Date(), true, badLogins,
 					devices);
-
-			try {
-				userDeviceService.createUser(userFull);
-			} catch(DuplicatedUserException e) {
-				mav.addObject("validityErrors", "This userid is already preserved: " + user.getUserid());
-			} catch(Exception e) {
-				mav.addObject("validityErrors", "An error occured!");
-			}
-			mav.addObject("validityErrors", "User creation was successful!");
-		} else {
-
-			mav.addObject("validityErrors", errors.getErrors());
+			userDeviceService.createUser(userFull);
+		} catch (DuplicatedUserException e) {
+			result.addMessage("This userid is already reserved! ID: " + user.getUserid());
+			return result;
+		} catch (Exception e) {
+			result.addMessage("Service error!");
+			return result;
 		}
-		return mav;
+		result.setExecutionState(true);
+		result.addMessage("The account has been created!");
+		return result;
 	}
 
 	/*
@@ -160,6 +165,10 @@ public class AdminpageController {
 
 	public void setEncoder(PasswordEncoder encoder) {
 		this.encoder = encoder;
+	}
+
+	public void setCentralManager(TrackingModuleCentralManager centralManager) {
+		this.centralManager = centralManager;
 	}
 
 }

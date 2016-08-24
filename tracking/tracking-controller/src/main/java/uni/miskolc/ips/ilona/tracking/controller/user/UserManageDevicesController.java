@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import uni.miskolc.ips.ilona.tracking.controller.model.ExecutionResultDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserDeviceDataDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserSecurityDetails;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateDeviceData;
@@ -22,6 +23,7 @@ import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.persist.UserAndDeviceDAO;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
+import uni.miskolc.ips.ilona.tracking.service.exceptions.DeviceNotFoundException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedDeviceException;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
@@ -48,6 +50,7 @@ public class UserManageDevicesController {
 			mav.addObject("executionError", "Service error!");
 			return mav;
 		}
+		fillModelAndViewWithCreateDeviceData(mav);
 		mav.addObject("devices", devices);
 		mav.addObject("deviceOwnerid", userDetails.getUserid());
 		mav.addObject("deviceOwnerName", userDetails.getUsername());
@@ -55,8 +58,17 @@ public class UserManageDevicesController {
 	}
 
 	@RequestMapping(value = "/mandevdeletedevice", method = { RequestMethod.POST })
-	public ModelAndView processDeleteDeviceRequestHandler(@ModelAttribute() UserDeviceDataDTO deletableDevice) {
-		ModelAndView mav = new ModelAndView("tracking/user/manageDevices");
+	@ResponseBody
+	public ExecutionResultDTO processDeleteDeviceRequestHandler(@ModelAttribute() UserDeviceDataDTO deletableDevice) {
+
+		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+
+		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		if (!userDetails.getUserid().equals(deletableDevice.getUserid())) {
+			result.setExecutionState(false);
+			result.addMessage("Authorization violation!");
+		}
 		UserData owner = null;
 		try {
 			owner = userAndDeviceService.getUser(deletableDevice.getUserid());
@@ -67,22 +79,41 @@ public class UserManageDevicesController {
 			dev.setDeviceTypeName(deletableDevice.getDeviceTypeName());
 			userAndDeviceService.deleteDevice(dev, owner);
 
-			Collection<DeviceData> devices = userAndDeviceService.readUserDevices(owner);
-			mav.addObject("devices", devices);
-			mav.addObject("deviceOwnerid", owner.getUserid());
-			mav.addObject("deviceOwnerName", owner.getUsername());
-			return mav;
+		} catch (DeviceNotFoundException e) {
+			result.addMessage("Device not found!");
+			return result;
 		} catch (Exception e) {
-			mav.addObject("executionError", "An error occured!");
-			return mav;
+			result.addMessage("Service error!");
+			return result;
 		}
-
-		// return mav;
+		result.setExecutionState(true);
+		result.addMessage("Device has been deleted!");
+		return result;
 	}
 
 	@RequestMapping(value = "/mandevupdatedevicedetails", method = { RequestMethod.POST })
-	public ModelAndView processUpdateUserDeviceDetailsRequestHandler(@ModelAttribute() UserDeviceDataDTO device) {
-		ModelAndView mav = new ModelAndView("tracking/user/manageDevices");
+	@ResponseBody
+	public ExecutionResultDTO processUpdateUserDeviceDetailsRequestHandler(@ModelAttribute() UserDeviceDataDTO device) {
+
+		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		ValidityStatusHolder errors = new ValidityStatusHolder();
+		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(device.getDeviceid()));
+		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceName(device.getDeviceName()));
+		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceType(device.getDeviceType()));
+		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceTypeName(device.getDeviceTypeName()));
+
+		if (!errors.isValid()) {
+			result.setMessages(errors.getErrors());
+			return result;
+		}
+
+		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		if (!userDetails.getUserid().equals(device.getUserid())) {
+			result.setExecutionState(false);
+			result.addMessage("Authorization violation!");
+		}
+
 		try {
 			UserData user = userAndDeviceService.getUser(device.getUserid());
 			DeviceData dev = new DeviceData();
@@ -92,16 +123,16 @@ public class UserManageDevicesController {
 			dev.setDeviceTypeName(device.getDeviceTypeName());
 			userAndDeviceService.updateDevice(dev, user);
 
-			Collection<DeviceData> devices = userAndDeviceService.readUserDevices(user);
-			mav.addObject("devices", devices);
-			mav.addObject("deviceOwnerid", user.getUserid());
-			mav.addObject("deviceOwnerName", user.getUsername());
-			return mav;
-
+		} catch (DeviceNotFoundException e) {
+			result.addMessage("Device not found!");
+			return result;
 		} catch (Exception e) {
-			return mav;
+			result.addMessage("Service error!");
+			return result;
 		}
-		// return mav;
+		result.setExecutionState(true);
+		result.addMessage("Device modification was successfull!");
+		return result;
 	}
 
 	@RequestMapping(value = "/createdevicepage", method = { RequestMethod.POST })
@@ -135,7 +166,7 @@ public class UserManageDevicesController {
 				.getPrincipal();
 
 		if (!newDevice.getUserid().equals(userDetails.getUserid())) {
-			returnMessage.add("Authorization violation error!");
+			returnMessage.add("Authorization violation!");
 			return returnMessage;
 		}
 

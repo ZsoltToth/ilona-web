@@ -8,168 +8,238 @@
 
 <script type="text/javascript">
 
-	
-
 	$("#adminNavbarHome").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#adminNavbarHome").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("ADMIN-PAGE-ACCOUNT MANAGEMENT ERROR!");
-			},
-			timeout : 10000
-		});
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				async : true,
+				type : "POST",
+				url : $("#adminNavbarHome").attr('href'),
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminNavbarNavigationErrorDIV")
+							.html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}
+				},
+				timeout : 10000
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});
 
 	$("#adminNavbarAccountManagement").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#adminNavbarAccountManagement").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("ADMIN-PAGE-ACCOUNT MANAGEMENT ERROR!");
-			},
-			timeout : 10000
-		});
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				async : true,
+				type : "POST",
+				url : $("#adminNavbarAccountManagement").attr('href'),
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminNavbarNavigationErrorDIV")
+							.html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}
+				},
+				timeout : 10000
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});
 
 	$("#adminNavbarCreateuser").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#adminNavbarCreateuser").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("ADMIN - CREATE USER ERROR!");
-			}
-		});
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				async : true,
+				type : "POST",
+				url : $("#adminNavbarCreateuser").attr('href'),
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminNavbarNavigationErrorDIV")
+							.html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}
+				}
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});
 
 	$("#adminNavbarListUsers").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#adminNavbarListUsers").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("ADMIN - CREATE USER ERROR!");
-			}
-		});
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				async : true,
+				type : "POST",
+				url : $("#adminNavbarListUsers").attr('href'),
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminNavbarNavigationErrorDIV")
+							.html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}
+				}
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});
 
 	$("#adminNavbarCentralManagement").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#adminNavbarCentralManagement").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("ADMIN - CREATE USER ERROR!");
-			}
-		});
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				async : true,
+				type : "POST",
+				url : $("#adminNavbarCentralManagement").attr('href'),
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminNavbarNavigationErrorDIV")
+							.html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}
+				}
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});
 	
 	$("#adminNavbarTrack").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#adminNavbarTrack").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("ADMIN - CREATE USER ERROR!");
-			}
-		});
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				async : true,
+				type : "POST",
+				url : $("#adminNavbarTrack").attr('href'),
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminNavbarNavigationErrorDIV")
+							.html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}
+				}
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});
 	
 	$("#adminNavbarStat").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#adminNavbarStat").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("ADMIN - CREATE USER ERROR!");
-			}
-		});
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				async : true,
+				type : "POST",
+				url : $("#adminNavbarStat").attr('href'),
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminNavbarNavigationErrorDIV")
+							.html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}
+				}
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});
 	
 	$("#adminNavbarLogout").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#adminNavbarLogout").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("ADMIN - CREATE USER ERROR!");
-			}
-		});
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				async : true,
+				type : "POST",
+				url : $("#adminNavbarLogout").attr('href'),
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				success : function(result, status, xhr) {
+					$("#page-wrapper").html(result);
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminNavbarNavigationErrorDIV")
+							.html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}
+				}
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});
 	
 </script>
@@ -213,3 +283,4 @@
 		</ul>
 	</div>
 </nav>
+<div id="adminNavbarNavigationErrorDIV"></div>

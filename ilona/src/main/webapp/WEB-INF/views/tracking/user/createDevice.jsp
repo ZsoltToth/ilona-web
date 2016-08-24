@@ -16,7 +16,7 @@
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
 
-	$("#userCreateDeviceCreatDeviceBTN").click(function(event){
+	$("#userCreateDeviceCreateDeviceBTN").click(function(event){
 		try {
 			event.preventDefault();
 			var token = $("meta[name='_csrf']").attr("content");
@@ -208,7 +208,7 @@
 						pattern="${deviceTypeNamePattern}"
 						name="devicetypename"> <br />
 					
-					<input type="button" id="userCreateDeviceCreatDeviceBTN" value="Add Device!" class="btn btn-primary">
+					<input type="button" id="userCreateDeviceCreateDeviceBTN" value="Add Device!" class="btn btn-primary">
 					<input type="hidden" id="userCreateDeviceOwneridHidden" value="${deviceOwnerid}">
 				</div>
 				<div>

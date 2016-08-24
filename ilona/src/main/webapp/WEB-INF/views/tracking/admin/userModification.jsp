@@ -278,7 +278,7 @@
 					</span>
 				</label>
 					
-				<input type="text" 
+				<input type="email" 
 					class="form-control"
 					id="adminUserModEmailTXT"
 					required="required"

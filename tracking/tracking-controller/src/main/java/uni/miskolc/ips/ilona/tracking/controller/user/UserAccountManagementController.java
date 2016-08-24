@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.controller.exception.UserChangeDetailsExecutionException;
+import uni.miskolc.ips.ilona.tracking.controller.model.ExecutionResultDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserBaseDetailsDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserSecurityDetails;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
@@ -46,17 +47,18 @@ public class UserAccountManagementController {
 
 	@RequestMapping(value = "/accountmanagement/changeuserdetails", method = { RequestMethod.POST })
 	@ResponseBody
-	public UserBaseDetailsDTO changerUserDetailsHandler(@ModelAttribute() UserBaseDetailsDTO newUserDetails)
+	public ExecutionResultDTO changerUserDetailsHandler(@ModelAttribute() UserBaseDetailsDTO newUserDetails)
 			throws UserChangeDetailsExecutionException {
 
+		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
 		ValidityStatusHolder errors = new ValidityStatusHolder();
 
 		/*
 		 * Request null check
 		 */
 		if (newUserDetails == null) {
-			errors.addValidityError("The account is null!");
-			throw new UserChangeDetailsExecutionException("The account is null!", errors);
+			result.addMessage("Userdata is null!");
+			return result;
 		}
 
 		/*
@@ -69,8 +71,8 @@ public class UserAccountManagementController {
 		 * The user only can't change other users data.
 		 */
 		if (newUserDetails.getUserid() == null || !newUserDetails.getUserid().equals(userDetails.getUserid())) {
-			errors.addValidityError("Account authorization requirements failed!");
-			throw new UserChangeDetailsExecutionException("Account authorization requirements failed!", errors);
+			result.addMessage("Account authorization requirements failed!");
+			return result;
 		}
 
 		/*
@@ -81,7 +83,8 @@ public class UserAccountManagementController {
 		errors.appendValidityStatusHolder(ValidateUserData.validateEmail(newUserDetails.getEmail()));
 
 		if (!errors.isValid()) {
-			throw new UserChangeDetailsExecutionException("Account validity error!", errors);
+			result.setMessages(errors.getErrors());
+			return result;
 		}
 
 		/*
@@ -94,8 +97,8 @@ public class UserAccountManagementController {
 			userDeviceService.updateUser(updatedUserDetails);
 
 		} catch (Exception e) {
-			errors.addValidityError("Tracking service error!");
-			throw new UserChangeDetailsExecutionException("Tracking service error!", errors);
+			result.addMessage("Service error!");
+			return result;
 		}
 
 		/*
@@ -107,8 +110,9 @@ public class UserAccountManagementController {
 		/*
 		 * Return with the updated data.
 		 */
-
-		return newUserDetails;
+		result.setExecutionState(true);
+		result.addMessage("The account has been modified!");
+		return result;
 
 	}
 

@@ -12,84 +12,74 @@
 <!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
+<script src="<c:url value='/js/deviceManagement.js'></c:url>"></script>
+
 <script type="text/javascript">
-
-	$(".listDevicesDeleteDevice").click(function(event){
-		event.preventDefault();
-		
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		
-		var link1 = "userManDevDeviceName"+$(this).attr('href');
-		var deviceName = document.getElementById(link1).value;
-		
-		var link2 = "userManDevDeviceType"+$(this).attr('href');
-		var deviceType = document.getElementById(link2).value;
-		
-		var link3 = "userManDevDeviceTypeName"+$(this).attr('href');
-		var deviceTypeName = document.getElementById(link3).value;
-		
-		$.ajax({
-			type : "POST",
-			async : true,
-			url : "<c:url value='/tracking/user/mandevdeletedevice'></c:url>",
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			data : {
-				userid : $("#userManDevOwneridHidden").val(),
-				deviceid : $(this).attr('href'),
-				deviceName : deviceName,
-				deviceType : deviceType,
-				deviceTypeName : deviceTypeName
-			},
-			success : function(result, status, error) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("error!");
-			}
-		});
+	
+	$("#userManDevDeviceModificationDeleteDeviceBTN").click(function(event){
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				type : "POST",
+				async : true,
+				url : "<c:url value='/tracking/user/mandevdeletedevice'></c:url>",
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : {
+					userid : $("#userManDevOwneridHidden").val(),
+					deviceid : $("#userManDevDeviceModificationDeviceid").val(),
+					deviceType : $("#userManDevDeviceModificationDeviceType").val(),
+					deviceTypeName : $("#userManDevDeviceModificationDeviceTypeName").val()
+				},
+				success : function(result, status, error) {
+					try {
+						if(result.executionState == true) {							
+							$("#userManDevResultOrErrorDIV")
+								.html("<p class='text-danger bg-primary'>Device deletion was successful!</p>");
+							$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+							var deviceid = "#userManDevDeviceRow" + $("#userManDevDeviceModificationDeviceid").val();						
+							$(deviceid).remove();
+							
+						} else {
+							var i = 0;
+							var messages = result.messages;
+							var length = messages.length;						
+							var errorMessages = "";
+							for(i; i < length; i++) {
+								errorMessages += "<p class='text-danger bg-primary'>" + messages[i] + "</p>";
+							}
+							$("#userManDevResultOrErrorDIV").html(errorMessages);
+							$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+						}
+						
+					} catch(err) {
+						console.log(err);
+					}
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+						$("#userManDevResultOrErrorDIV").html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}
+				}
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});
-
-
-	$(".listDevicesUpdateDevice").click(function(event){		
-		event.preventDefault();
-		
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		
-		var link1 = "userManDevDeviceName"+$(this).attr('href');
-		var deviceName = document.getElementById(link1).value;
-		
-		var link2 = "userManDevDeviceType"+$(this).attr('href');
-		var deviceType = document.getElementById(link2).value;
-		
-		var link3 = "userManDevDeviceTypeName"+$(this).attr('href');
-		var deviceTypeName = document.getElementById(link3).value;
-			
-		$.ajax({
-			type : "POST",
-			async : true,
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			data : {
-				userid : $("#userManDevOwneridHidden").val(),
-				deviceid : $(this).attr('href'),
-				deviceName : deviceName,
-				deviceType : deviceType,
-				deviceTypeName : deviceTypeName
-			},
-			url : "<c:url value='/tracking/user/mandevupdatedevicedetails'></c:url>",
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("error!");
-			}
-			
-		});
+	
+	$("#userManDevDeviceModificationCancelModificationBTN").click(function(event){
+		try {
+			event.preventDefault();
+			$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+		} catch(err) {
+			console.log(err);
+		}
 	});
 	
 	$(".userManDevStartDeviceModification").click(function(event){
@@ -105,9 +95,8 @@
 			$("#userManDevDeviceModificationDeviceid").val(actualDeviceid);
 			$("#userManDevDeviceModificationDeviceName").val(deviceNameInputValue);		
 			$("#userManDevDeviceModificationDeviceType").val(deviceTypeInputValue);
-			$("#userManDevDeviceModificationTypeName").val(deviceTypeNameInputValue);
+			$("#userManDevDeviceModificationDeviceTypeName").val(deviceTypeNameInputValue);
 			
-			// too small input size?! min size?!
 			var inputDefaultSize = 20;		
 			if(actualDeviceid.length < inputDefaultSize) {
 				$("#userManDevDeviceModificationDeviceid").attr("size", inputDefaultSize);
@@ -127,98 +116,130 @@
 			}
 			
 			if(deviceTypeNameInputValue.length < inputDefaultSize) {
-				$("#userManDevDeviceModificationTypeName").attr("size", inputDefaultSize);
+				$("#userManDevDeviceModificationDeviceTypeName").attr("size", inputDefaultSize);
 			} else {
-				$("#userManDevDeviceModificationTypeName").attr("size", deviceTypeNameInputValue.length);
+				$("#userManDevDeviceModificationDeviceTypeName").attr("size", deviceTypeNameInputValue.length);
 			}
 			
+			$("#userManDevModifyDeviceCollapseDIV").removeClass("collapse");
+			document.getElementById("userManDevModifyDeviceCollapseDIV").scrollIntoView();
 			
+
+		} catch(err) {
+			console.log(err);
+		}
+	});
+	
+	$("#userManDevDeviceModificationConfirmModificationBTN").click(function(event){
+		try {
+			event.preventDefault();
+			$("#userManDevResultOrErrorDIV").html("");
+			var deviceidInput = document.getElementById("userManDevDeviceModificationDeviceid");
+			var deviceNameInput = document.getElementById("userManDevDeviceModificationDeviceName");				
+			var deviceTypeInput = document.getElementById("userManDevDeviceModificationDeviceType");	
+			var deviceTypeNameInput = document.getElementById("userManDevDeviceModificationDeviceTypeName");
+
+			var hadError = 0;
+			var errorMessage = "";
 			
-			//alert(deviceNameInputValue);
+			if(deviceidInput.checkValidity() == false) {
+				hadError++;
+				errorMessage += "<p class='text-danger bg-primary'>Invalid deviceid!</p>";
+			}
+			
+			if(deviceNameInput.checkValidity() == false) {
+				hadError++;
+				errorMessage += "<p class='text-danger bg-primary'>Invalid device name!</p>";
+			}
+			
+			if(deviceTypeInput.checkValidity() == false) {
+				hadError++;
+				errorMessage += "<p class='text-danger bg-primary'>Invalid device type!</p>";
+			}
+			
+			if(deviceTypeNameInput.checkValidity() == false) {
+				hadError++;
+				errorMessage += "<p class='text-danger bg-primary'>Invalid device type name!</p>";
+			}
+			
+			if(Boolean(hadError)) {
+				$("#userManDevResultOrErrorDIV").html(errorMessage);
+				return;
+			}
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				type : "POST",
+				async : true,
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : {
+					userid : $("#userManDevOwneridHidden").val(),
+					deviceid : deviceidInput.value,
+					deviceName : deviceNameInput.value,
+					deviceType : deviceTypeInput.value,
+					deviceTypeName : deviceTypeNameInput.value
+				},
+				url : "<c:url value='/tracking/user/mandevupdatedevicedetails'></c:url>",
+				success : function(result, status, xhr) {
+					try {
+						if(result.executionState == true) {							
+							$("#userManDevResultOrErrorDIV")
+								.html("<p class='text-danger bg-primary'>Device modification was successful!</p>");
+							$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+							var deviceid = deviceidInput.value;
+							$("#userManDevDeviceName"+deviceid).val(deviceNameInput.value);
+							$("#userManDevDeviceType"+deviceid).val(deviceTypeInput.value);
+							$("#userManDevDeviceTypeName"+deviceid).val(deviceTypeNameInput.value);
+							resizeTableElements();
+							
+						} else {
+							var i = 0;
+							var messages = result.messages;
+							var length = messages.length;						
+							var errorMessages = "";
+							for(i; i < length; i++) {
+								errorMessages = "<p class='text-danger bg-primary'>" + messages[i] + "</p>";
+							}
+							$("#userManDevResultOrErrorDIV").html(errorMessages);
+							$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+						}					
+					} catch(err) {
+						alert(err);
+					}				
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+						$("#userManDevResultOrErrorDIV").html("<p class='text-danger bg-primary'>Service error!</p>");
+					} catch(err) {
+						console.log(err);
+					}									
+				}			
+			});			
 		} catch(err) {
 			alert(err);
 		}
 	});
-	
-	function alignDeviceidInputs(size) {
+
+	function resizeTableElements() {
 		try {
-			var deviceidInputs = $(".userManDevDeviceidClass");
-			var i = 0;
-			var length = deviceidInputs.length;
-			for(i = 0; i < length; i++) {
-				deviceidInputs[i].size = size;
-			}
+			var resizeInputs = ["userManDevDeviceidClass", "userManDevDeviceNameClass",
+			                    "userManDevDeviceTypeClass", "userManDevDeviceTypeNameClass"];
+			resizeTableElementsByClassname(resizeInputs);		
 		} catch(err) {
-			console.log(err);
+			alert(err);
 		}
-	} 
+	}
 	
 	/*
 	 * Table column width align.
 	 * Every column with the max column length.
 	 */ 
-	$(document).ready(function(){
-		
+	$(document).ready(function(){	
 		try {	
-			/*
-			 * deviceid align
-			 */
-			var deviceInputs = $(".userManDevDeviceidClass");
-			var maxSize = 0;
-			var length = deviceInputs.length;
-			var i = 0;
-			for(i; i < length; i++) {
-				if (maxSize < deviceInputs[i].size) {
-					maxSize = deviceInputs[i].size;
-				}
-			}
-			for(i = 0; i < length; i++) {
-				deviceInputs[i].size = maxSize;
-			}
-			
-			/*
-			 * device name align
-			 */
-			deviceInputs = $(".userManDevDeviceNameClass");
-			maxSize = 0;
-			length = deviceInputs.length;
-			i = 0;
-			for(i; i < length; i++) {
-				if (maxSize < deviceInputs[i].size) {
-					maxSize = deviceInputs[i].size;
-				}
-			}
-			for(i = 0; i < length; i++) {
-				deviceInputs[i].size = maxSize;
-			}
-			
-			deviceInputs = $(".userManDevDeviceTypeClass");
-			maxSize = 0;
-			length = deviceInputs.length;
-			i = 0;
-			for(i; i < length; i++) {
-				if (maxSize < deviceInputs[i].size) {
-					maxSize = deviceInputs[i].size;
-				}
-			}
-			for(i = 0; i < length; i++) {
-				deviceInputs[i].size = maxSize;
-			}
-			
-			deviceInputs = $(".userManDevDeviceTypeNameClass");
-			maxSize = 0;
-			length = deviceInputs.length;
-			i = 0;
-			for(i; i < length; i++) {
-				if (maxSize < deviceInputs[i].size) {
-					maxSize = deviceInputs[i].size;
-				}
-			}
-			for(i = 0; i < length; i++) {
-				deviceInputs[i].size = maxSize;
-			}
-			
-			
+			resizeTableElements();			
 		} catch(err) {
 			alert(err);
 		}
@@ -242,57 +263,68 @@
 				<p>Device onwerid: ${deviceOwnerid} <br/> Device owner name: ${deviceOwnerName}</p>
 			</div>
 			<div class="panel-body">
-				<div id="userManDevModifyDeviceDataDIV" class="table-responsive">
-					<table class="table">
-						<thead>
-							<tr>
-								<th>Deviceid</th>
-								<th>Device name</th>
-								<th>Device type</th>
-								<th>Delete type name</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>
-									<label></label>
-									<input type="text" value="" class="form-control"
-										id="userManDevDeviceModificationDeviceid" readonly="readonly">	
-								</td>
-								<td>
-									<label></label>
-									<input type="text" value="" class="form-control"
-										id="userManDevDeviceModificationDeviceName">	
-								</td>
-								<td>
-									<label></label>
-									<input type="text" value="" class="form-control"
-										id="userManDevDeviceModificationDeviceType">	
-								</td>
-								<td>
-									<label></label>
-									<input type="text" value="" class="form-control"
-										id="userManDevDeviceModificationTypeName">	
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<input type="button" value="Confirm modification!">
-								</td>
-								<td>
-									<input type="button" value="Cancel modification!"> 
-								</td>
-								<td>
-									
-								</td>
-								<td>
-									
-								</td>
-							</tr>
-						</tbody>
-					</table>
+				<div id="userManDevModifyDeviceDataDIV" class="table-responsive" >
+					<div id="userManDevModifyDeviceCollapseDIV" class="collapse">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Deviceid</th>
+									<th>Device name</th>
+									<th>Device type</th>
+									<th>Delete type name</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<label></label>
+										<input type="text" value="" class="form-control"
+											id="userManDevDeviceModificationDeviceid" 
+											readonly="readonly"
+											pattern="${deviceidPattern}">	
+									</td>
+									<td>
+										<label></label>
+										<input type="text" value="" class="form-control"
+											id="userManDevDeviceModificationDeviceName"
+											pattern="${deviceNamePattern}">	
+									</td>
+									<td>
+										<label></label>
+										<input type="text" value="" class="form-control"
+											id="userManDevDeviceModificationDeviceType"
+											pattern="${deviceTypePattern}">	
+									</td>
+									<td>
+										<label></label>
+										<input type="text" value="" class="form-control"
+											id="userManDevDeviceModificationDeviceTypeName"
+											pattern="${deviceTypeNamePattern}">	
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<input type="button" value="Confirm modification!"
+											id="userManDevDeviceModificationConfirmModificationBTN">
+									</td>
+									<td>
+										<input type="button" value="Cancel modification!"
+											id="userManDevDeviceModificationCancelModificationBTN"> 
+									</td>
+									<td>
+										<input type="button" value="Delete device!"
+											id="userManDevDeviceModificationDeleteDeviceBTN"> 
+									</td>
+									<td>
+										
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 				<div id="userManDevDeleteDeviceDIV">dadsa</div>
+				<div id="userManDevResultOrErrorDIV"></div>
 				<div style="overflow: auto; height: 800px">
 					<div class="table-responsive">
 						<table class="table" id="userManDevdataTables-example">
@@ -302,13 +334,12 @@
 									<th>Device name</th>
 									<th>Device type</th>
 									<th>Device type name</th>
-									<th>Delete device</th>
-									<th>Confirm modifications</th> 
+									<th>Device modification</th> 
 								</tr>
 							</thead>
 							<tbody>							
 								<c:forEach var="device" items="${devices}" >
-									<tr>
+									<tr id="userManDevDeviceRow${device.deviceid}">
 										<td>
 											<input type="text" readonly="readonly" 
 												value="${device.deviceid}"
@@ -337,16 +368,10 @@
 											id="userManDevDeviceTypeName${device.deviceid}"
 											size="${fn:length(device.deviceTypeName)}"
 											readonly="readonly">
-										</td>
+										</td>						
 											
 										<td><a href="${device.deviceid}" 
-										
-											class="">Delete device 
-											<span class="glyphicon glyphicon-ban-circle "></span></a>
-										</td>
-											
-										<td><a href="${device.deviceid}" 
-											class="userManDevStartDeviceModification">Confirm modifications
+											class="userManDevStartDeviceModification">Modify device
 											<span class="glyphicon glyphicon-ok-sign "></span></a>
 										</td>
 												

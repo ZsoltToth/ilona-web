@@ -66,31 +66,39 @@
 						email : $("#userAccManEmailTXT").val()
 					},
 					success : function(result, status, xhr) {
+						try {
+							if(result.executionState == true) {							
+								$("#userAccManUpdateDetailsErrorDIV")
+									.html("<p class='text-danger bg-primary'>Account updated successfully!</p>");
+								userAccManSavedUsername = $("#userAccManUsernameTXT").val();
+								userAccManSavedEmail = $("#userAccManEmailTXT").val();
+							} else {
+								var i = 0;
+								var messages = result.messages;
+								var length = messages.length;						
+								var errorMessages = "";
+								for(i; i < length; i++) {
+									errorMessages += "<p class='text-danger bg-primary'>" + messages[i] + "</p>";
+								}							
+								$("#userAccManUpdateDetailsErrorDIV").html(errorMessages);
+							}
+						} catch(err) {
+							console.log(err);
+						}
+						
 						/*
 						 * Write the response JSON into the text fields.
 						 */
-						userAccManSavedUsername = $("#userAccManUsernameTXT").val();
-						userAccManSavedEmail = $("#userAccManEmailTXT").val();
-						$("#userAccManUserChangeErrorSpan").html("Account updated successfully!");
+						
+						
 					},
 					error : function(xhr, status, error) {
 						try {
 							$("#userAccManUsernameTXT").val(userAccManSavedUsername);
 							$("#userAccManEmailTXT").val(userAccManSavedEmail);						
-							var Errors = JSON.parse(xhr.responseText);
-						} catch(err) {
-							/*
-							 * If the error was not from the controller 
-							 */
 							$("#userAccManUpdateDetailsErrorDIV").html("<p class='text-danger bg-primary'>Tracking service is offline!</p>");
-							return;
-						}
-						if(Errors instanceof Array) {						
-							var errorHtml = "";
-							for(var i = 0; i < Errors.length; i++) {
-								errorHtml += "<p class='text-danger bg-primary'>" + Errors[i] +"</p>"
-							}
-							$("#userAccManUpdateDetailsErrorDIV").html(errorHtml);
+						} catch(err) {
+							console.log(err);
 						}					
 					}
 				});
@@ -169,7 +177,7 @@
 		<div class="col-lg-12">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-					<h4><b>Account details change: <span id="userAccManUserChangeErrorSpan"></span></b></h4>
+					<h4><b>Account details change:</b></h4>
 				</div>
 				<div class="panel-body">
 					<label for="userAccManUseridTXT"id="userAccManUseridTXTLabel">
@@ -224,7 +232,7 @@
 						${emailRestriction}
 					</p>
 					
-					<input type="text"
+					<input type="email"
 						id="userAccManEmailTXT" 
 						class="form-control" 
 						required="required"
@@ -238,15 +246,13 @@
 				</div>
 				
 				<div class="panel-body" id="userAccManUpdateDetailsErrorDIV">
-					<c:forEach var="error" items="${changeDetailsErrors}">
-						<p class='text-danger bg-primary'>${error}</p>
-					</c:forEach>
+					
 				</div>
 			</div> <!-- panel primary basic details end -->
 				
 			<div class="panel panel-danger">
 				<div class="panel-heading">
-					<h4><b>Account password change: ${successfulPasswordModification}</b></h4>
+					<h4><b>Account password change:</b></h4>
 					
 				</div>
 				
@@ -292,9 +298,7 @@
 				</div>
 				
 				<div class="panel-body" id="userAccManChangePasswordErrorsDIV">
-					<c:forEach var="error" items="${passwordErrors}">
-						<p class='text-danger bg-primary'>${error}</p>
-					</c:forEach>
+					
 				</div>
 			</div> <!-- panel danger account password end -->
 		</div> <!-- colg 12 end -->

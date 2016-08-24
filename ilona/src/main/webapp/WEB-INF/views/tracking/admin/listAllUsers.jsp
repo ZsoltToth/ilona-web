@@ -93,6 +93,7 @@
 			<input type="checkbox" checked="checked"> Show Admins (Red background!)
 			</div>
 			<div class="panel-body">
+				<div><p class="bg-primary">${serviceError}</p></div>
 				<div class="table-responsive">
 					<table class="table"
 						class="table table-striped table-bordered table-hover"

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -14,24 +16,32 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import uni.miskolc.ips.ilona.tracking.controller.model.ExecutionResultDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.LoginAttemptFormStorage;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserBaseDetailsDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserDeviceDataDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserSecurityDetails;
+import uni.miskolc.ips.ilona.tracking.controller.util.ValidateDeviceData;
+import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.persist.UserAndDeviceDAO;
+import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
+import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedDeviceException;
+import uni.miskolc.ips.ilona.tracking.service.exceptions.UserNotFoundException;
+import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 @Controller
 @RequestMapping(value = "/tracking/admin")
 public class AdminListAllUsersController {
 
-	@Autowired
-	private UserAndDeviceDAO userDeviceDAO;
+	@Resource(name = "UserAndDeviceService")
+	private UserAndDeviceService userAndDeviceService;
 
-	@Autowired
+	@Resource(name = "mailSender")
 	private MailSender mailSender;
 
 	@RequestMapping(value = "/listallusers")
@@ -40,8 +50,7 @@ public class AdminListAllUsersController {
 		Collection<UserData> users = new ArrayList<UserData>();
 		Collection<UserBaseDetailsDTO> filteredUsers = new ArrayList<UserBaseDetailsDTO>();
 		try {
-
-			users = userDeviceDAO.getAllUsers();
+			users = userAndDeviceService.getAllUsers();
 
 			for (UserData user : users) {
 				UserBaseDetailsDTO newUser = new UserBaseDetailsDTO();
@@ -59,9 +68,8 @@ public class AdminListAllUsersController {
 				newUser.setAdminRole(isAdmin);
 				filteredUsers.add(newUser);
 			}
-
 		} catch (Exception e) {
-
+			userlistPage.addObject("serviceError", "Service error!");
 		}
 		userlistPage.addObject("users", filteredUsers);
 		return userlistPage;
@@ -77,8 +85,8 @@ public class AdminListAllUsersController {
 
 		Collection<DeviceData> devices = new ArrayList<>();
 		try {
-			UserData user = userDeviceDAO.getUser(userid);
-			devices = userDeviceDAO.readUserDevices(user);
+			UserData user = userAndDeviceService.getUser(userid);
+			devices = userAndDeviceService.readUserDevices(user);
 			mav.addObject("devices", devices);
 			mav.addObject("deviceOwner", userid);
 		} catch (Exception e) {
@@ -92,14 +100,14 @@ public class AdminListAllUsersController {
 		ModelAndView mav = new ModelAndView("tracking/admin/userDevices");
 		Collection<DeviceData> newDeviceList = new ArrayList<>();
 		try {
-			UserData user = userDeviceDAO.getUser(device.getUserid());
+			UserData user = userAndDeviceService.getUser(device.getUserid());
 			DeviceData newDevice = new DeviceData();
 			newDevice.setDeviceid(device.getDeviceid());
 			newDevice.setDeviceName(device.getDeviceName());
 			newDevice.setDeviceType(device.getDeviceType());
 			newDevice.setDeviceTypeName(device.getDeviceTypeName());
-			userDeviceDAO.updateDevice(newDevice, user);
-			newDeviceList = userDeviceDAO.readUserDevices(user);
+			userAndDeviceService.updateDevice(newDevice, user);
+			newDeviceList = userAndDeviceService.readUserDevices(user);
 			mav.addObject("devices", newDeviceList);
 		} catch (Exception e) {
 			mav.addObject("executionError", "Device update failed!");
@@ -113,15 +121,15 @@ public class AdminListAllUsersController {
 		ModelAndView mav = new ModelAndView("tracking/admin/userDevices");
 		Collection<DeviceData> newDeviceList = new ArrayList<>();
 		try {
-			UserData user = userDeviceDAO.getUser(device.getUserid());
+			UserData user = userAndDeviceService.getUser(device.getUserid());
 			DeviceData deletableDevice = new DeviceData();
 			deletableDevice.setDeviceid(device.getDeviceid());
 			deletableDevice.setDeviceName(device.getDeviceName());
 			deletableDevice.setDeviceType(device.getDeviceType());
 			deletableDevice.setDeviceTypeName(device.getDeviceTypeName());
-			userDeviceDAO.deleteDevice(deletableDevice, user);
+			userAndDeviceService.deleteDevice(deletableDevice, user);
 
-			newDeviceList = userDeviceDAO.readUserDevices(user);
+			newDeviceList = userAndDeviceService.readUserDevices(user);
 			mav.addObject("devices", newDeviceList);
 
 		} catch (Exception e) {
@@ -137,9 +145,9 @@ public class AdminListAllUsersController {
 		Collection<UserData> users = new ArrayList<UserData>();
 		Collection<UserBaseDetailsDTO> filteredUsers = new ArrayList<UserBaseDetailsDTO>();
 		try {
-			userDeviceDAO.deleteUser(userid);
+			// userAndDeviceService.deleteUser(userid);
 
-			users = userDeviceDAO.getAllUsers();
+			users = userAndDeviceService.getAllUsers();
 
 			for (UserData user : users) {
 				UserBaseDetailsDTO newUser = new UserBaseDetailsDTO();
@@ -174,7 +182,7 @@ public class AdminListAllUsersController {
 		}
 
 		try {
-			UserData user = userDeviceDAO.getUser(userid);
+			UserData user = userAndDeviceService.getUser(userid);
 			mav.addObject("Userid", user.getUserid());
 			mav.addObject("Username", user.getUsername());
 			mav.addObject("Email", user.getEmail());
@@ -235,26 +243,52 @@ public class AdminListAllUsersController {
 	public ModelAndView createDeviceForUserRequestHandler(@RequestParam("userid") String userid) {
 		ModelAndView mav = new ModelAndView("tracking/admin/createNewDevice");
 		mav.addObject("deviceOwnerid", userid);
+		fillModelAndViewWithCreateDeviceData(mav);
 		return mav;
 	}
 
 	@RequestMapping(value = "/createnewdeviceforuser", method = { RequestMethod.POST })
-	public ModelAndView createDeviceForUserCreateDeviceRequestHandler(@ModelAttribute() UserDeviceDataDTO newDevice) {
-		ModelAndView mav = new ModelAndView("tracking/admin/createNewDevice");
-		//
+	@ResponseBody
+	public ExecutionResultDTO createDeviceForUserCreateDeviceRequestHandler(
+			@ModelAttribute() UserDeviceDataDTO newDevice) {
+
+		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		if (newDevice == null) {
+			result.addMessage("User is null!");
+		}
+
+		ValidityStatusHolder errors = new ValidityStatusHolder();
+		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(newDevice.getDeviceid()));
+		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceName(newDevice.getDeviceName()));
+		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceType(newDevice.getDeviceType()));
+		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceTypeName(newDevice.getDeviceTypeName()));
+
+		if (!errors.isValid()) {
+			result.setMessages(errors.getErrors());
+			return result;
+		}
+
 		try {
-			UserData user = userDeviceDAO.getUser(newDevice.getUserid());
+			UserData user = userAndDeviceService.getUser(newDevice.getUserid());
 			DeviceData device = new DeviceData();
 			device.setDeviceid(newDevice.getDeviceid());
 			device.setDeviceName(newDevice.getDeviceName());
 			device.setDeviceType(newDevice.getDeviceType());
 			device.setDeviceTypeName(newDevice.getDeviceTypeName());
-			userDeviceDAO.storeDevice(device, user);
+			userAndDeviceService.storeDevice(device, user);
+		} catch (UserNotFoundException e) {
+			result.addMessage("User not found with ID: " + newDevice.getUserid());
+			return result;
+		} catch (DuplicatedDeviceException e) {
+			result.addMessage("A device is already exists with ID: " + newDevice.getDeviceid());
+			return result;
 		} catch (Exception e) {
-			mav.addObject("OperationError", "An error occured!");
+			result.addMessage("Service error!");
+			return result;
 		}
-		mav.addObject("deviceOwnerid", newDevice.getUserid());
-		return mav;
+		result.setExecutionState(true);
+		result.addMessage("The device has been created!");
+		return result;
 	}
 
 	@RequestMapping(value = "/automatedpasswordreset", method = { RequestMethod.POST })
@@ -282,8 +316,22 @@ public class AdminListAllUsersController {
 		return null;
 	}
 
-	public void setUserDeviceDAO(UserAndDeviceDAO userDeviceDAO) {
-		this.userDeviceDAO = userDeviceDAO;
+	private ModelAndView fillModelAndViewWithCreateDeviceData(ModelAndView mav) {
+		mav.addObject("deviceidRestriction", WebpageInformationProvider.getDeviceidrestrictionmessage());
+		mav.addObject("deviceNameRestriction", WebpageInformationProvider.getDevicenamerestrictionmessage());
+		mav.addObject("deviceTypeRestriction", WebpageInformationProvider.getDevicetyperestrictionmessage());
+		mav.addObject("deviceTypeNameRestriction", WebpageInformationProvider.getDevicetypenamerestrictionmessage());
+
+		mav.addObject("deviceidPattern", WebpageInformationProvider.getDeviceidpattern());
+		mav.addObject("deviceNamePattern", WebpageInformationProvider.getDevicenamepattern());
+		mav.addObject("deviceTypePattern", WebpageInformationProvider.getDevicetypepattern());
+		mav.addObject("deviceTypeNamePattern", WebpageInformationProvider.getDevicetypenamepattern());
+
+		return mav;
+	}
+
+	public void setUserAndDeviceService(UserAndDeviceService userAndDeviceService) {
+		this.userAndDeviceService = userAndDeviceService;
 	}
 
 	public void setMailSender(MailSender mailSender) {

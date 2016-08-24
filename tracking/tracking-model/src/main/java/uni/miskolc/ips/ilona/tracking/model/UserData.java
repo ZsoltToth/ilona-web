@@ -5,9 +5,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+
+import javax.xml.soap.Node;
 
 /**
  * Dokumentáció készítése!
@@ -294,14 +297,15 @@ public class UserData implements Comparable<UserData>, Serializable, Cloneable {
 		if (noDevice == null) {
 			return null;
 		}
-		Iterator<DeviceData> devIt = this.devices.iterator();
-		while (devIt.hasNext()) {
-			DeviceData data = devIt.next();
-			if (data.getDeviceid().equals(noDevice.getDeviceid())) {
-				devIt.remove();
-				return noDevice;
+		
+		Collection<DeviceData> removableDevs = new ArrayList<DeviceData>();
+		String devid = noDevice.getDeviceid();
+		for(DeviceData dev : devices) {
+			if(dev.getDeviceid().equals(devid)) {
+				removableDevs.add(dev);
 			}
 		}
+		devices.removeAll(removableDevs);
 		return noDevice;
 	}
 

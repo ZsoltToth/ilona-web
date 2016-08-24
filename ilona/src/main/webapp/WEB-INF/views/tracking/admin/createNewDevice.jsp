@@ -13,32 +13,93 @@
 
 <script type="text/javascript">
 
+	$('[data-toggle="tooltip"]').tooltip();
+	$('[data-toggle="popover"]').popover();
+
 	$("#adminCreateNewDeviceCreateNewDeviceBTN").click(function(event){
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		
-		$.ajax({
-			type : "POST",
-			async : true,
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			url : "<c:url value='/tracking/admin/createnewdeviceforuser'></c:url>",
-			data : {
-				userid : $("#adminCreateNewDeviceOwnerIDHIDDEN").val(),
-				deviceid : $("#adminCreateNewDeviceDeviceidTXT").val(),
-				deviceName : $("#adminCreateNewDeviceDeviceNameTXT").val(),
-				deviceType : $("#adminCreateNewDeviceDeviceTypeTXT").val(),
-				deviceTypeName : $("#adminCreateNewDeviceDeviceTypeNameTXT").val()
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				alert("Error device creation!"+status+error);
+		try {
+			event.preventDefault();
+			
+			
+			var deviceIdElement = document.getElementById("adminCreateNewDeviceDeviceidTXT");
+			var deviceNameElement = document.getElementById("adminCreateNewDeviceDeviceNameTXT");
+			var deviceTypeElement = document.getElementById("adminCreateNewDeviceDeviceTypeTXT");
+			var deviceTypeNameElement = document.getElementById("adminCreateNewDeviceDeviceTypeNameTXT");
+			
+			var hadError = 0;
+			var errorText = "";
+			
+			if (deviceIdElement.checkValidity() == false) {
+				hadError++;
+				errorText += "<p class='text-danger bg-primary'>Invalid deviceid!</p>";
 			}
-		});
+			
+			if(deviceNameElement.checkValidity() == false) {
+				hadError++;
+				errorText += "<p class='text-danger bg-primary'>Invalid device name!</p>";
+			}
+			
+			if(deviceTypeElement.checkValidity() == false) {
+				hadError++;
+				errorText += "<p class='text-danger bg-primary'>Invalid device type!</p>";
+			}
+			
+			if(deviceTypeNameElement.checkValidity() == false) {
+				hadError++;
+				errorText += "<p class='text-danger bg-primary'>Invalid device type name!</p>";
+			}
+			
+			if(Boolean(hadError)) {
+				$("#adminCreateNewDeviceResultDIV").html(errorText);
+				return;
+			}
+			
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			$.ajax({
+				type : "POST",
+				async : true,
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				url : "<c:url value='/tracking/admin/createnewdeviceforuser'></c:url>",
+				data : {
+					userid : $("#adminCreateNewDeviceOwnerIDHIDDEN").val(),
+					deviceid : $("#adminCreateNewDeviceDeviceidTXT").val(),
+					deviceName : $("#adminCreateNewDeviceDeviceNameTXT").val(),
+					deviceType : $("#adminCreateNewDeviceDeviceTypeTXT").val(),
+					deviceTypeName : $("#adminCreateNewDeviceDeviceTypeNameTXT").val()
+				},
+				success : function(result, status, xhr) {
+					if(result.executionState == true) {
+						$("#adminCreateNewDeviceDeviceidTXT").val("");
+						$("#adminCreateNewDeviceDeviceNameTXT").val("");
+						$("#adminCreateNewDeviceDeviceTypeTXT").val("");
+						$("#adminCreateNewDeviceDeviceTypeNameTXT").val("");
+						$("#adminCreateNewDeviceResultDIV")
+							.html("<p class='text-danger bg-primary'>The device has been created!</p>");
+					} else {
+						$("#adminCreateNewDeviceDeviceidTXT").val("");
+						$("#adminCreateNewDeviceDeviceNameTXT").val("");
+						$("#adminCreateNewDeviceDeviceTypeTXT").val("");
+						$("#adminCreateNewDeviceDeviceTypeNameTXT").val("");
+						var i = 0;
+						var messages = result.messages;
+						var length = messages.length;
+						var resultStatus = "";
+						for(i; i < length; i++) {
+							resultStatus += "<p class='bg-primary'>" + messages[i] + "</p>";
+						}					
+						$("#adminCreateNewDeviceResultDIV").html(resultStatus);
+					}
+				},
+				error : function(xhr, status, error) {
+					alert("Error device creation!"+status+error);
+				}
+			});
+		} catch(err) {
+			console.log(err);
+		}
 	});	
 </script>
 
@@ -52,84 +113,107 @@
 				<p>Userid: ${deviceOwnerid}</p>
 			</div>
 			<div class="panel-body">
+				<div id="adminCreateNewDeviceResultDIV"></div>
 				
-				<label for="adminCreateNewDeviceDeviceidTXT">Deviceid: <br /> For more information:
+				<label for="adminCreateNewDeviceDeviceidTXT">Deviceid: <br /> 
+					<a href="#adminCreateNewDeviceDeviceidDropdown" 
+						data-toggle="collapse">Click for more information:
+					</a>
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
-						data-content="${useridRestriction}"
+						data-content="${deviceidRestriction}"
 						title="The userid can contain the following elements:"
 						class="fa  fa-info-circle">
 					</span>
 				</label>
-					
+				<p id="adminCreateNewDeviceDeviceidDropdown" class="collapse">
+					${deviceidRestriction}
+				</p>
+				
 				<input type="text"
 					class="form-control"
 					id="adminCreateNewDeviceDeviceidTXT"
 					required="required"
 					placeholder="Please type in your userid!"
-					pattern="${useridPattern}"
+					pattern="${deviceidPattern}"
 					name="userid"> <br />
 					
-				<label for="adminCreateNewDeviceDeviceNameTXT">Device name: <br /> For more information:
+				<label for="adminCreateNewDeviceDeviceNameTXT">Device name: <br />
+					<a href="#adminCreateNewDeviceDeviceNameDropdown" 
+						data-toggle="collapse">Click for more information:
+					</a>
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
-						data-content="${useridRestriction}"
+						data-content="${deviceNameRestriction}"
 						title="The userid can contain the following elements:"
 						class="fa  fa-info-circle">
 					</span>
 				</label>
+				<p id="adminCreateNewDeviceDeviceNameDropdown" class="collapse">
+					${deviceNameRestriction}
+				</p>
 					
 				<input type="text"
 					class="form-control"
 					id="adminCreateNewDeviceDeviceNameTXT"
 					required="required"
 					placeholder="Please type in your userid!"
-					pattern="${useridPattern}"
+					pattern="${deviceNamePattern}"
 					name="userid"> <br />
 					
-				<label for="adminCreateNewDeviceDeviceTypeTXT">Device type: <br /> For more information:
+				<label for="adminCreateNewDeviceDeviceTypeTXT">Device type: <br />
+					<a href="#adminCreateNewDeviceDeviceTypeDropdown" 
+						data-toggle="collapse">Click for more information:
+					</a>
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
-						data-content="${useridRestriction}"
+						data-content="${deviceTypeRestriction}"
 						title="The userid can contain the following elements:"
 						class="fa  fa-info-circle">
 					</span>
 				</label>
+				<p id="adminCreateNewDeviceDeviceTypeDropdown" class="collapse">
+					${deviceTypeRestriction}
+				</p>
 					
 				<input type="text"
 					class="form-control"
 					id="adminCreateNewDeviceDeviceTypeTXT"
 					required="required"
 					placeholder="Please type in your userid!"
-					pattern="${useridPattern}"
+					pattern="${deviceTypePattern}"
 					name="userid"> <br />
 					
-				<label for="adminCreateNewDeviceDeviceTypeNameTXT">Device type name: <br /> For more information:
+				<label for="adminCreateNewDeviceDeviceTypeNameTXT">Device type name: <br />
+					<a href="#adminCreateNewDeviceDeviceTypeNameDropdown" 
+						data-toggle="collapse">Click for more information:
+					</a>
 					<span data-toggle="popover"
 						data-html="true"
 						data-trigger="hover"
-						data-content="${useridRestriction}"
+						data-content="${deviceTypeNameRestriction}"
 						title="The userid can contain the following elements:"
 						class="fa  fa-info-circle">
 					</span>
 				</label>
+				<p id="adminCreateNewDeviceDeviceTypeNameDropdown" class="collapse">
+					${deviceTypeNameRestriction}
+				</p>
 					
 				<input type="text"
 					class="form-control"
 					id="adminCreateNewDeviceDeviceTypeNameTXT"
 					required="required"
 					placeholder="Please type in your userid!"
-					pattern="${useridPattern}"
+					pattern="${deviceTypeNamePattern}"
 					name="userid"> <br />
 				
 				<input type="button" id="adminCreateNewDeviceCreateNewDeviceBTN" value="Add Device!" class="btn btn-primary">
 				<input type="hidden" id="adminCreateNewDeviceOwnerIDHIDDEN" value="${deviceOwnerid}">
-			</div>
-			<div class="panel-body">${OperationError}</div>
+			</div>		
 		</div>
-
 	</div>
 </div>
