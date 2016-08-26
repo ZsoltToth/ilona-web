@@ -65,9 +65,9 @@
 		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
 		<constructor-arg name="strength" value="10"></constructor-arg>
 	</bean>
-
+	<!-- 
 	<bean id="customLogout" class="security.CustomlogoutSuccerHandler"></bean>
-
+ 	-->
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host" value="smtp.gmail.com" />
 		<property name="port" value="587" />

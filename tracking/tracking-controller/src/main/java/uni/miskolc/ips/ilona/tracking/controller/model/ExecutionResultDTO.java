@@ -4,12 +4,28 @@ import java.util.Collection;
 
 public class ExecutionResultDTO {
 
+	/**
+	 * 100: OK <br>
+	 * 200: Parameter error <br>
+	 * 300: Validity error <br>
+	 * 400: Service error <br>
+	 * 500: Server error (Timeout in the ajax)<br>
+	 * 600+: Controller defines errors, arbitrary code and meaning
+	 */
+	private int responseState;
+
 	private boolean executionState;
 
 	private Collection<String> messages;
 
 	public ExecutionResultDTO() {
 
+	}
+
+	public ExecutionResultDTO(int responseState, Collection<String> messages) {
+		super();
+		this.responseState = responseState;
+		this.messages = messages;
 	}
 
 	public ExecutionResultDTO(boolean executionState, Collection<String> messages) {
@@ -22,11 +38,11 @@ public class ExecutionResultDTO {
 		if (message == null) {
 			return;
 		}
-		if(messages != null) {
+		if (messages != null) {
 			messages.add(message);
 		}
 	}
-	
+
 	public boolean isExecutionState() {
 		return executionState;
 	}
@@ -41,6 +57,14 @@ public class ExecutionResultDTO {
 
 	public void setMessages(Collection<String> messages) {
 		this.messages = messages;
+	}
+
+	public int getResponseState() {
+		return responseState;
+	}
+
+	public void setResponseState(int responseState) {
+		this.responseState = responseState;
 	}
 
 }

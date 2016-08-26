@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * THIS CLASS IS NO THREADSAFE!
+ * THIS CLASS IS NOT THREADSAFE!
  * 
  * @author Patrik / A5USL0
  *
@@ -24,7 +24,6 @@ public class ValidityStatusHolder {
 		} else {
 			return false;
 		}
-
 	}
 
 	public void appendValidityStatusHolder(ValidityStatusHolder statusHolder) {
@@ -43,7 +42,7 @@ public class ValidityStatusHolder {
 	}
 
 	public void addValidityError(String validityError) {
-		if(validityError == null) {
+		if (validityError == null) {
 			return;
 		}
 		errors.add(validityError);
@@ -53,19 +52,22 @@ public class ValidityStatusHolder {
 		if (validityErrors == null) {
 			return;
 		}
-		
-		errors.addAll(validityErrors);
+		for (String error : validityErrors) {
+			if (error != null) {
+				errors.add(error);
+			}
+		}
 	}
-	
+
 	public String getErrorsAsString() {
 		StringBuilder builder = new StringBuilder();
 		for (String error : errors) {
-			builder.append(error);
+			builder.append(error + " ");
 		}
 		return builder.toString();
 	}
 
 	public List<String> getErrors() {
-		return errors;
+		return new ArrayList<>(errors);
 	}
 }

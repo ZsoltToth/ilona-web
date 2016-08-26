@@ -6,7 +6,7 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 public class ValidateUserData {
 
-	private static String useridPattern = "[a-zA-Z]{1}[a-zA-Z0-9]{4,19}";
+	private static String useridPattern = "^[a-zA-Z]{1}[a-zA-Z0-9]{4,19}$";
 	private static String userNamePattern = "^[a-zA-ZöüóőúéáűÖÜÓŐÚŰÁÉ][a-zA-ZöüóőúéáűÖÜÓŐÚŰÁÉ0-9]{4,30}$";
 	private static String emailPattern = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 

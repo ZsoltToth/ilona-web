@@ -8,19 +8,24 @@ import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.controller.exception.PasswordRecoveryTokenValidityErrorException;
+import uni.miskolc.ips.ilona.tracking.controller.exception.TrackingServiceErrorException;
+import uni.miskolc.ips.ilona.tracking.controller.model.ExecutionResultDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserCreationDTO;
 import uni.miskolc.ips.ilona.tracking.controller.passwordrecovery.PasswordRecoveryManager;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
@@ -90,7 +95,7 @@ public class TrackingEntryPointController {
 	 *         and/or the actual authority of the current user.
 	 */
 	@RequestMapping(value = "/maincontentdecision", method = { RequestMethod.GET, RequestMethod.POST })
-	public ModelAndView createTrackingContentpage(Authentication authentication) {
+	public ModelAndView createTrackingContentpage(Authentication authentication) throws InterruptedException {
 		/*
 		 * 
 		 * RETURN PAGE DEPENDS ON THE ACTUAL AUTHENTICATION! anonymousUser
@@ -171,17 +176,12 @@ public class TrackingEntryPointController {
 	}
 
 	@RequestMapping(value = "/getmainpagesignup", method = { RequestMethod.POST })
-	public ModelAndView generateMainpageSignup() {
+	public ModelAndView generateMainpageSignup() throws InterruptedException {
 		ModelAndView mav = new ModelAndView("tracking/mainpageSignup");
-
 		mav.addObject("useridRestriction", WebpageInformationProvider.getUseridRestrictionMessage());
 		mav.addObject("usernameRestriction", WebpageInformationProvider.getUsernameRestrictionMessage());
 		mav.addObject("passwordRestriction", WebpageInformationProvider.getPasswordRestrictionMessage());
 		mav.addObject("emailRestriction", WebpageInformationProvider.getEmailRestrictionMessage());
-
-		mav.addObject("useridPattern", WebpageInformationProvider.getUseridpattern());
-		mav.addObject("usernamePattern", WebpageInformationProvider.getUsernamepattern());
-		mav.addObject("passwordPattern", WebpageInformationProvider.getPasswordpattern());
 
 		return mav;
 	}
@@ -193,77 +193,93 @@ public class TrackingEntryPointController {
 		return mav;
 	}
 
+	/**
+	 * 
+	 * @param user
+	 * @return {@link ExecutionResultDTO}<br>
+	 *         <ul>
+	 *         <li>100: OK</li>
+	 *         <li>200: Parameter error</li>
+	 *         <li>300: Validity error</li>
+	 *         <li>400: Service error</li>
+	 *         <li>500: Server error(timeout)</li>
+	 *         <li>600: Duplicated user error</li>
+	 *         </ul>
+	 */
 	@RequestMapping(value = "/registeruser", method = { RequestMethod.POST })
 	@ResponseBody
-	public Collection<String> registerUser(@ModelAttribute(name = "user") UserCreationDTO user) {
-		// ModelAndView mav = new ModelAndView("tracking/mainpageSignup");
-		/*
-		 * Validity check.
-		 */
-		ValidityStatusHolder errors = new ValidityStatusHolder();
-		errors = ValidateUserData.validateUserid(user.getUserid());
-		errors.appendValidityStatusHolder(ValidateUserData.validateUsername(user.getUsername()));
-		errors.appendValidityStatusHolder(ValidateUserData.validateEmail(user.getEmail()));
-		errors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
+	public ExecutionResultDTO registerUser(@ModelAttribute(name = "user") UserCreationDTO user) {
 
-		/*
-		 * Empty error/success holder.
-		 */
-		Collection<String> returnValues = new ArrayList<String>();
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateUserData.validateUserid(user.getUserid()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateUsername(user.getUsername()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateEmail(user.getEmail()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
 
-		if (errors.isValid()) {
-			try {
-				/*
-				 * Password encoding.
-				 */
-				String encodedPassword = passwordEncoder.encode(user.getPassword());
-				/*
-				 * ROLES setup.
-				 */
-				ArrayList<String> roles = new ArrayList<String>();
-				roles.add("ROLE_USER");
-
-				/*
-				 * Credentials validity setup.
-				 */
-				Date passwordExpired = new Date(new Date().getTime() + centralManager.getCredentialsValidityPeriod());
-
-				/*
-				 * Setup other still null fields.
-				 */
-				Collection<Date> badLogins = new ArrayList<Date>();
-				Collection<DeviceData> devices = new ArrayList<DeviceData>();
-				/*
-				 * Create user with the given details. The account will be
-				 * enabled and non locked and the last login date is the account
-				 * creation time.
-				 */
-				UserData userDB = new UserData(user.getUserid(), user.getUsername(), user.getEmail(), encodedPassword,
-						true, roles, new Date(), passwordExpired, new Date(), true, badLogins, devices);
-				/*
-				 * 
-				 */
-				this.userDeviceService.createUser(userDB);
-			} catch (DuplicatedUserException e) {
-				logger.error("Duplicated userid: " + user.getUserid());
-				returnValues.add("Duplicated user with this userid: " + user.getUserid());
-				return returnValues;
-			} catch (ServiceGeneralErrorException e) {
-				logger.error("Error: " + e.getMessage());
-				returnValues.add("There has been an error with the service, the account is not created!");
-				return returnValues;
-			} catch (Exception e) {
-				logger.error("Error: " + e.getMessage());
-				returnValues.add("There has been an error with the service, the account is not created!");
-				return returnValues;
+			if (!errors.isValid()) {
+				result.setResponseState(300);
+				result.setMessages(errors.getErrors());
+				return result;
 			}
-		} else {
-			logger.info("User creation failed with values " + user.toString());
-			returnValues.addAll(errors.getErrors());
-			return returnValues;
+		} catch (Exception e) {
+			result.setResponseState(400);
+			result.addMessage(e.getMessage());
+			return result;
 		}
-		returnValues.add("The account has been successfully created!");
-		return returnValues;
+		try {
+
+			/*
+			 * Password encoding.
+			 */
+			String encodedPassword = passwordEncoder.encode(user.getPassword());
+			/*
+			 * ROLES setup.
+			 */
+			ArrayList<String> roles = new ArrayList<String>();
+			roles.add("ROLE_USER");
+
+			/*
+			 * Credentials validity setup.
+			 */
+			Date passwordExpired = new Date(new Date().getTime() + centralManager.getCredentialsValidityPeriod());
+
+			/*
+			 * Setup other still null fields.
+			 */
+			Collection<Date> badLogins = new ArrayList<Date>();
+			Collection<DeviceData> devices = new ArrayList<DeviceData>();
+			/*
+			 * Create user with the given details. The account will be enabled
+			 * and non locked and the last login date is the account creation
+			 * time.
+			 */
+			UserData userDB = new UserData(user.getUserid(), user.getUsername(), user.getEmail(), encodedPassword, true,
+					roles, new Date(), passwordExpired, new Date(), true, badLogins, devices);
+			/*
+			 * 
+			 */
+			this.userDeviceService.createUser(userDB);
+		} catch (DuplicatedUserException e) {
+			logger.error("Duplicated userid: " + user.getUserid());
+			result.addMessage("Duplicated user with this userid: " + user.getUserid());
+			result.setResponseState(600);
+			return result;
+		} catch (ServiceGeneralErrorException e) {
+			logger.error("Error: " + e.getMessage());
+			result.addMessage("There has been an error with the service, the account is not created!");
+			result.setResponseState(400);
+			return result;
+		} catch (Exception e) {
+			logger.error("Error: " + e.getMessage());
+			result.addMessage("There has been an error with the service, the account is not created!");
+			result.setResponseState(400);
+			return result;
+		}
+
+		result.addMessage("Account has been created!");
+		return result;
 	}
 
 	@RequestMapping(value = "/resetpassword", method = { RequestMethod.POST })
@@ -297,6 +313,13 @@ public class TrackingEntryPointController {
 			return "Password recovery error!";
 		}
 		return "The new password has been sent!";
+	}
+
+	@ExceptionHandler(TrackingServiceErrorException.class)
+	@ResponseBody
+	@ResponseStatus(code = HttpStatus.CREATED)
+	public String dadsa() {
+		return "";
 	}
 
 	public void setUserDeviceService(UserAndDeviceService userDeviceService) {

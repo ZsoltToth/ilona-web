@@ -123,8 +123,6 @@
 			
 			$("#userManDevModifyDeviceCollapseDIV").removeClass("collapse");
 			document.getElementById("userManDevModifyDeviceCollapseDIV").scrollIntoView();
-			
-
 		} catch(err) {
 			console.log(err);
 		}
@@ -323,7 +321,6 @@
 						</table>
 					</div>
 				</div>
-				<div id="userManDevDeleteDeviceDIV">dadsa</div>
 				<div id="userManDevResultOrErrorDIV"></div>
 				<div style="overflow: auto; height: 800px">
 					<div class="table-responsive">

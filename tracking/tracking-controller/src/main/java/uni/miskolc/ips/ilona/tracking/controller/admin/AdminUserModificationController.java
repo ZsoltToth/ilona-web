@@ -1,11 +1,17 @@
 package uni.miskolc.ips.ilona.tracking.controller.admin;
 
 import java.nio.file.AccessDeniedException;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,29 +19,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.controller.model.UserBaseDetailsDTO;
+import uni.miskolc.ips.ilona.tracking.controller.model.UserSecurityDetails;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.persist.UserAndDeviceDAO;
+import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
 
 @Controller
 @RequestMapping(value = "/tracking/admin")
 public class AdminUserModificationController {
 
-	@Autowired
-	private UserAndDeviceDAO userDeviceDAO;
+	@Resource(name = "UserAndDeviceService")
+	private UserAndDeviceService userAndDeviceService;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	@Resource(name = "mailSender")
+	private MailSender mailSender;
 
 	@RequestMapping(value = "/usermodresetaccountexpiration", method = { RequestMethod.POST })
 	@ResponseBody
 	public Date accountExpirationResetHandler(@RequestParam("userid") String userid) throws AccessDeniedException {
 
 		try {
-			UserData user = userDeviceDAO.getUser(userid);
+			UserData user = userAndDeviceService.getUser(userid);
 			user.setLastLoginDate(new Date());
-			userDeviceDAO.updateUser(user);
+			userAndDeviceService.updateUser(user);
 			return new Date();
 
 		} catch (Exception e) {
@@ -54,10 +65,10 @@ public class AdminUserModificationController {
 		// validation!
 
 		try {
-			UserData newUser = userDeviceDAO.getUser(user.getUserid());
+			UserData newUser = userAndDeviceService.getUser(user.getUserid());
 			String hashedPassword = passwordEncoder.encode(user.getPassword());
 			newUser.setPassword(hashedPassword);
-			userDeviceDAO.updateUser(newUser);
+			userAndDeviceService.updateUser(newUser);
 			return "Password has been modified successfully!";
 
 		} catch (Exception e) {
@@ -75,7 +86,7 @@ public class AdminUserModificationController {
 		// validation!
 
 		try {
-			UserData updatedUser = userDeviceDAO.getUser(user.getUserid());
+			UserData updatedUser = userAndDeviceService.getUser(user.getUserid());
 			updatedUser.setUsername(user.getUsername());
 			updatedUser.setEmail(user.getEmail());
 			updatedUser.setEnabled(user.isEnabled());
@@ -85,7 +96,7 @@ public class AdminUserModificationController {
 				roles.add("ROLE_ADMIN");
 			}
 			updatedUser.setRoles(roles);
-			userDeviceDAO.updateUser(updatedUser);
+			userAndDeviceService.updateUser(updatedUser);
 			return "Password has been modified successfully!";
 
 		} catch (Exception e) {
@@ -103,10 +114,10 @@ public class AdminUserModificationController {
 		// validation!
 
 		try {
-			UserData updatedUser = userDeviceDAO.getUser(userid);
+			UserData updatedUser = userAndDeviceService.getUser(userid);
 			Date newPasswordExpiration = new Date(new Date().getTime() + 31536000000L);
 			updatedUser.setCredentialNonExpiredUntil(newPasswordExpiration);
-			userDeviceDAO.updateUser(updatedUser);
+			userAndDeviceService.updateUser(updatedUser);
 
 			return newPasswordExpiration;
 
@@ -120,18 +131,18 @@ public class AdminUserModificationController {
 	@ResponseBody
 	public String accountManagementUpdateLoginAttemptsHandler(@RequestParam("userid") String userid,
 			@RequestParam(value = "attempts[]", required = false) String[] loginAttempts) throws AccessDeniedException {
-		// integrity check!	
+		// integrity check!
 		// validation!
 		Collection<Date> logins = new ArrayList<>();
 		for (int i = 0; i < loginAttempts.length; i++) {
 			logins.add(new Date(Long.valueOf(loginAttempts[i])));
 		}
-		
+
 		for (Date d : logins) {
 			System.out.println(d.toString());
 		}
 		try {
-			UserData updatedUser = userDeviceDAO.getUser(userid);
+			UserData updatedUser = userAndDeviceService.getUser(userid);
 
 			return "";
 
@@ -141,12 +152,41 @@ public class AdminUserModificationController {
 
 	}
 
-	public void setUserDeviceDAO(UserAndDeviceDAO userDeviceDAO) {
-		this.userDeviceDAO = userDeviceDAO;
+	@RequestMapping(value = "/automatedpasswordreset", method = { RequestMethod.POST })
+	public ModelAndView userPasswordAutoGenerationHandler(@RequestParam("userid") String userid) {
+
+		UserSecurityDetails user = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+
+		try {
+			SimpleMailMessage mailMessage = new SimpleMailMessage();
+			mailMessage.setFrom("ILONA@gmail.com");
+			mailMessage.setTo(user.getEmail().trim());
+			mailMessage.setSubject("Password recovery!");
+			MessageDigest md = MessageDigest.getInstance("SHA-1");
+			String newPassword = user.getUserid() + user.hashCode(); // OK...
+			byte[] datas = md.digest(newPassword.getBytes());
+
+			mailMessage.setText("Your new password is: " + newPassword);
+			// mailSender.send(mailMessage);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public void setUserAndDeviceService(UserAndDeviceService userAndDeviceService) {
+		this.userAndDeviceService = userAndDeviceService;
 	}
 
 	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
 		this.passwordEncoder = passwordEncoder;
+	}
+
+	public void setMailSender(MailSender mailSender) {
+		this.mailSender = mailSender;
 	}
 
 }

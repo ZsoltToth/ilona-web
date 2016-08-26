@@ -12,8 +12,8 @@
 	<!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}"/>
 
-
-
+<script src="<c:url value='/js/trackingGeneralFunctions.js'></c:url>"></script>
+<script src="<c:url value='/js/tracking/validation.js'></c:url>"></script>
 <script type="text/javascript">
 	/*
 	 * Popover and tooltip initialization.
@@ -23,9 +23,17 @@
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
 	
+	var mainpageSignupSignupLock = true;
+	
 	$("#mainpageSignupRegistrationBTN").click(function(event){
 		try {
 			event.preventDefault();
+			if(mainpageSignupSignupLock == true) {
+				mainpageSignupSignupLock = false;
+			} else {
+				return;
+			}
+			
 			/*
 			 * Clear the error div.
 			 */
@@ -34,96 +42,118 @@
 			/*
 			 * Validity checking.
 			 */
-			var hadError = 0;
-			var errorText = "";
-			
-			var userid = document.getElementById("mainpageSignupUseridTXT");			
-			if (userid.checkValidity() == false) {
-				errorText += "<p class='text-danger bg-primary'>Invalid userid!</p>";
-				
-				hadError = 1;
-			}
-			
-			var username = document.getElementById("mainpageSignupUsernameTXT");	
-			if (username.checkValidity() == false) {
-				errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
-				hadError = 1;
-			}
-			
+			var userid = document.getElementById("mainpageSignupUseridTXT");
+			var username = document.getElementById("mainpageSignupUsernameTXT");
 			var password1 = document.getElementById("mainpageSignupPassword1TXT");
 			var password2 = document.getElementById("mainpageSignupPassword2TXT");
-			if (password1.checkValidity() == false) {
-				errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
-				hadError = 1;
-			}
-			if ( password1.value != password2.value) {
-				errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
-				hadError = 1;
-			}
-			
 			var email = document.getElementById("mainpageSignupEmailTXT");
-			if(email.checkValidity()  == false) {
-				errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
-				hadError = 1;
-			}
+	
+			var inputs = {
+				userid: userid.value,
+				username: username.value,
+				password: [password1.value,
+				           password2.value],
+				email: email.value
+			};
 			
+			var dependency = {
+				validateInputs : checkInputsValidity
+			};
+			
+			var result = dependency.validateInputs(inputs);
+						
+			function eraseInputFields() {
+				$("#mainpageSignupUseridTXT").val("");
+				$("#mainpageSignupUsernameTXT").val("");
+				$("#mainpageSignupPassword1TXT").val("");
+				$("#mainpageSignupPassword2TXT").val("");
+				$("#mainpageSignupEmailTXT").val("");
+			}
 			/*
 			 * Bad validity.
 			 */
-			if (Boolean(hadError) == true) {
-				$("#mainpageSignupErrorDIV").html(errorText);
+			if (result.valid == false) {
+				$("#mainpageSignupErrorDIV").html(result.errors);
+				mainpageSignupSignupLock = true;
 				/*
 				 * After good validity.
 				 */
 			} else{
-				var token = $("meta[name='_csrf']").attr("content");
-				var header = $("meta[name='_csrf_header']").attr("content");
 				$.ajax({
 					type : "POST",
 					async : true,
 					url : "<c:url value='/tracking/registeruser'></c:url>",
 					beforeSend : function(xhr) {
-						xhr.setRequestHeader(header, token);
+						xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
+								$("meta[name='_csrf']").attr("content"));
 					},
 					data : {
-						userid : $("#mainpageSignupUseridTXT").val(),
-						username : $("#mainpageSignupUsernameTXT").val(),
-						password : $("#mainpageSignupPassword1TXT").val(),
-						email : $("#mainpageSignupEmailTXT").val(),
+						userid : userid.value,
+						username : username.value,
+						password : password1.value,
+						email : email.value,
 					},
 					success : function(result, status, xhr) {
-						$("#mainpageSignupUseridTXT").val("");
-						$("#mainpageSignupUsernameTXT").val("");
-						$("#mainpageSignupPassword1TXT").val("");
-						$("#mainpageSignupPassword2TXT").val("");
-						$("#mainpageSignupEmailTXT").val("");				
-						var resultText = "";
-						for(var i = 0; i < result.length; i++) {						
-							resultText+= "<p class='bg-primary'>" + result[i] + "</p>";
+						try {
+						mainpageSignupSignupLock = true;								
+						switch(result.responseState) {
+						case 100: {
+							$("#mainpageSignupErrorDIV")
+								.html("<p class='bg-primary'>User has been created successfully!</p>");
+							break;
 						}
-						$("#mainpageSignupErrorDIV").html(resultText);
-	
+						case 200: {
+							$("#mainpageSignupErrorDIV")
+							.html("<p class='bg-primary'>User data was invalid!</p>");
+							break;
+						}
+						case 300: {
+							$("#mainpageSignupErrorDIV")
+							.html("<p class='bg-primary'>User data was invalid!</p>");
+							break;
+						}
+						case 400: {
+							$("#mainpageSignupErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						case 600: {
+							$("#mainpageSignupErrorDIV")
+							.html("<p class='bg-primary'>A user is already exists with id: " + userid.value + "</p>");
+							break;
+						}
+						default: {
+							$("#mainpageSignupErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						}
+						eraseInputFields();
+						} catch(error) {
+							$("#mainpageSignupErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							console.log(error);
+						}
 					},
 					error : function(xhr, status, error) {
-						$("#mainpageSignupUseridTXT").val("");
-						$("#mainpageSignupUsernameTXT").val("");
-						$("#mainpageSignupPassword1TXT").val("");
-						$("#mainpageSignupPassword1TXT").val("");
-						$("#mainpageSignupEmailTXT").val("");
+						mainpageSignupSignupLock = true;
+						eraseInputFields();
 						$("#mainpageSignupErrorDIV").
 						html("<p class='bg-primary'>There has been an error with the service!</p>");
-					}
+					}					
 				});
 			}
-		} catch(e) {
+		} catch(error) {
 			try {
+				mainpageSignupSignupLock = true;
 				$("#mainpageSignupErrorDIV").
 				html("<p class='bg-primary'>There has been an error with the service!</p>");
+				console.log(error);
 			} catch(e) {
 				console.log(e);
 			}
 		}
-	});
+	});	
 </script>
 
 <jsp:directive.include file="mainpageNavbar.jsp" />
@@ -162,7 +192,6 @@
 							id="mainpageSignupUseridTXT"
 							required="required"
 							placeholder="Please type in your userid!"
-							pattern="${useridPattern}"
 							name="userid"> <br />
 							
 							
@@ -187,7 +216,6 @@
 							id="mainpageSignupUsernameTXT"
 							required="required"
 							placeholder="Please type in your username!"
-							pattern="${usernamePattern}"
 							name="username" > <br />
 							
 						<label for="mainpageSignupPassword1TXT">Password: <br />
@@ -211,7 +239,6 @@
 							id="mainpageSignupPassword1TXT"
 							required="required"
 							placeholder="Please type in your password!"
-							pattern="${passwordPattern}"
 							name="password"> <br />
 							
 						<input type="password"
@@ -245,7 +272,8 @@
 							name="userid"><br />
 		
 					<button id="mainpageSignupRegistrationBTN" type="button" class="btn">Register</button>
-							
+					<input type="hidden" value = "<c:url value='/tracking/registeruser'></c:url>" 
+						id="mainpageSignupRegistrationUrlHidden">		
 				</div>	<!-- panel body end -->							
 			</div> <!-- panel default end -->
 		</div> <!-- col-12 end -->
