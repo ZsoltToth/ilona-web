@@ -41,6 +41,12 @@
 <script type="text/javascript" src="js/metisMenu.min.js"></script>
 <script type="text/javascript" src="js/sb-admin-2.js"></script>
 
+
+<script type="text/javascript" charset="utf8" 
+	src="http://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" 
+	href="http://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+
 <script type="text/javascript">
 	$(document).ready(function() {
 

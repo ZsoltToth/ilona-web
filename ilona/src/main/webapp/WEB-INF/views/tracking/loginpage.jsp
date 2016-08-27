@@ -14,6 +14,9 @@
 
 <script type="text/javascript">
 	
+	var mainpageLoginPasswordResetLock = true;
+	var mainpageLoginPasswordTokenResetLock = true;
+	
 	$("#mainpageLoginLoginBTN").click(function() {
 		try {
 			$("#errorContent").html("");
@@ -70,6 +73,11 @@
 
 	$("#mainpageLoginPasswordResetBTN").click(function() {
 		try {
+			if(mainpageLoginPasswordResetLock == true) {
+				mainpageLoginPasswordResetLock = false;
+			} else {
+				return;
+			}						
 			$("#errorContent").html("");
 			var token = $("meta[name='_csrf']").attr("content");
 			var header = $("meta[name='_csrf_header']").attr("content");
@@ -77,6 +85,7 @@
 			
 			if(userid == null || userid == "") {
 				$("#mainpageLoginPasswordResetErrorParagh").html("Password value error!");
+				mainpageLoginPasswordResetLock = true;
 				return;
 			}
 			$.ajax({
@@ -90,16 +99,46 @@
 					userid : userid
 				},
 				timeout : 10000,
-				error : function(xhr, status, error) {
-					$("#mainpageLoginResetPasswordTXT").val("");
-					$("#mainpageLoginPasswordResetErrorParagh").html("Service error!");
-				},
 				success : function(result, status, xhr) {
-					$("#mainpageLoginResetPasswordTXT").val("");
-					$("#mainpageLoginPasswordResetErrorParagh").html(result);
+					mainpageLoginPasswordResetLock = true;
+					$("#mainpageLoginResetPasswordUseridTXT").val("");
+					switch(result.responseState) {
+					case 100: {
+						$("#mainpageLoginPasswordResetErrorParagh")
+							.html("The revocery token has been sent to the email address!");
+						break;
+					}
+					case 200: {
+						$("#mainpageLoginPasswordResetErrorParagh")
+						.html("Invalid parameter!");
+						break;
+					}
+					case 400: {
+						$("#mainpageLoginPasswordResetErrorParagh")
+						.html("Service error!");
+						break;
+					}
+					case 600: {
+						$("#mainpageLoginPasswordResetErrorParagh")
+						.html("There is no user with this id in the system!");
+						break;
+					}
+					default: {
+						$("#mainpageLoginPasswordResetErrorParagh")
+						.html("Service error!");
+						break;
+					}
+					}
+				},
+				error : function(xhr, status, error) {
+					mainpageLoginPasswordResetLock = true;
+					$("#mainpageLoginResetPasswordUseridTXT").val("");
+					$("#mainpageLoginPasswordResetErrorParagh").html("Service error!");
 				}
+				
 			});
 		} catch(err) {
+			mainpageLoginPasswordResetLock = true;
 			try {
 				$("#mainpageLoginPasswordResetErrorParagh").html("Service is unavailable!");
 			} catch(err) {
@@ -110,24 +149,28 @@
 	
 	$("#mainpageLoginResetPassworkWithTokenBTN").click(function(event) {
 		try {
+			if(mainpageLoginPasswordTokenResetLock == true) {
+				mainpageLoginPasswordTokenResetLock = false;
+			} else {
+				return;
+			}
 			event.preventDefault();
 			var token = $("meta[name='_csrf']").attr("content");
 			var header = $("meta[name='_csrf_header']").attr("content");
 			
 			var userid = $("#mainpageLoginRestorePasswordWithTokenUseridTXT").val();			
 			var passwordToken = $("#mainpageLoginRestorePasswordWithTokenTokenTXT").val();			
-			
+			$("#mainpageLoginRestorePasswordWithTokenUseridTXT").val("");
+			$("#mainpageLoginRestorePasswordWithTokenTokenTXT").val("");
 			if(userid == null || userid == "") {
 				$("#mainpageLoginPasswordResetWithTokenErrorParagh").html("Userid is invalid!");
-				$("#mainpageLoginRestorePasswordWithTokenUseridTXT").val("");
-				$("#mainpageLoginRestorePasswordWithTokenTokenTXT").val("");
+				mainpageLoginPasswordTokenResetLock = true;
 				return;
 			}
 			
 			if(passwordToken == null || passwordToken == "") {
 				$("#mainpageLoginPasswordResetWithTokenErrorParagh").html("Token is invalid!");
-				$("#mainpageLoginRestorePasswordWithTokenUseridTXT").val("");
-				$("#mainpageLoginRestorePasswordWithTokenTokenTXT").val("");
+				mainpageLoginPasswordTokenResetLock = true;
 				return;
 			}
 			
@@ -143,20 +186,51 @@
 					token : passwordToken
 				},
 				timeout : 10000,
-				error : function(xhr, status, error) {
-					$("#mainpageLoginRestorePasswordWithTokenUseridTXT").val("");
-					$("#mainpageLoginRestorePasswordWithTokenTokenTXT").val("");
-					$("#mainpageLoginPasswordResetWithTokenErrorParagh").html("Service error!");
-				},
 				success : function(result, status, xhr) {
-					$("#mainpageLoginRestorePasswordWithTokenUseridTXT").val("");
-					$("#mainpageLoginRestorePasswordWithTokenTokenTXT").val("");
-					$("#mainpageLoginPasswordResetWithTokenErrorParagh").html(result);
+					mainpageLoginPasswordTokenResetLock = true;
+					switch(result.responseState) {
+					case 100: {
+						$("#mainpageLoginPasswordResetWithTokenErrorParagh")
+							.html("The new password has been sent to the email address!");
+						break;
+					}
+					case 200: {
+						$("#mainpageLoginPasswordResetWithTokenErrorParagh")
+						.html("Invalid parameter!");
+						break;
+					}
+					case 300: {
+						$("#mainpageLoginPasswordResetWithTokenErrorParagh")
+						.html("The token has expired!");
+						break;
+					}
+					case 400: {
+						$("#mainpageLoginPasswordResetWithTokenErrorParagh")
+						.html("Service error!");
+						break;
+					}
+					case 600: {
+						$("#mainpageLoginPasswordResetWithTokenErrorParagh")
+						.html("There is no user with this id in the system!");
+						break;
+					}
+					default: {
+						$("#mainpageLoginPasswordResetWithTokenErrorParagh")
+						.html("Service error!");
+						break;
+					}
+					}
+				},
+				error : function(xhr, status, error) {
+					mainpageLoginPasswordTokenResetLock = true;
+					$("#mainpageLoginPasswordResetWithTokenErrorParagh").html("Service error!");
 				}
+				
 			});
 			
 		} catch(err) {
 			try {
+				mainpageLoginPasswordTokenResetLock = true;
 				alert(err);
 				$("#mainpageLoginPasswordResetWithTokenErrorParagh").html("Service is unavailable!");
 			} catch(err) {

@@ -8,131 +8,53 @@
 
 <script type="text/javascript">
 
-	$("#userNavbarHomeMenuitem").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#userNavbarHomeMenuitem").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
-			},
-			timeout : 10000
-		});
+	var userNavbarNavigationLock = true;
+
+	$(".userNavbarNavigationClass").click(function(event){
+		try {
+			event.preventDefault();
+			if (userNavbarNavigationLock == true) {
+				userNavbarNavigationLock = false;
+			} else {
+				return;
+			}
+			
+			$.ajax({
+				async : true,
+				type : "POST",
+				url : $(this).attr('href'),
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
+							$("meta[name='_csrf']").attr("content"));
+				},
+				success : function(result, status, xhr) {
+					try {
+						userNavbarNavigationLock = true;
+						$("#page-wrapper").html(result);
+					} catch(error) {
+						console.log(error);
+					}
+				},
+				error : function(xhr, status, error) {
+					try {
+						userNavbarNavigationLock = true;
+						$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
+					} catch(error) {
+						console.log(error);
+					}
+				},
+				timeout : 10000
+			});
+		} catch(error) {
+			try {
+				userNavbarNavigationLock = true;
+				$("#userNavbarNavigationErrorDIV").html("Service error!<h2>");
+			} catch(err) {
+				console.log(err);
+			}		
+		}
 	});
-	
-	$("#userNavbarAccountManagement").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#userNavbarAccountManagement").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
-			},
-			timeout : 10000
-		});
-	});
-	
-	$("#userNavbarManageDevices").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#userNavbarManageDevices").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
-			},
-			timeout : 10000
-		});
-	});
-	
-	$("#userNavbarAddDevice").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#userNavbarAddDevice").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
-			},
-			timeout : 10000
-		});
-	});
-	
-	$("#userNavbarDeviceTracking").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#userNavbarDeviceTracking").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
-			},
-			timeout : 10000
-		});
-	});
-	
-	$("#userNavbarLogout").click(function(event) {
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			async : true,
-			type : "POST",
-			url : $("#userNavbarLogout").attr('href'),
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			success : function(result, status, xhr) {
-				$("#page-wrapper").html(result);
-			},
-			error : function(xhr, status, error) {
-				$("#userNavbarNavigationErrorDIV").html("<h2>The tracking service is unreachable!<h2>");
-			},
-			timeout : 10000
-		});
-	});
+
 </script>
 
 <nav class="navbar navbar-inverse" id="userNavbarDIV">
@@ -144,7 +66,7 @@
 		</div>
 		<ul class="nav navbar-nav">
 			<li>
-				<a id="userNavbarHomeMenuitem"
+				<a id="userNavbarHomeMenuitem" class="userNavbarNavigationClass"
 					href="<c:url value='/tracking/user/homepage'></c:url>">
 					<span class="fa fa-globe"></span> Home
 				</a>
@@ -152,28 +74,28 @@
 		</ul>
 		<ul class="nav navbar-nav navbar-left">
 			<li>
-				<a id="userNavbarAccountManagement"
+				<a id="userNavbarAccountManagement" class="userNavbarNavigationClass"
 					href="<c:url value='/tracking/user/accountmanagement'></c:url>">
 					<span class="glyphicon glyphicon-edit "></span> Account Management 
 				</a>
 			</li>
 			
 			<li>
-				<a id="userNavbarManageDevices"
+				<a id="userNavbarManageDevices" class="userNavbarNavigationClass"
 					href="<c:url value='/tracking/user/managedevices'></c:url>">
 					<span class="glyphicon glyphicon-user"></span> Manage devices 
 				</a>
 			</li>
 			
 			<li>
-				<a id="userNavbarAddDevice"
+				<a id="userNavbarAddDevice" class="userNavbarNavigationClass"
 					href="<c:url value='/tracking/user/createdevicepage'></c:url>">
 					<span class="glyphicon glyphicon-user"></span> Create device 
 				</a>
 			</li>
 					
 			<li>
-				<a id="userNavbarDeviceTracking"
+				<a id="userNavbarDeviceTracking" class="userNavbarNavigationClass"
 					href="<c:url value='/tracking/user/devicetracking'></c:url>">
 					<span class="fa fa-share-alt"></span> Tracking 
 				</a>
@@ -181,7 +103,7 @@
 		</ul>
 		<ul class="nav navbar-nav navbar-right">
 			<li>
-				<a id="userNavbarLogout"
+				<a id="userNavbarLogout" class="userNavbarNavigationClass"
 					href="<c:url value='/tracking/logout'></c:url>">
 					<span class="fa fa-power-off"></span> Logut
 				</a>

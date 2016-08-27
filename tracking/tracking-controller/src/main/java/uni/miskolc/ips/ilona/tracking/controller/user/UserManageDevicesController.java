@@ -5,7 +5,8 @@ import java.util.Collection;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,7 +22,6 @@ import uni.miskolc.ips.ilona.tracking.controller.util.ValidateDeviceData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
-import uni.miskolc.ips.ilona.tracking.persist.UserAndDeviceDAO;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DeviceNotFoundException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedDeviceException;
@@ -31,91 +31,115 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 @RequestMapping(value = "/tracking/user")
 public class UserManageDevicesController {
 
+	private static Logger logger = LogManager.getLogger(UserManageDevicesController.class);
+
 	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userAndDeviceService;
 
 	@RequestMapping(value = "/managedevices")
 	public ModelAndView createDeviceManagementpageHandler() {
 		ModelAndView mav = new ModelAndView("tracking/user/manageDevices");
-		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
-				.getPrincipal();
 		Collection<DeviceData> devices = new ArrayList<>();
-
 		try {
-
+			UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext()
+					.getAuthentication().getPrincipal();
 			UserData user = userAndDeviceService.getUser(userDetails.getUserid());
 			devices = userAndDeviceService.readUserDevices(user);
+			fillModelAndViewWithCreateDeviceData(mav);
+			mav.addObject("devices", devices);
+			mav.addObject("deviceOwnerid", userDetails.getUserid());
+			mav.addObject("deviceOwnerName", userDetails.getUsername());
+			return mav;
 
 		} catch (Exception e) {
+			logger.error("Service error: " + e.getMessage());
 			mav.addObject("executionError", "Service error!");
 			return mav;
 		}
-		fillModelAndViewWithCreateDeviceData(mav);
-		mav.addObject("devices", devices);
-		mav.addObject("deviceOwnerid", userDetails.getUserid());
-		mav.addObject("deviceOwnerName", userDetails.getUsername());
-		return mav;
 	}
 
+	/**
+	 * DOC! 100: OK 200: parameter error 400: service error 600: device not
+	 * found
+	 * 
+	 * @param deletableDevice
+	 * @return
+	 */
 	@RequestMapping(value = "/mandevdeletedevice", method = { RequestMethod.POST })
 	@ResponseBody
 	public ExecutionResultDTO processDeleteDeviceRequestHandler(@ModelAttribute() UserDeviceDataDTO deletableDevice) {
 
-		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(deletableDevice.getDeviceid()));
+		} catch (Exception e) {
+			logger.info("Invalid deviceid " + deletableDevice.getDeviceid());
+			result.addMessage("Invalid deviceid!");
+			result.setResponseState(200);
+			return result;
+		}
 
 		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		if (!userDetails.getUserid().equals(deletableDevice.getUserid())) {
-			result.setExecutionState(false);
-			result.addMessage("Authorization violation!");
-		}
-		UserData owner = null;
+
 		try {
-			owner = userAndDeviceService.getUser(deletableDevice.getUserid());
+			UserData owner = userAndDeviceService.getUser(userDetails.getUserid());
 			DeviceData dev = new DeviceData();
 			dev.setDeviceid(deletableDevice.getDeviceid());
 			dev.setDeviceName(deletableDevice.getDeviceName());
 			dev.setDeviceType(deletableDevice.getDeviceType());
 			dev.setDeviceTypeName(deletableDevice.getDeviceTypeName());
 			userAndDeviceService.deleteDevice(dev, owner);
-
 		} catch (DeviceNotFoundException e) {
 			result.addMessage("Device not found!");
+			result.setResponseState(600);
 			return result;
 		} catch (Exception e) {
 			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
-		result.setExecutionState(true);
 		result.addMessage("Device has been deleted!");
 		return result;
 	}
 
+	/**
+	 * DOC! 100: OK 200: parameter error 300: validation error 400: service
+	 * error 600: not found
+	 * 
+	 * @param device
+	 * @return
+	 */
 	@RequestMapping(value = "/mandevupdatedevicedetails", method = { RequestMethod.POST })
 	@ResponseBody
 	public ExecutionResultDTO processUpdateUserDeviceDetailsRequestHandler(@ModelAttribute() UserDeviceDataDTO device) {
 
-		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
-		ValidityStatusHolder errors = new ValidityStatusHolder();
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(device.getDeviceid()));
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceName(device.getDeviceName()));
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceType(device.getDeviceType()));
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceTypeName(device.getDeviceTypeName()));
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(device.getDeviceid()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceName(device.getDeviceName()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceType(device.getDeviceType()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceTypeName(device.getDeviceTypeName()));
 
-		if (!errors.isValid()) {
-			result.setMessages(errors.getErrors());
+			if (!errors.isValid()) {
+				result.setMessages(errors.getErrors());
+				result.setResponseState(300);
+				return result;
+			}
+		} catch (Exception e) {
+			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
 
 		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		if (!userDetails.getUserid().equals(device.getUserid())) {
-			result.setExecutionState(false);
-			result.addMessage("Authorization violation!");
-		}
 
 		try {
-			UserData user = userAndDeviceService.getUser(device.getUserid());
+			UserData user = userAndDeviceService.getUser(userDetails.getUserid());
 			DeviceData dev = new DeviceData();
 			dev.setDeviceid(device.getDeviceid());
 			dev.setDeviceName(device.getDeviceName());
@@ -125,12 +149,13 @@ public class UserManageDevicesController {
 
 		} catch (DeviceNotFoundException e) {
 			result.addMessage("Device not found!");
+			result.setResponseState(600);
 			return result;
 		} catch (Exception e) {
 			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
-		result.setExecutionState(true);
 		result.addMessage("Device modification was successfull!");
 		return result;
 	}
@@ -147,28 +172,46 @@ public class UserManageDevicesController {
 		return mav;
 	}
 
+	/**
+	 * DOC! 100: OK 200: parameter / authorization error 300: validity error
+	 * 400: service error 600: duplicated device
+	 * 
+	 * @param newDevice
+	 * @return
+	 */
 	@RequestMapping(value = "/createnewdevice", method = { RequestMethod.POST })
 	@ResponseBody
-	public Collection<String> createUserDeviceHandler(@ModelAttribute UserDeviceDataDTO newDevice) {
-		Collection<String> returnMessage = new ArrayList<String>();
+	public ExecutionResultDTO createUserDeviceHandler(@ModelAttribute UserDeviceDataDTO newDevice) {
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 
-		ValidityStatusHolder errors = new ValidityStatusHolder();
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(newDevice.getDeviceid()));
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceName(newDevice.getDeviceName()));
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceType(newDevice.getDeviceType()));
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceTypeName(newDevice.getDeviceTypeName()));
-
-		if (!errors.isValid()) {
-			returnMessage.addAll(errors.getErrors());
-			return returnMessage;
+		if (newDevice == null) {
+			logger.error("Invalid parameter: input is null!");
+			result.addMessage("Invalid parameter!");
+			result.setResponseState(200);
+			return result;
 		}
+
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(newDevice.getDeviceid()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceName(newDevice.getDeviceName()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceType(newDevice.getDeviceType()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceTypeName(newDevice.getDeviceTypeName()));
+
+			if (!errors.isValid()) {
+				result.setMessages(errors.getErrors());
+				result.setResponseState(300);
+				return result;
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Error: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
+		}
+
 		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-
-		if (!newDevice.getUserid().equals(userDetails.getUserid())) {
-			returnMessage.add("Authorization violation!");
-			return returnMessage;
-		}
 
 		try {
 			UserData user = userAndDeviceService.getUser(userDetails.getUserid());
@@ -179,15 +222,16 @@ public class UserManageDevicesController {
 			dev.setDeviceTypeName(newDevice.getDeviceTypeName());
 			userAndDeviceService.storeDevice(dev, user);
 		} catch (DuplicatedDeviceException e) {
-			returnMessage.add("Device already exists with id: " + newDevice.getDeviceid());
-			return returnMessage;
+			result.addMessage("Device already exists with id: " + newDevice.getDeviceid());
+			result.setResponseState(600);
+			return result;
 		} catch (Exception e) {
-			returnMessage.add("Service error, device storage has failed!");
-			return returnMessage;
+			result.addMessage("Service error, device storage has failed!");
+			return result;
 		}
 
-		returnMessage.add("Device has been created successfully!");
-		return returnMessage;
+		result.addMessage("Device has been created successfully!");
+		return result;
 	}
 
 	private ModelAndView fillModelAndViewWithCreateDeviceData(ModelAndView mav) {

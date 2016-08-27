@@ -417,7 +417,7 @@ function checkInputsValidity(inputs) {
 		}
 
 		inputValue = inputs["password"];
-		if (typeof inputValue != 'undefined' && typeof inputValue != null 
+		if (typeof inputValue != 'undefined' && typeof inputValue != null
 				&& inputValue instanceof Array) {
 			if (inputValue.length == 2) {
 				var password1 = inputValue[0];
@@ -436,18 +436,10 @@ function checkInputsValidity(inputs) {
 					}
 				}
 			} else {
-				throw "Invalid array length: " + inputValue.length; 
+				throw "Invalid array length: " + inputValue.length;
 			}
 		}
 
-		/*
-		 * var InputId = inputs["username"]; if (typeof InputId != 'undefined' &&
-		 * InputId != null) { try { var username =
-		 * document.getElementById(InputId); result =
-		 * validateUsername(username.value); if (!result.valid) { hadError =
-		 * true; errorText = errorText.concat(dep.formatter(dep
-		 * .useridMessage(result.errors))); } } catch (err) { throw "" + err; } }
-		 */
 		return {
 			valid : !hadError,
 			errors : errorText

@@ -35,6 +35,7 @@ import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedUserException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.ServiceGeneralErrorException;
+import uni.miskolc.ips.ilona.tracking.service.exceptions.UserNotFoundException;
 import uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
@@ -282,37 +283,83 @@ public class TrackingEntryPointController {
 		return result;
 	}
 
+	/**
+	 * DOC! 100: OK 200: Invalid Parameter 400: service error 600: User not
+	 * found
+	 * 
+	 * @param userid
+	 * @return
+	 */
 	@RequestMapping(value = "/resetpassword", method = { RequestMethod.POST })
 	@ResponseBody
-	public String trackingResetPasswordHandler(@RequestParam(value = "userid", required = false) String userid) {
-
+	public ExecutionResultDTO trackingResetPasswordHandler(
+			@RequestParam(value = "userid", required = false) String userid) {
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 		if (userid == null) {
-			return "Invalid userid!";
+			result.setResponseState(200);
+			result.addMessage("Invalid parameter!");
+			return result;
 		}
 		try {
-			passwordRecoveryManager.handlePasswordRecoveryRequest(userid);
+			UserData user = userDeviceService.getUser(userid);
+			passwordRecoveryManager.handlePasswordRecoveryRequest(user);
+		} catch (UserNotFoundException e) {
+			logger.info("Password recovery has failed, user not found! userid: " + userid);
+			result.addMessage("User not found with id: " + userid);
+			result.setResponseState(600);
+			return result;
 		} catch (Exception e) {
 			logger.info("Password recovery has failed! userid: " + userid);
-			return "Password recovery has failed!";
+			result.setResponseState(400);
+			result.addMessage("Password recovery has failed!");
+			return result;
 		}
 
-		return "Password request has been sent successfully!";
+		result.addMessage("Password recovery has been sent!");
+		return result;
 	}
 
+	/**
+	 * DOC! 100: OK 200: parameter error 300: token validity error 400: service
+	 * 600: user not found
+	 * 
+	 * @param userid
+	 * @param token
+	 * @return
+	 */
 	@RequestMapping(value = "/passwordrequestwithtoken", method = { RequestMethod.POST })
 	@ResponseBody
-	public String resetPasswordWithTokenHandler(@RequestParam("userid") String userid,
-			@RequestParam("token") String token) {
+	public ExecutionResultDTO resetPasswordWithTokenHandler(
+			@RequestParam(value = "userid", required = false) String userid,
+			@RequestParam(value = "token", required = false) String token) {
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+
+		if (userid == null || token == null) {
+			result.addMessage("Invalid paramter: userid: " + userid + " Token: " + token);
+			result.setResponseState(200);
+			return result;
+		}
 		try {
-			passwordRecoveryManager.handlePasswordRestore(userid, token);
+			UserData user = userDeviceService.getUser(userid);
+			passwordRecoveryManager.handlePasswordRestore(user, token);
+		} catch (UserNotFoundException e) {
+			logger.info("user not found with id: " + userid);
+			result.addMessage("user not found with id: " + userid);
+			result.setResponseState(600);
+			return result;
 		} catch (PasswordRecoveryTokenValidityErrorException e) {
 			logger.info("Password recovery token validity error! userid: " + userid + " token: " + token);
-			return "Password token validity error!";
+			result.addMessage("Password token validity error!");
+			result.setResponseState(300);
+			return result;
 		} catch (Exception e) {
 			logger.info("Password recovery error! userid: " + userid + " token: " + token);
-			return "Password recovery error!";
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
 		}
-		return "The new password has been sent!";
+		result.addMessage("The new password has been sent!");
+		return result;
 	}
 
 	@ExceptionHandler(TrackingServiceErrorException.class)

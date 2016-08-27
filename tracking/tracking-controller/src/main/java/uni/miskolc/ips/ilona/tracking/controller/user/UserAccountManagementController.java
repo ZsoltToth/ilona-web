@@ -1,21 +1,18 @@
 package uni.miskolc.ips.ilona.tracking.controller.user;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.controller.exception.UserChangeDetailsExecutionException;
@@ -32,6 +29,8 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 @RequestMapping(value = "/tracking/user")
 public class UserAccountManagementController {
 
+	private static Logger logger = LogManager.getLogger(UserAccountManagementController.class);
+
 	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userDeviceService;
 
@@ -45,19 +44,42 @@ public class UserAccountManagementController {
 		return mav;
 	}
 
+	/**
+	 * DOC! 100: OK 200: parameter 300: validation error 400: service error
+	 * 
+	 * @param newUserDetails
+	 * @return
+	 * @throws UserChangeDetailsExecutionException
+	 */
 	@RequestMapping(value = "/accountmanagement/changeuserdetails", method = { RequestMethod.POST })
 	@ResponseBody
-	public ExecutionResultDTO changerUserDetailsHandler(@ModelAttribute() UserBaseDetailsDTO newUserDetails)
-			throws UserChangeDetailsExecutionException {
+	public ExecutionResultDTO changerUserDetailsHandler(@ModelAttribute() UserBaseDetailsDTO newUserDetails) {
 
-		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 		ValidityStatusHolder errors = new ValidityStatusHolder();
 
 		/*
-		 * Request null check
+		 * Request null check provided by the spring with default constructor?!
 		 */
 		if (newUserDetails == null) {
-			result.addMessage("Userdata is null!");
+			result.addMessage("Invalid parameter!");
+			result.setResponseState(200);
+			return result;
+		}
+
+		try {
+			errors.appendValidityStatusHolder(ValidateUserData.validateUsername(newUserDetails.getUsername()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateEmail(newUserDetails.getEmail()));
+
+			if (!errors.isValid()) {
+				result.setMessages(errors.getErrors());
+				result.setResponseState(300);
+				return result;
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
 
@@ -66,38 +88,23 @@ public class UserAccountManagementController {
 		 */
 		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-
-		/*
-		 * The user only can't change other users data.
-		 */
-		if (newUserDetails.getUserid() == null || !newUserDetails.getUserid().equals(userDetails.getUserid())) {
-			result.addMessage("Account authorization requirements failed!");
-			return result;
-		}
-
 		/*
 		 * Validation
 		 */
-
-		errors.appendValidityStatusHolder(ValidateUserData.validateUsername(newUserDetails.getUsername()));
-		errors.appendValidityStatusHolder(ValidateUserData.validateEmail(newUserDetails.getEmail()));
-
-		if (!errors.isValid()) {
-			result.setMessages(errors.getErrors());
-			return result;
-		}
 
 		/*
 		 * Update User data
 		 */
 		try {
-			UserData updatedUserDetails = userDeviceService.getUser(newUserDetails.getUserid());
+			UserData updatedUserDetails = userDeviceService.getUser(userDetails.getUserid());
 			updatedUserDetails.setUsername(newUserDetails.getUsername());
 			updatedUserDetails.setEmail(newUserDetails.getEmail());
 			userDeviceService.updateUser(updatedUserDetails);
 
 		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
 			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
 
@@ -110,46 +117,58 @@ public class UserAccountManagementController {
 		/*
 		 * Return with the updated data.
 		 */
-		result.setExecutionState(true);
 		result.addMessage("The account has been modified!");
 		return result;
 
 	}
 
+	/**
+	 * DOC! 100: OK 200: parameter / authority error 300: validity error 400:
+	 * service error
+	 * 
+	 * @param user
+	 * @return
+	 */
 	@RequestMapping(value = "/accountmanagement/changepassword", method = { RequestMethod.POST })
 	@ResponseBody
-	public Collection<String> changeUserPasswordHandler(@ModelAttribute() UserBaseDetailsDTO user) {
+	public ExecutionResultDTO changeUserPasswordHandler(@ModelAttribute() UserBaseDetailsDTO user) {
 
-		Collection<String> errors = new ArrayList<String>();
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+
 		if (user == null) {
-			errors.add("Account error!");
-			return errors;
+			result.addMessage("Invalid parameter!");
+			result.setResponseState(200);
+			return result;
+		}
+		try {
+			ValidityStatusHolder valErrors = new ValidityStatusHolder();
+			valErrors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
+			if (!valErrors.isValid()) {
+				result.setMessages(valErrors.getErrors());
+				result.setResponseState(300);
+				return result;
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
 		}
 
 		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 
-		if (user.getUserid() == null || !user.getUserid().equals(userDetails.getUserid())) {
-			errors.add("User authorization error!");
-			return errors;
-		}
-
-		ValidityStatusHolder valErrors = new ValidityStatusHolder();
-		valErrors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
-
-		if (!valErrors.isValid()) {
-			return valErrors.getErrors();
-		}
-
 		String hashedPassword = null;
 		try {
-			UserData updatedUserDetails = userDeviceService.getUser(user.getUserid());
+			UserData updatedUserDetails = userDeviceService.getUser(userDetails.getUserid());
 			hashedPassword = passwordEncoder.encode(user.getPassword());
 			updatedUserDetails.setPassword(hashedPassword);
 			userDeviceService.updateUser(updatedUserDetails);
 		} catch (Exception e) {
-			errors.add("Tracking serice error!");
-			return errors;
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
 		}
 
 		/*
@@ -160,9 +179,8 @@ public class UserAccountManagementController {
 		/*
 		 * Account management page with updated details
 		 */
-		errors.add("The update was successful!");
-
-		return errors;
+		result.addMessage("The update was successful!");
+		return result;
 	}
 
 	/**
@@ -189,14 +207,6 @@ public class UserAccountManagementController {
 		mav.addObject("usernameValue", userDetails.getUsername());
 		mav.addObject("emailValue", userDetails.getEmail());
 
-	}
-
-	@ExceptionHandler(UserChangeDetailsExecutionException.class)
-	@ResponseBody
-	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
-	public Collection<String> UserDetailsChangeErrorsHandler(UserChangeDetailsExecutionException error) {
-
-		return error.getValidityErrors().getErrors();
 	}
 
 	public void setUserDeviceService(UserAndDeviceService userDeviceService) {

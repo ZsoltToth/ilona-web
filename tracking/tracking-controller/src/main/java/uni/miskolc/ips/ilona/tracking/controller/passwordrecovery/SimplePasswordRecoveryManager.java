@@ -48,27 +48,26 @@ public class SimplePasswordRecoveryManager implements PasswordRecoveryManager {
 	}
 
 	@Override
-	public void handlePasswordRecoveryRequest(String userid) throws PasswordRecoveryException {
+	public void handlePasswordRecoveryRequest(UserData user) throws PasswordRecoveryException {
 		try {
 			String passwordToken = tokenGenerator.generateToken();
 			long tokenValidityLength = centralManager.getPasswordRecoveryTokenValidityTime();
 			Date validUntil = new Date((new Date().getTime()) + tokenValidityLength);
-			PasswordRecoveryToken token = new PasswordRecoveryToken(userid, passwordToken, validUntil);
+			PasswordRecoveryToken token = new PasswordRecoveryToken(user.getUserid(), passwordToken, validUntil);
 			this.tokenDAO.storePasswordToken(token);
-			UserData user = userDeviceService.getUser(userid);
-			this.tokenSender.sendToken(userid, passwordToken, user.getEmail());
+			this.tokenSender.sendToken(user.getUserid(), passwordToken, user.getEmail());
 		} catch (Exception e) {
-			logger.error("Token storage request failed! userid: " + userid);
-			throw new PasswordRecoveryException("Token storage request failed! userid: " + userid, e);
+			logger.error("Token storage request failed! userid: " + user.getUserid());
+			throw new PasswordRecoveryException("Token storage request failed! userid: " + user.getUserid(), e);
 		}
 	}
 
 	@Override
-	public void handlePasswordRestore(String userid, String token)
+	public void handlePasswordRestore(UserData user, String token)
 			throws PasswordRecoveryTokenValidityErrorException, PasswordRecoveryException {
 		try {
 			token = token.trim();
-			PasswordRecoveryToken requestToken = new PasswordRecoveryToken(userid, token, null);
+			PasswordRecoveryToken requestToken = new PasswordRecoveryToken(user.getUserid(), token, null);
 			PasswordRecoveryToken tok = tokenDAO.loadPasswordToken(requestToken);
 			Date until = tok.getTokenValidUntil();
 			if (until.getTime() < new Date().getTime()) {
@@ -77,15 +76,15 @@ public class SimplePasswordRecoveryManager implements PasswordRecoveryManager {
 			if (!tok.getToken().equals(token)) {
 				throw new PasswordRecoveryTokenValidityErrorException("Validity error!");
 			}
-			UserData user = userDeviceService.getUser(userid);
+			// UserData user = userDeviceService.getUser(userid);
 			String oldPassword = user.getPassword();
 			String newPassword = passwordGenerator.generatePassword(10);
 			String hashedPassword = passwordEncoder.encode(newPassword);
 			user.setPassword(hashedPassword);
 			userDeviceService.updateUser(user);
 			try {
-				tokenSender.sendNewPassword(userid, newPassword, user.getEmail());
-				tokenDAO.deletePasswordRecoveryToken(userid);
+				tokenSender.sendNewPassword(user.getUserid(), newPassword, user.getEmail());
+				tokenDAO.deletePasswordRecoveryToken(user.getUserid());
 			} catch (Exception e) {
 				user.setPassword(oldPassword);
 				userDeviceService.updateUser(user);
@@ -94,16 +93,17 @@ public class SimplePasswordRecoveryManager implements PasswordRecoveryManager {
 
 		} catch (Exception e) {
 			if (e instanceof PasswordRecoveryTokenValidityErrorException) {
-				logger.error(
-						"Token restore request failed, token validity expired! userid: " + userid + " token:" + token);
+				logger.error("Token restore request failed, token validity expired! userid: " + user.getUserid()
+						+ " token:" + token);
 				throw new PasswordRecoveryTokenValidityErrorException(
-						"Token restore request failed, token validity expired! userid: " + userid + " token:" + token,
+						"Token restore request failed, token validity expired! userid: " + user.getUserid() + " token:"
+								+ token,
 						e);
 			}
 
-			logger.error("Token restore request failed! userid: " + userid + " token:" + token);
-			throw new PasswordRecoveryException("Token storage request failed! userid: " + userid + " token:" + token,
-					e);
+			logger.error("Token restore request failed! userid: " + user.getUserid() + " token:" + token);
+			throw new PasswordRecoveryException(
+					"Token storage request failed! userid: " + user.getUserid() + " token:" + token, e);
 		}
 
 	}

@@ -11,54 +11,59 @@
 <!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
+<script src="<c:url value='/js/tracking/validation.js'></c:url>"></script>
 <script type="text/javascript">
 
 	var userAccManSavedUsername = $("#userAccManUsernameTXT").val();
 	var userAccManSavedEmail = $("#userAccManEmailTXT").val();
 
+	var userAccManUpdateDetailsLock = true;
+	var userAccManChangePasswordLock = true;
+	
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
 
 	$("#userAccManUpdateDetailsBTN").click(function(event){
 		try {
 			event.preventDefault();
-			/*
-			 * get CSTF Token
-			 */
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
-			
+			if(userAccManUpdateDetailsLock == true) {
+				userAccManUpdateDetailsLock = false;
+			} else {
+				return;
+			}
+			function restoreAccountDetails() {
+				$("#userAccManUsernameTXT").val(userAccManSavedUsername);
+				$("#userAccManEmailTXT").val(userAccManSavedEmail);
+			}
+						
 			/*
 			 * Validity 
 			 */
 			$("#userAccManUpdateDetailsErrorDIV").html("");
-			$("#userAccManUserChangeErrorSpan").html("");
-			var hadError = 0;
-			var errorText = "";
 			
-			var username = document.getElementById("userAccManUsernameTXT");	
-			if (username.checkValidity() == false) {
-				errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
-				hadError = 1;
-			}
-					
-			var email = document.getElementById("userAccManEmailTXT");
-			if(email.checkValidity()  == false) {
-				errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
-				hadError = 1;
-			}
+			var inputs = {
+				username: $("#userAccManUsernameTXT").val(),
+				email: $("#userAccManEmailTXT").val()
+			};
 			
-			if (Boolean(hadError) == true) {
-				$("#userAccManUsernameTXT").val(userAccManSavedUsername);
-				$("#userAccManEmailTXT").val(userAccManSavedEmail);
-				$("#userAccManUpdateDetailsErrorDIV").html(errorText);
+			var dependency = {
+				validateInputs : checkInputsValidity
+			};
+			
+			var result = dependency.validateInputs(inputs);
+			
+			if (result.valid == false) {
+				restoreAccountDetails();
+				$("#userAccManUpdateDetailsErrorDIV").html(result.errors);
+				userAccManUpdateDetailsLock = true;
 			} else {
 				$.ajax({
 					type : "POST",
 					async : true,
 					url : "<c:url value='/tracking/user/accountmanagement/changeuserdetails'></c:url>",
 					beforeSend : function(xhr) {
-						xhr.setRequestHeader(header, token);
+						xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
+								$("meta[name='_csrf']").attr("content"));
 					},
 					data : {
 						userid : $("#userAccManUseridTXT").val(),
@@ -67,35 +72,45 @@
 					},
 					success : function(result, status, xhr) {
 						try {
-							if(result.executionState == true) {							
+							userAccManUpdateDetailsLock = true;
+							switch(result.responseState) {
+							case 100: {
 								$("#userAccManUpdateDetailsErrorDIV")
-									.html("<p class='text-danger bg-primary'>Account updated successfully!</p>");
-								userAccManSavedUsername = $("#userAccManUsernameTXT").val();
-								userAccManSavedEmail = $("#userAccManEmailTXT").val();
-							} else {
-								var i = 0;
-								var messages = result.messages;
-								var length = messages.length;						
-								var errorMessages = "";
-								for(i; i < length; i++) {
-									errorMessages += "<p class='text-danger bg-primary'>" + messages[i] + "</p>";
-								}							
-								$("#userAccManUpdateDetailsErrorDIV").html(errorMessages);
+									.html("<p class='bg-primary'>The account has been modified!</p>");
+								break;
+							}
+							case 200: {
+								$("#userAccManUpdateDetailsErrorDIV")
+								.html("<p class='bg-primary'>Invalid parameter!</p>");
+								break;
+							}
+							case 300: {
+								$("#userAccManUpdateDetailsErrorDIV")
+								.html("<p class='bg-primary'>Invalid data!</p>");						
+								break;
+							}
+							case 400: {
+								$("#userAccManUpdateDetailsErrorDIV")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}						
+							default: {
+								$("#userAccManUpdateDetailsErrorDIV")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}
+							}
+							if(result.respinseState != 100) {
+								restoreAccountDetails();
 							}
 						} catch(err) {
 							console.log(err);
-						}
-						
-						/*
-						 * Write the response JSON into the text fields.
-						 */
-						
-						
+						}				
 					},
 					error : function(xhr, status, error) {
 						try {
-							$("#userAccManUsernameTXT").val(userAccManSavedUsername);
-							$("#userAccManEmailTXT").val(userAccManSavedEmail);						
+							userAccManUpdateDetailsLock = true;
+							restoreAccountDetails();				
 							$("#userAccManUpdateDetailsErrorDIV").html("<p class='text-danger bg-primary'>Tracking service is offline!</p>");
 						} catch(err) {
 							console.log(err);
@@ -103,11 +118,14 @@
 					}
 				});
 			}
-		} catch(err) {
+		} catch(error) {
 			try {
+				userAccManUpdateDetailsLock = true;
 				$("#userAccManUpdateDetailsErrorDIV").html("<p class='text-danger bg-primary'>Service error!</p>");
-			} catch(error) {
+				restoreAccountDetails();
 				console.log(error);
+			} catch(err) {
+				console.log(err);
 			}
 		}
 	});
@@ -115,53 +133,91 @@
 	$("#userAccManChangePasswordBTN").click(function(event){
 		try {
 			event.preventDefault();
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
-			
+			if (userAccManChangePasswordLock == true) {
+				userAccManChangePasswordLock = false;
+			} else {
+				return;
+			}
 			$("#userAccManChangePasswordErrorsDIV").html("");
-			var hadError = 0;
-			var errorText = "";
-			var password1 = document.getElementById("userAccManPassword1TXT");
-			var password2 = document.getElementById("userAccManPassword2TXT");
 			
-			if (password1.checkValidity() == false) {
-				errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
-				hadError = 1;
+			function clearPasswordFields() {
+				$("#userAccManPassword1TXT").val("");
+				$("#userAccManPassword2TXT").val("");
 			}
 			
-			if ( password1.value != password2.value) {
-				errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
-				hadError = 1;
-			}
+			var inputs = {
+				password: [$("#userAccManPassword1TXT").val(),
+				           $("#userAccManPassword2TXT").val()]
+			};
+				
+			var dependency = {
+				validateInputs : checkInputsValidity
+			};
+				
+			var result = dependency.validateInputs(inputs);
 	
-			if(Boolean(hadError) == true) {
-				$("#userAccManChangePasswordErrorsDIV").html(errorText);
+			if(result.valid == false) {
+				$("#userAccManChangePasswordErrorsDIV").html(result.errors);
+				userAccManChangePasswordLock = true;
 			} else {
 				$.ajax({
 					type : "POST",
 					async : true,
 					url : "<c:url value='/tracking/user/accountmanagement/changepassword'></c:url>",
 					beforeSend : function(xhr) {
-						xhr.setRequestHeader(header, token);
+						xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
+								$("meta[name='_csrf']").attr("content"));
 					},
 					data : {
 						userid : $("#userAccManUseridTXT").val(),
 						password : $("#userAccManPassword1TXT").val()
 					},
 					success : function(result, status, xhr) {
-						var ResultText = "";
-						for(var i = 0; i < result.length; i++) {
-							ResultText += "<p class='text-danger bg-primary'>" + result[i] + "</p>";
-						}
-						$("#userAccManChangePasswordErrorsDIV").html(ResultText);
+						try {
+							userAccManChangePasswordLock = true;
+							clearPasswordFields();
+							switch(result.responseState) {
+							case 100: {
+								$("#userAccManChangePasswordErrorsDIV")
+									.html("<p class='bg-primary'>The password has been modified!</p>");
+								break;
+							}
+							case 200: {
+								$("#userAccManChangePasswordErrorsDIV")
+								.html("<p class='bg-primary'>Invalid parameter!</p>");
+								break;
+							}
+							case 300: {
+								$("#userAccManChangePasswordErrorsDIV")
+								.html("<p class='bg-primary'>Invalid data!</p>");						
+								break;
+							}
+							case 400: {
+								$("#userAccManChangePasswordErrorsDIV")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}						
+							default: {
+								$("#userAccManChangePasswordErrorsDIV")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}
+							}						
+						} catch(err) {
+							console.log(err);
+						}			
 					},
 					error : function(xhr, status, error) {
+						userAccManChangePasswordLock = true;
+						clearPasswordFields();
 						$("#userAccManChangePasswordErrorsDIV").html("<p class='text-danger bg-primary'>Tracking service error!</p>"+error);
 					}
 				});
 			}
 		} catch(err) {
 			try {
+				userAccManChangePasswordLock = true;
+				clearPasswordFields();
 				$("#userAccManChangePasswordErrorsDIV").html("<p class='text-danger bg-primary'>Tracking service error!</p>"+error);
 			} catch(error) {
 				console.log(error);

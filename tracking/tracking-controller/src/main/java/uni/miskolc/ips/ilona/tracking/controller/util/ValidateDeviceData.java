@@ -6,13 +6,13 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 public class ValidateDeviceData {
 
-	private static String deviceidPattern = "^(?=.{5,50}$)([a-zA-Z0-9]{1}[_:-]{0,1}){1,49}[a-zA-Z0-9]{1}$";
+	private static String deviceidPattern = "^(?=.{5,50}$)^([a-zA-Z0-9]{1}[_:-]{0,1}){1,49}[a-zA-Z0-9]{1}$";
 
-	private static String deviceNamePattern = "^(?=.{5,50}$)([a-zA-Z0-9]{1}[ ]{0,1}){1,49}[a-zA-Z0-9]{1}$";
+	private static String deviceNamePattern = "^(?=.{5,50}$)^([a-zA-Z0-9]{1}[ ]{0,1}){1,49}[a-zA-Z0-9]{1}$";
 
 	private static String deviceTypePattern = "^[a-zA-Z]{1,20}$";
 
-	private static String deviceTypeNamePattern = "^(?=.{1,30}$)([a-zA-Z0-9]{1}[_ -]{0,1}){1,29}[a-zA-Z0-9]{1}$";
+	private static String deviceTypeNamePattern = "^(?=.{1,30}$)^([a-zA-Z0-9]{1}[_ -]{0,1}){1,29}[a-zA-Z0-9]{1}$";
 
 	public static ValidityStatusHolder validateDeviceid(String deviceid) {
 		ValidityStatusHolder errors = new ValidityStatusHolder();

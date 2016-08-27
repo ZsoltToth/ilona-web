@@ -12,21 +12,33 @@
 <!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
+<script src="<c:url value='/js/tracking/deviceValidation.js'></c:url>"></script>
 <script src="<c:url value='/js/deviceManagement.js'></c:url>"></script>
 
 <script type="text/javascript">
 	
+	var userManDevDeviceModificationDeleteDeviceLock = true;
+	
+	var userManDevDeviceidBeforeModification;
+	var userManDevDeviceNameBeforeModification;
+	var userManDevDeviceTypeBeforeModification;
+	var userManDevDeviceTypeNameBeforeModification;
+	
 	$("#userManDevDeviceModificationDeleteDeviceBTN").click(function(event){
 		try {
 			event.preventDefault();
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
+			if(userManDevDeviceModificationDeleteDeviceLock == true) {
+				userManDevDeviceModificationDeleteDeviceLock = false;
+			} else {
+				return;
+			}
 			$.ajax({
 				type : "POST",
 				async : true,
 				url : "<c:url value='/tracking/user/mandevdeletedevice'></c:url>",
 				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
+					xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"), 
+							$("meta[name='_csrf']").attr("content"));
 				},
 				data : {
 					userid : $("#userManDevOwneridHidden").val(),
@@ -36,24 +48,38 @@
 				},
 				success : function(result, status, error) {
 					try {
-						if(result.executionState == true) {							
+						userManDevDeviceModificationDeleteDeviceLock = true;
+						switch(result.responseState) {
+						case 100: {
 							$("#userManDevResultOrErrorDIV")
-								.html("<p class='text-danger bg-primary'>Device deletion was successful!</p>");
-							$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+								.html("<p class='bg-primary'>Device has been deleted successfully!</p>");
 							var deviceid = "#userManDevDeviceRow" + $("#userManDevDeviceModificationDeviceid").val();						
 							$(deviceid).remove();
-							
-						} else {
-							var i = 0;
-							var messages = result.messages;
-							var length = messages.length;						
-							var errorMessages = "";
-							for(i; i < length; i++) {
-								errorMessages += "<p class='text-danger bg-primary'>" + messages[i] + "</p>";
-							}
-							$("#userManDevResultOrErrorDIV").html(errorMessages);
-							$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+							break;
 						}
+						case 200: {
+							$("#userManDevResultOrErrorDIV")
+							.html("<p class='bg-primary'>Device data was invalid!</p>");
+							break;
+						}
+						case 400: {
+							$("#userManDevResultOrErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						case 600: {
+							$("#userManDevResultOrErrorDIV")
+							.html("<p class='bg-primary'>Device not found and not deleted with id: "
+									+ $("#userManDevDeviceModificationDeviceid").val() + "</p>");
+							break;
+						}
+						default: {
+							$("#mainpageSignupErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						}
+						$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
 						
 					} catch(err) {
 						console.log(err);
@@ -61,6 +87,7 @@
 				},
 				error : function(xhr, status, error) {
 					try {
+						userManDevDeviceModificationDeleteDeviceLock = true;
 						$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
 						$("#userManDevResultOrErrorDIV").html("<p class='text-danger bg-primary'>Service error!</p>");
 					} catch(err) {
@@ -69,6 +96,7 @@
 				}
 			});
 		} catch(err) {
+			userManDevDeviceModificationDeleteDeviceLock = true;
 			console.log(err);
 		}
 	});
@@ -76,6 +104,7 @@
 	$("#userManDevDeviceModificationCancelModificationBTN").click(function(event){
 		try {
 			event.preventDefault();
+			$("#userManDevResultOrErrorDIV").html("");
 			$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
 		} catch(err) {
 			console.log(err);
@@ -85,17 +114,21 @@
 	$(".userManDevStartDeviceModification").click(function(event){
 		try {
 			event.preventDefault();
-			
-			var actualDeviceid = $(this).attr("href");
-			
-			var deviceNameInputValue = $("#" + "userManDevDeviceName" + actualDeviceid).val();
-			var deviceTypeInputValue = $("#" + "userManDevDeviceType" + actualDeviceid).val();			
-			var deviceTypeNameInputValue =  $("#" + "userManDevDeviceTypeName" + actualDeviceid).val();
+			$("#userManDevResultOrErrorDIV").html("");
+			var actualDeviceid = $(this).attr("href");		
+			var deviceNameInputValue = document.getElementById("userManDevDeviceName" + actualDeviceid).textContent.trim();
+			var deviceTypeInputValue = document.getElementById("userManDevDeviceType" + actualDeviceid).textContent.trim();			
+			var deviceTypeNameInputValue =  document.getElementById("userManDevDeviceTypeName" + actualDeviceid).textContent.trim();
 			
 			$("#userManDevDeviceModificationDeviceid").val(actualDeviceid);
 			$("#userManDevDeviceModificationDeviceName").val(deviceNameInputValue);		
 			$("#userManDevDeviceModificationDeviceType").val(deviceTypeInputValue);
 			$("#userManDevDeviceModificationDeviceTypeName").val(deviceTypeNameInputValue);
+			
+			userManDevDeviceidBeforeModification = actualDeviceid;
+			userManDevDeviceNameBeforeModification = deviceNameInputValue;
+			userManDevDeviceTypeBeforeModification = deviceTypeInputValue;
+			userManDevDeviceTypeNameBeforeModification = deviceTypeNameInputValue;
 			
 			var inputDefaultSize = 20;		
 			if(actualDeviceid.length < inputDefaultSize) {
@@ -132,79 +165,99 @@
 		try {
 			event.preventDefault();
 			$("#userManDevResultOrErrorDIV").html("");
-			var deviceidInput = document.getElementById("userManDevDeviceModificationDeviceid");
-			var deviceNameInput = document.getElementById("userManDevDeviceModificationDeviceName");				
-			var deviceTypeInput = document.getElementById("userManDevDeviceModificationDeviceType");	
-			var deviceTypeNameInput = document.getElementById("userManDevDeviceModificationDeviceTypeName");
 
-			var hadError = 0;
-			var errorMessage = "";
+			var inputs = {
+				deviceid: document.getElementById("userManDevDeviceModificationDeviceid").value,
+				deviceName: document.getElementById("userManDevDeviceModificationDeviceName").value,
+				deviceType: document.getElementById("userManDevDeviceModificationDeviceType").value,
+				deviceTypeName: document.getElementById("userManDevDeviceModificationDeviceTypeName").value
+			};
 			
-			if(deviceidInput.checkValidity() == false) {
-				hadError++;
-				errorMessage += "<p class='text-danger bg-primary'>Invalid deviceid!</p>";
+			function restoreDeviceModification() {
+				$("#userManDevDeviceModificationDeviceid").val(userManDevDeviceidBeforeModification);
+				$("#userManDevDeviceModificationDeviceName").val(userManDevDeviceNameBeforeModification);
+				$("#userManDevDeviceModificationDeviceType").val(userManDevDeviceTypeBeforeModification);
+				$("#userManDevDeviceModificationDeviceTypeName").val(userManDevDeviceTypeNameBeforeModification);
 			}
 			
-			if(deviceNameInput.checkValidity() == false) {
-				hadError++;
-				errorMessage += "<p class='text-danger bg-primary'>Invalid device name!</p>";
-			}
-			
-			if(deviceTypeInput.checkValidity() == false) {
-				hadError++;
-				errorMessage += "<p class='text-danger bg-primary'>Invalid device type!</p>";
-			}
-			
-			if(deviceTypeNameInput.checkValidity() == false) {
-				hadError++;
-				errorMessage += "<p class='text-danger bg-primary'>Invalid device type name!</p>";
-			}
-			
-			if(Boolean(hadError)) {
-				$("#userManDevResultOrErrorDIV").html(errorMessage);
+			var dependency = {
+				validateInputs : checkDevicesInputsValidity
+			};
+					
+			var result = dependency.validateInputs(inputs);
+
+			if(result.valid == false) {
+				$("#userManDevResultOrErrorDIV").html(result.errors);
+				restoreDeviceModification();
 				return;
 			}
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
+			
 			$.ajax({
 				type : "POST",
 				async : true,
 				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
+					xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"), 
+							$("meta[name='_csrf']").attr("content"));
 				},
 				data : {
 					userid : $("#userManDevOwneridHidden").val(),
-					deviceid : deviceidInput.value,
-					deviceName : deviceNameInput.value,
-					deviceType : deviceTypeInput.value,
-					deviceTypeName : deviceTypeNameInput.value
+					deviceid : document.getElementById("userManDevDeviceModificationDeviceid").value,
+					deviceName : document.getElementById("userManDevDeviceModificationDeviceName").value,
+					deviceType : document.getElementById("userManDevDeviceModificationDeviceType").value,
+					deviceTypeName : document.getElementById("userManDevDeviceModificationDeviceTypeName").value
 				},
 				url : "<c:url value='/tracking/user/mandevupdatedevicedetails'></c:url>",
 				success : function(result, status, xhr) {
 					try {
-						if(result.executionState == true) {							
+						switch(result.responseState) {
+						case 100: {
 							$("#userManDevResultOrErrorDIV")
-								.html("<p class='text-danger bg-primary'>Device modification was successful!</p>");
-							$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
-							var deviceid = deviceidInput.value;
-							$("#userManDevDeviceName"+deviceid).val(deviceNameInput.value);
-							$("#userManDevDeviceType"+deviceid).val(deviceTypeInput.value);
-							$("#userManDevDeviceTypeName"+deviceid).val(deviceTypeNameInput.value);
-							resizeTableElements();
+								.html("<p class='bg-primary'>The device has been updated successfully!</p>");
+							var deviceid = document.getElementById("userManDevDeviceModificationDeviceid").value;
+							$("#userManDevDeviceName"+deviceid)
+								.text(document.getElementById("userManDevDeviceModificationDeviceName").value);
 							
-						} else {
-							var i = 0;
-							var messages = result.messages;
-							var length = messages.length;						
-							var errorMessages = "";
-							for(i; i < length; i++) {
-								errorMessages = "<p class='text-danger bg-primary'>" + messages[i] + "</p>";
-							}
-							$("#userManDevResultOrErrorDIV").html(errorMessages);
-							$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
-						}					
+							dataTableDevices.fnDraw();
+							/*
+							var deviceid = document.getElementById("userManDevDeviceModificationDeviceid").value;
+							document.getElementById("userManDevDeviceName"+deviceid).textContent = 
+								document.getElementById("userManDevDeviceModificationDeviceName").value);
+			
+							document.getElementById("userManDevDeviceType"+deviceid).textContent = 
+								document.getElementById("userManDevDeviceModificationDeviceType").value);
+	
+							document.getElementById("userManDevDeviceTypeName"+deviceid).textContent = 
+								document.getElementById("userManDevDeviceModificationDeviceTypeName").value);
+							//resizeTableElements();
+							*/
+							break;
+						}
+						case 300: {
+							$("#userManDevResultOrErrorDIV")
+							.html("<p class='bg-primary'>Device data was invalid!</p>");
+							restoreDeviceModification();
+							return;
+						}
+						case 400: {
+							$("#userManDevResultOrErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						case 600: {
+							$("#userManDevResultOrErrorDIV")
+							.html("<p class='bg-primary'>Device not found with this id: " 
+									+ $("#userCreateDeviceDeviceidTXT").val() + "</p>");
+							break;
+						}
+						default: {
+							$("#userManDevResultOrErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						}
+						$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");											
 					} catch(err) {
-						alert(err);
+						console.log(err);
 					}				
 				},
 				error : function(xhr, status, error) {
@@ -215,9 +268,10 @@
 						console.log(err);
 					}									
 				}			
-			});			
+			});	
+			
 		} catch(err) {
-			alert(err);
+			console.log(err);
 		}
 	});
 
@@ -225,21 +279,27 @@
 		try {
 			var resizeInputs = ["userManDevDeviceidClass", "userManDevDeviceNameClass",
 			                    "userManDevDeviceTypeClass", "userManDevDeviceTypeNameClass"];
-			resizeTableElementsByClassname(resizeInputs);		
+			//resizeTableElementsByClassname(resizeInputs);		
 		} catch(err) {
-			alert(err);
+			console.log(err);
 		}
 	}
 	
 	/*
 	 * Table column width align.
 	 * Every column with the max column length.
-	 */ 
+	 */
+	 var dataTableDevices; 
+	 
 	$(document).ready(function(){	
 		try {	
-			resizeTableElements();			
+			//resizeTableElements();
+			
+			dataTableDevices = $("#userManDevDataTable").dataTable({
+				responsive: true
+			});
 		} catch(err) {
-			alert(err);
+			console.log(err);
 		}
 	});
 </script>
@@ -324,7 +384,7 @@
 				<div id="userManDevResultOrErrorDIV"></div>
 				<div style="overflow: auto; height: 800px">
 					<div class="table-responsive">
-						<table class="table" id="userManDevdataTables-example">
+						<table class="display" id="userManDevDataTable">
 							<thead>
 								<tr>
 									<th>Deviceid</th>
@@ -337,35 +397,13 @@
 							<tbody>							
 								<c:forEach var="device" items="${devices}" >
 									<tr id="userManDevDeviceRow${device.deviceid}">
-										<td>
-											<input type="text" readonly="readonly" 
-												value="${device.deviceid}"
-												class="form-control userManDevDeviceidClass" 
-												size="${fn:length(device.deviceid)}">
-										</td>
+										<td>${device.deviceid}</td>
 										
-										<td><input type="text" 
-											value="${device.deviceName}"
-											class="form-control userManDevDeviceNameClass" 
-											id="userManDevDeviceName${device.deviceid}"
-											size="${fn:length(device.deviceName)}"
-											readonly="readonly">
-										</td>
+										<td id="userManDevDeviceName${device.deviceid}">${device.deviceName}</td>
 											
-										<td><input type="text" 
-											value="${device.deviceType}"
-											class="form-control userManDevDeviceTypeClass" 
-											id="userManDevDeviceType${device.deviceid}"
-											size="${fn:length(device.deviceType)}"
-											readonly="readonly">
-										</td>
+										<td id="userManDevDeviceType${device.deviceid}">${device.deviceType}</td>
 											
-										<td><input type="text" value="${device.deviceTypeName}" 
-											class="form-control userManDevDeviceTypeNameClass"
-											id="userManDevDeviceTypeName${device.deviceid}"
-											size="${fn:length(device.deviceTypeName)}"
-											readonly="readonly">
-										</td>						
+										<td id="userManDevDeviceTypeName${device.deviceid}">${device.deviceTypeName}</td>						
 											
 										<td><a href="${device.deviceid}" 
 											class="userManDevStartDeviceModification">Modify device

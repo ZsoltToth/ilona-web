@@ -10,17 +10,24 @@
 <meta name="_csrf" content="${_csrf.token}" />
 <!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}" />
-
+<script src="<c:url value='/js/tracking/deviceValidation.js'></c:url>"></script>
 <script type="text/javascript">
 
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
 
+	var userCreateDeviceCreateDeviceLock = true;
+	
 	$("#userCreateDeviceCreateDeviceBTN").click(function(event){
 		try {
 			event.preventDefault();
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
+			
+			if(userCreateDeviceCreateDeviceLock == true) {
+				userCreateDeviceCreateDeviceLock = false;
+			} else {
+				return;
+			}
+			
 			$("#userCreateDeviceCreationErrorDIV").html("");
 			
 			var deviceIdElement = document.getElementById("userCreateDeviceDeviceidTXT");
@@ -28,31 +35,29 @@
 			var deviceTypeElement = document.getElementById("userCreateDeviceDeviceTypeTXT");
 			var deviceTypeNameElement = document.getElementById("userCreateDeviceDeviceTypeNameTXT");
 			
-			var hadError = 0;
-			var errorText = "";
-			
-			if (deviceIdElement.checkValidity() == false) {
-				hadError++;
-				errorText += "<p class='text-danger bg-primary'>Invalid deviceid!</p>";
+			function clearDeviceInputs() {
+				$("#userCreateDeviceDeviceidTXT").val("");
+				$("#userCreateDeviceDeviceNameTXT").val("");
+				$("#userCreateDeviceDeviceTypeTXT").val("");
+				$("#userCreateDeviceDeviceTypeNameTXT").val("");
 			}
 			
-			if(deviceNameElement.checkValidity() == false) {
-				hadError++;
-				errorText += "<p class='text-danger bg-primary'>Invalid device name!</p>";
-			}
-			
-			if(deviceTypeElement.checkValidity() == false) {
-				hadError++;
-				errorText += "<p class='text-danger bg-primary'>Invalid device type!</p>";
-			}
-			
-			if(deviceTypeNameElement.checkValidity() == false) {
-				hadError++;
-				errorText += "<p class='text-danger bg-primary'>Invalid device type name!</p>";
-			}
-			
-			if(Boolean(hadError)) {
-				$("#userCreateDeviceCreationErrorDIV").html(errorText);
+			var inputs = {
+				deviceid: deviceIdElement.value,
+				deviceName: deviceNameElement.value,
+				deviceType: deviceTypeElement.value,
+				deviceTypeName: deviceTypeNameElement.value
+			};
+				
+			var dependency = {
+				validateInputs : checkDevicesInputsValidity
+			};
+				
+			var result = dependency.validateInputs(inputs);
+		
+			if(result.valid == false) {
+				$("#userCreateDeviceCreationErrorDIV").html(result.errors);
+				userCreateDeviceCreateDeviceLock = true;
 				return;
 			}
 			
@@ -60,7 +65,8 @@
 				type : "POST",
 				async : true,
 				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
+					xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"), 
+							$("meta[name='_csrf']").attr("content"));
 				},
 				url : "<c:url value='/tracking/user/createnewdevice'></c:url>",
 				data : {
@@ -71,31 +77,63 @@
 					deviceTypeName : $("#userCreateDeviceDeviceTypeNameTXT").val()
 				},
 				success : function(result, status, xhr) {
-					var i = 0;
-					length = result.length;
-					resultStatus = "";
-					for(i; i < length; i++) {
-						resultStatus += "<p class='bg-primary'>" + result[i] + "</p>";
-					}					
-					$("#userCreateDeviceDeviceidTXT").val("");
-					$("#userCreateDeviceDeviceNameTXT").val("");
-					$("#userCreateDeviceDeviceTypeTXT").val("");
-					$("#userCreateDeviceDeviceTypeNameTXT").val("");
-					$("#userCreateDeviceCreationErrorDIV").html(resultStatus);
+					try {
+						userCreateDeviceCreateDeviceLock = true;
+						switch(result.responseState) {
+						case 100: {
+							$("#userCreateDeviceCreationErrorDIV")
+								.html("<p class='bg-primary'>The device has been added successfully!</p>");
+							break;
+						}
+						case 200: {
+							$("#userCreateDeviceCreationErrorDIV")
+							.html("<p class='bg-primary'>Device data was invalid!</p>");
+							break;
+						}
+						case 300: {
+							$("#userCreateDeviceCreationErrorDIV")
+							.html("<p class='bg-primary'>Device data was invalid!</p>");
+							break;
+						}
+						case 400: {
+							$("#userCreateDeviceCreationErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						case 600: {
+							$("#userCreateDeviceCreationErrorDIV")
+							.html("<p class='bg-primary'>A device is already exists with id: "
+									+ $("#userCreateDeviceDeviceidTXT").val() + "</p>");
+							break;
+						}
+						default: {
+							$("#userCreateDeviceCreationErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						}
+						clearDeviceInputs();
+					} catch(error) {
+						console.log(error);
+					}
 				},
 				error : function(xhr, status, error) {
-					$("#userCreateDeviceDeviceidTXT").val("");
-					$("#userCreateDeviceDeviceNameTXT").val("");
-					$("#userCreateDeviceDeviceTypeTXT").val("");
-					$("#userCreateDeviceDeviceTypeNameTXT").val("");				
-					$("#userCreateDeviceCreationErrorDIV").html("<p class='bg-primary'>Service error!</p>");
+					try {
+						userCreateDeviceCreateDeviceLock = true;
+						clearDeviceInputs();				
+						$("#userCreateDeviceCreationErrorDIV").html("<p class='bg-primary'>Service error!</p>");
+					} catch(error) {
+						console.log(error);
+					}
 				}
 			});
-		} catch(err) {
+		} catch(error) {
 			try {
+				userCreateDeviceCreateDeviceLock = true;
 				$("#userCreateDeviceCreationErrorDIV").html("<p class='bg-primary'>Service error!</p>");
-			} catch(error) {
-				console.log(error);
+				console.log(error)
+			} catch(err) {
+				console.log(err);
 			}
 		}
 	});	
