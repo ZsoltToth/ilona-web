@@ -11,94 +11,137 @@
 <!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
+<script src="<c:url value='/js/tracking/deviceValidation.js'></c:url>"></script>
 <script type="text/javascript">
 
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
 
+	var adminCreateNewDeviceLock = true;
+	
 	$("#adminCreateNewDeviceCreateNewDeviceBTN").click(function(event){
 		try {
 			event.preventDefault();
-			
-			
+			if (adminCreateNewDeviceLock == true) {
+				adminCreateNewDeviceLock = false;
+			} else {
+				return;
+			}
 			var deviceIdElement = document.getElementById("adminCreateNewDeviceDeviceidTXT");
 			var deviceNameElement = document.getElementById("adminCreateNewDeviceDeviceNameTXT");
 			var deviceTypeElement = document.getElementById("adminCreateNewDeviceDeviceTypeTXT");
 			var deviceTypeNameElement = document.getElementById("adminCreateNewDeviceDeviceTypeNameTXT");
 			
-			var hadError = 0;
-			var errorText = "";
-			
-			if (deviceIdElement.checkValidity() == false) {
-				hadError++;
-				errorText += "<p class='text-danger bg-primary'>Invalid deviceid!</p>";
+			function clearDeviceInputs() {
+				$("#adminCreateNewDeviceDeviceidTXT").val("");
+				$("#adminCreateNewDeviceDeviceNameTXT").val("");
+				$("#adminCreateNewDeviceDeviceTypeTXT").val("");
+				$("#adminCreateNewDeviceDeviceTypeNameTXT").val("");
 			}
 			
-			if(deviceNameElement.checkValidity() == false) {
-				hadError++;
-				errorText += "<p class='text-danger bg-primary'>Invalid device name!</p>";
-			}
-			
-			if(deviceTypeElement.checkValidity() == false) {
-				hadError++;
-				errorText += "<p class='text-danger bg-primary'>Invalid device type!</p>";
-			}
-			
-			if(deviceTypeNameElement.checkValidity() == false) {
-				hadError++;
-				errorText += "<p class='text-danger bg-primary'>Invalid device type name!</p>";
-			}
-			
-			if(Boolean(hadError)) {
-				$("#adminCreateNewDeviceResultDIV").html(errorText);
+			var inputs = {
+				deviceid: deviceIdElement.value,
+				deviceName: deviceNameElement.value,
+				deviceType: deviceTypeElement.value,
+				deviceTypeName: deviceTypeNameElement.value
+			};
+				
+			var dependency = {
+				validateInputs : checkDevicesInputsValidity
+			};
+				
+			var result = dependency.validateInputs(inputs);
+		
+			if(result.valid == false) {
+				adminCreateNewDeviceLock = true;
+				$("#adminCreateNewDeviceResultDIV").html(result.errors);
 				return;
 			}
 			
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
 			$.ajax({
 				type : "POST",
 				async : true,
 				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
+					xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"), 
+						$("meta[name='_csrf']").attr("content"));
 				},
 				url : "<c:url value='/tracking/admin/createnewdeviceforuser'></c:url>",
 				data : {
 					userid : $("#adminCreateNewDeviceOwnerIDHIDDEN").val(),
-					deviceid : $("#adminCreateNewDeviceDeviceidTXT").val(),
-					deviceName : $("#adminCreateNewDeviceDeviceNameTXT").val(),
-					deviceType : $("#adminCreateNewDeviceDeviceTypeTXT").val(),
-					deviceTypeName : $("#adminCreateNewDeviceDeviceTypeNameTXT").val()
+					deviceid : deviceIdElement.value,
+					deviceName : deviceNameElement.value,
+					deviceType : deviceTypeElement.value,
+					deviceTypeName : deviceTypeNameElement.value
 				},
 				success : function(result, status, xhr) {
-					if(result.executionState == true) {
-						$("#adminCreateNewDeviceDeviceidTXT").val("");
-						$("#adminCreateNewDeviceDeviceNameTXT").val("");
-						$("#adminCreateNewDeviceDeviceTypeTXT").val("");
-						$("#adminCreateNewDeviceDeviceTypeNameTXT").val("");
-						$("#adminCreateNewDeviceResultDIV")
-							.html("<p class='text-danger bg-primary'>The device has been created!</p>");
-					} else {
-						$("#adminCreateNewDeviceDeviceidTXT").val("");
-						$("#adminCreateNewDeviceDeviceNameTXT").val("");
-						$("#adminCreateNewDeviceDeviceTypeTXT").val("");
-						$("#adminCreateNewDeviceDeviceTypeNameTXT").val("");
-						var i = 0;
-						var messages = result.messages;
-						var length = messages.length;
-						var resultStatus = "";
-						for(i; i < length; i++) {
-							resultStatus += "<p class='bg-primary'>" + messages[i] + "</p>";
-						}					
-						$("#adminCreateNewDeviceResultDIV").html(resultStatus);
-					}
+					try {
+						adminCreateNewDeviceLock = true;
+						switch(result.responseState) {
+						case 100: {
+							$("#adminCreateNewDeviceResultDIV")
+								.html("<p class='bg-primary'>The device has been added successfully!</p>");
+							break;
+						}
+						case 200: {
+							$("#adminCreateNewDeviceResultDIV")
+							.html("<p class='bg-primary'>Device data was invalid!</p>");
+							break;
+						}
+						case 300: {
+							$("#adminCreateNewDeviceResultDIV")
+							.html("<p class='bg-primary'>Device data was invalid!</p>");
+							break;
+						}
+						case 400: {
+							$("#adminCreateNewDeviceResultDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						case 600: {
+							$("#adminCreateNewDeviceResultDIV")
+							.html("<p class='bg-primary'>No user has found with id: "
+									+ $("#adminCreateNewDeviceDeviceidTXT").val() + "</p>");
+							break;
+						}
+						case 700: {
+							$("#adminCreateNewDeviceResultDIV")
+							.html("<p class='bg-primary'>Duplicated device with id: "
+									+ $("#adminCreateNewDeviceDeviceidTXT").val() + "</p>");
+							break;
+						}
+						default: {
+							$("#adminCreateNewDeviceResultDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						}
+						clearDeviceInputs();
+					} catch(error) {
+						console.log(error);
+					}				
 				},
 				error : function(xhr, status, error) {
-					alert("Error device creation!"+status+error);
+					try {
+						adminCreateNewDeviceLock = true;
+						clearDeviceInputs();
+						$("#adminCreateNewDeviceResultDIV")
+						.html("<p class='bg-primary'>Service error!</p>");
+						console.log("" + status + " " + error);
+					} catch(error) {
+						console.log(error);
+					}
 				}
 			});
 		} catch(err) {
-			console.log(err);
+			try {
+				adminCreateNewDeviceLock = true;
+				clearDeviceInputs();
+				$("#adminCreateNewDeviceResultDIV")
+				.html("<p class='bg-primary'>Service error!</p>");
+				console.log("" + status + " " + error);
+			} catch(error) {
+				console.log(error);
+			}
 		}
 	});	
 </script>

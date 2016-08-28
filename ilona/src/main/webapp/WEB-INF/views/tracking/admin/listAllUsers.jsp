@@ -13,16 +13,17 @@
 
 <script type="text/javascript">
 	
+	var adminListUsersUsersDataTable;
+	
 	$(".adminListUsersDeviceListClass").click(function(event){
 		try {
 			event.preventDefault();
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
 			$.ajax({
 				type : "POST",
 				async : true,
 				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
+					xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
+						$("meta[name='_csrf']").attr("content"));
 				},
 				data : {
 					userid : $(this).attr('href')
@@ -39,92 +40,141 @@
 					try {
 						$("#adminListUsersResultAndErrorDIV")
 							.html("<p class='bg-primary'>Service error!</p>");
+						console.log("" + status + " " + error);
 					} catch(err) {
 						console.log(err);
 					}
 				}
 			});
-		} catch(err) {
-			console.log(err);
+		} catch(error) {
+			try {
+				$("#adminListUsersResultAndErrorDIV")
+					.html("<p class='bg-primary'>Service error!</p>");
+				console.log(error);
+			} catch(err) {
+				console.log(err);
+			}
 		}
 	});
 	
 	$(".adminListUsersModifyUserClass").click(function(event){
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		$.ajax({
-			type : "POST",
-			async : true,
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			data : {
-				userid : $(this).attr('href')
-			},
-			url : "<c:url value='/tracking/admin/listusers/modifyuser'></c:url>",
-			success : function(result, status, xhr) {
-				try {
-					$("#page-wrapper").html(result);
-				} catch(err) {
-					console.log(err);
+		try {
+			event.preventDefault();
+			$.ajax({
+				type : "POST",
+				async : true,
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"), 
+						$("meta[name='_csrf']").attr("content"));
+				},
+				data : {
+					userid : $(this).attr('href')
+				},
+				url : "<c:url value='/tracking/admin/listusers/modifyuser'></c:url>",
+				success : function(result, status, xhr) {
+					try {
+						$("#page-wrapper").html(result);
+					} catch(error) {
+						console.log(error);
+					}
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminListUsersResultAndErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+						console.log("" + status + " " + error);
+					} catch(err) {
+						console.log(err);
+					}
 				}
-			},
-			error : function(xhr, status, error) {
-				try {
-					$("#adminListUsersResultAndErrorDIV")
-						.html("<p class='bg-primary'>Service error!</p>");
-				} catch(err) {
-					console.log(err);
-				}
+			});
+		} catch(error) {
+			try {
+				$("#adminListUsersResultAndErrorDIV")
+					.html("<p class='bg-primary'>Service error!</p>");
+				console.log(error);
+			} catch(err) {
+				console.log(err);
 			}
-		});
+		}
 	});
 	
 	$(".adminListUsersDeleteUserClass").click(function(event){
-		event.preventDefault();
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		var userid = $(this).attr('href');
-		$.ajax({
-			type : "POST",
-			async : true,
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			data : {
-				userid : userid
-			},
-			url : "<c:url value='/tracking/admin/listusers/deleteuser'></c:url>",
-			success : function(result, status, xhr) {
-				try {
-					if(result.executionState == true) {
-						$("#adminListUsersResultAndErrorDIV")
-						.html("<p class='bg-primary'>User deleted!</p>");
-						$("#adminListUsers" + userid).remove();
-					} else {
-						var i = 0;
-						var messages = result.messages;
-						var length = messages.length;
-						var errorText = "";
-						for(i; i < length; i++) {
-							errorText += "<p class='bg-primary'>" + messages[i] + "</p>";
+		try {
+			event.preventDefault();
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			var userid = $(this).attr('href');
+			$.ajax({
+				type : "POST",
+				async : true,
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : {
+					userid : userid
+				},
+				url : "<c:url value='/tracking/admin/listusers/deleteuser'></c:url>",
+				success : function(result, status, xhr) {
+					try {
+						switch(result.responseState) {
+						case 100: {
+							$("#adminListUsersResultAndErrorDIV")
+								.html("<p class='bg-primary'>The account has been deleted!</p>");
+							$("#adminListUsers" + userid).remove();
+							adminListUsersUsersDataTable.draw(true);
+							break;
 						}
-						$("#adminListUsersResultAndErrorDIV").html(errorText);
+						case 200: {
+							$("#adminListUsersResultAndErrorDIV")
+							.html("<p class='bg-primary'>Input data was invalid!</p>");
+							break;
+						}
+						case 400: {
+							$("#adminListUsersResultAndErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						case 600: {
+							$("#adminListUsersResultAndErrorDIV")
+							.html("<p class='bg-primary'>User not found!</p>");
+							break;
+						}
+						case 700: {
+							$("#adminListUsersResultAndErrorDIV")
+							.html("<p class='bg-primary'>Own account deletion is forbidden!</p>");
+							break;
+						}
+						default: {
+							$("#adminListUsersResultAndErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+							break;
+						}
+						}
+					} catch(err) {
+						console.log(err);
 					}
-				} catch(err) {
-					console.log(err);
+				},
+				error : function(xhr, status, error) {
+					try {
+						$("#adminListUsersResultAndErrorDIV")
+							.html("<p class='bg-primary'>Service error!</p>");
+						console.log("" + status + " " + error);
+					} catch(err) {
+						console.log(err);
+					}
 				}
-			},
-			error : function(xhr, status, error) {
-				try {
-					$("#adminListUsersResultAndErrorDIV")
-						.html("<p class='bg-primary'>Service error!</p>");
-				} catch(err) {
-					console.log(err);
-				}
+			});
+		} catch(error) {
+			try {
+				$("#adminListUsersResultAndErrorDIV")
+					.html("<p class='bg-primary'>Service error!</p>");
+				
+				console.log(error);
+			} catch(err) {
+				console.log(err);
 			}
-		});
+		}
 	});
 	
 	$("#adminListUsersShowAdminsCHB").change(function(){
@@ -168,6 +218,25 @@
 			}
 		}
 	});
+	
+	
+	
+	$(document).ready(function(){
+		try {
+			adminListUsersUsersDataTable = $("#adminListUsersDataTable").dataTable({
+				responsive: true
+			});
+			
+			$('#adminListUsersUsersDataTable tbody').on( 'click', '.proba111', function () {
+			    table
+			        .row( $(this).parents('tr') )
+			        .remove()
+			        .draw();
+			} );
+		} catch(error) {
+			console.log(error);
+		}
+	});
 </script>
 
 <jsp:directive.include file="adminNavbar.jsp" />
@@ -179,14 +248,13 @@
 				<div class="panel-heading">
 				<input type="checkbox" checked="checked" id="adminListUsersShowAdminsCHB"> Show Admins
 				<input type="checkbox" checked="checked" id="adminListUsersShowUsersCHB"> Show Users
+				<input type="button" class="proba111" value="CLICK!">
 				</div>
 				<div class="panel-body">
 					<div id="adminListUsersResultAndErrorDIV"><p class="bg-primary">${serviceError}</p></div>
-					<div style="overflow: auto; height: 800px">
 						<div class="table-responsive">
-							<table class="table"
-								class="table table-striped table-bordered table-hover"
-								id="dataTables-example">
+							<table class="display"
+								id="adminListUsersDataTable">
 								<thead>
 									<tr>
 										<th>Userid</th>
@@ -233,7 +301,6 @@
 								</tbody>
 							</table>
 						</div>	<!-- table responsive end -->
-					</div> <!-- table height overflow auto end -->
 				</div>	<!-- panel body end -->
 			</div>	<!-- panel default end -->
 		</div>	<!-- colg-lg-12 end -->

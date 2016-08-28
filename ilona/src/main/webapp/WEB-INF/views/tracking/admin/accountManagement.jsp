@@ -11,6 +11,7 @@
 <!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
+<script src="<c:url value='/js/tracking/validation.js'></c:url>"></script>
 <script type="text/javascript">
 
 	$('[data-toggle="tooltip"]').tooltip();
@@ -19,144 +20,201 @@
 	var adminAccManSavedUsername = $("#adminAccManUsernameTXT").val();
 	var adminAccManSavedEmail = $("#adminAccManEmailTXT").val();
 	
+	var adminAccManUpdateDetailsLock = true;
+	var adminAccManUpdatePasswordLock = true;
+	
 	$("#accountUpdateDetails").click(function(event){
 		try {
-			event.preventDefault();
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
-			
+			event.preventDefault();	
+			if (adminAccManUpdateDetailsLock == true) {
+				adminAccManUpdateDetailsLock = false;
+			} else {
+				return;
+			}
 			$("#adminAccManAccountDetailsChangeResultDIV").html("");
-			var hadError = 0;
-			var errorText = "";
-							
-			var username = document.getElementById("adminAccManUsernameTXT");	
-			if (username.checkValidity() == false) {
-				errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
-				hadError = 1;
-			}
-					
-			var email = document.getElementById("adminAccManEmailTXT");
-			if(email.checkValidity()  == false) {
-				errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
-				hadError = 1;
-			}
-	
-			if (Boolean(hadError) == true) {
+			
+			var inputs = {
+				username: $("#adminAccManUsernameTXT").val(),
+				email: $("#adminAccManEmailTXT").val()
+			};
+				
+			var dependency = {
+				validateInputs : checkInputsValidity
+			};
+				
+			var result = dependency.validateInputs(inputs);
+
+			if (result.valid == false) {
+				adminAccManUpdateDetailsLock = true;
 				$("#adminAccManUsernameTXT").val(adminAccManSavedUsername);
 				$("#adminAccManEmailTXT").val(adminAccManSavedEmail);
-				$("#adminAccManAccountDetailsChangeResultDIV").html(errorText);
+				$("#adminAccManAccountDetailsChangeResultDIV").html(result.errors);
 			} else {
 				$.ajax({
 					type : "POST",
 					async : true,
 					url : "<c:url value='/tracking/admin/accountchangedetails'></c:url>",
 					beforeSend : function(xhr) {
-						xhr.setRequestHeader(header, token);
+						xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"), 
+							$("meta[name='_csrf']").attr("content"));
 					},
 					data : {
 						userid : $("#adminAccManUseridTXT").val(),
-						username : username.value,
-						email : email.value
+						username : $("#adminAccManUsernameTXT").val(),
+						email : $("#adminAccManEmailTXT").val()
 					},
 					success : function(result, status, xhr) {
-						if(result.executionState == true) {
-							$("#adminAccManAccountDetailsChangeResultDIV")
-								.html("<p class='text-danger bg-primary'>The password has been changed!</p>");
-						} else {
+						try {
+							adminAccManUpdateDetailsLock = true;
+							switch(result.responseState) {
+							case 100: {
+								$("#adminAccManAccountDetailsChangeResultDIV")
+									.html("<p class='bg-primary'>User has been modified successfully!</p>");
+								adminAccManSavedUsername = $("#adminAccManUsernameTXT").val();
+								adminAccManSavedEmail = $("#adminAccManEmailTXT").val();
+								return;
+							}
+							case 200: {
+								$("#adminAccManAccountDetailsChangeResultDIV")
+								.html("<p class='bg-primary'>User data was invalid!</p>");
+								break;
+							}
+							case 300: {
+								$("#adminAccManAccountDetailsChangeResultDIV")
+								.html("<p class='bg-primary'>User data was invalid!</p>");
+								break;
+							}
+							case 400: {
+								$("#adminAccManAccountDetailsChangeResultDIV")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}
+							default: {
+								$("#adminAccManAccountDetailsChangeResultDIV")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}
+							}
 							$("#adminAccManUsernameTXT").val(adminAccManSavedUsername);
 							$("#adminAccManEmailTXT").val(adminAccManSavedEmail);
-							var i = 0;
-							var messages = result.messages;
-							var length = messages.length;
-							var resultText = "";
-							for(i; i < length; i++) {
-								resultText += "<p class='text-danger bg-primary'>" + messages[i] + "</p>"
-							}				
-							$("#adminAccManAccountDetailsChangeResultDIV").html(resultText);
+						} catch(error) {
+							console.log(error);
 						}
 					},
 					error : function(xhr, status, error) {
 						try {
+							adminAccManUpdateDetailsLock = true;
 							$("#adminAccManAccountDetailsChangeResultDIV")
-								.html("<p class='text-danger bg-primary'>An error occured!</p>");	
+								.html("<p class='text-danger bg-primary'>An error occured!</p>");
+							console.log("" + status + " " + error);
 						} catch(err) {
 							console.log(err);
 						}
 					}
 				});
 			}
-		} catch(err) {
-			console.log(err);
+		} catch(error) {
+			try {
+				adminAccManUpdateDetailsLock = true;
+				$("#adminAccManAccountDetailsChangeResultDIV")
+					.html("<p class='text-danger bg-primary'>An error occured!</p>");
+				console.log(error);
+			} catch(err) {
+				console.log(err);
+			}
 		}	
 	});
 	
 	$("#adminAccManPasswordChangeBTN").click(function(event){
 		try {
 			event.preventDefault();
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
+			if (adminAccManUpdatePasswordLock == true) {
+				adminAccManUpdatePasswordLock = false;
+			} else {
+				return;
+			}
 			
 			$("#adminAccManPasswordChangeResultDIV").html("");
-			var hadError = 0;
-			var errorText = "";
-			var password1 = document.getElementById("adminAccManPasswordChange1TXT");
-			var password2 = document.getElementById("adminAccManPasswordChange1TXT");
 			
-			if (password1.checkValidity() == false) {
-				errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
-				hadError = 1;
-			}
+			var inputs = {
+				password : [$("#adminAccManPasswordChange1TXT").val(),
+				            $("#adminAccManPasswordChange2TXT").val()]
+			};
+					
+			var dependency = {
+				validateInputs : checkInputsValidity
+			};
+					
+			var result = dependency.validateInputs(inputs);
 			
-			if ( password1.value != password2.value) {
-				errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
-				hadError = 1;
-			}
-			
-			if(Boolean(hadError) == true) {
+			if(result.valid == false) {
+				adminAccManUpdatePasswordLock = true;
 				$("#adminAccManPasswordChange1TXT").val("");
 				$("#adminAccManPasswordChange2TXT").val("");
-				$("#adminAccManPasswordChangeResultDIV").html(errorText);
+				$("#adminAccManPasswordChangeResultDIV").html(result.errors);
 			} else {
 				$.ajax({
 					type : "POST",
 					async : true,
 					url : "<c:url value='/tracking/admin/accountchangepassword'></c:url>",
 					beforeSend : function(xhr) {
-						xhr.setRequestHeader(header, token);
+						xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
+							$("meta[name='_csrf']").attr("content"));
 					},
 					data : {
-						userid : $("#adminUserid").val(),
+						userid : $("#adminAccManUseridTXT").val(),
 						password : $("#adminAccManPasswordChange1TXT").val()
 					},
 					success : function(result, status, xhr) {
 						try {
-							if(result.executionState == true) {
-								$("#adminAccManPasswordChange1TXT").val("");
-								$("#adminAccManPasswordChange2TXT").val("");
+							adminAccManUpdatePasswordLock = true;
+							$("#adminAccManPasswordChange1TXT").val("");
+							$("#adminAccManPasswordChange2TXT").val("");
+							switch(result.responseState) {
+							case 100: {
 								$("#adminAccManPasswordChangeResultDIV")
-									.html("<p class='text-danger bg-primary'>The password has been changed!</p>");
-							} else {
-								$("#adminAccManPasswordChange1TXT").val("");
-								$("#adminAccManPasswordChange2TXT").val("");
-								var i = 0;
-								var messages = result.messages;
-								var length = messages.length;
-								var resultText = "";
-								for(i; i < length; i++) {
-									resultText += "<p class='text-danger bg-primary'>" + messages[i] + "</p>"
-								}				
-								$("#adminAccManPasswordChangeResultDIV").html(resultText);
+									.html("<p class='bg-primary'>The password has been modified successfully!</p>");
+								break;
 							}
+							case 200: {
+								$("#adminAccManPasswordChangeResultDIV")
+								.html("<p class='bg-primary'>Password data was invalid!</p>");
+								break;
+							}
+							case 300: {
+								$("#adminAccManPasswordChangeResultDIV")
+								.html("<p class='bg-primary'>Password data was invalid!</p>");
+								break;
+							}
+							case 400: {
+								$("#adminAccManPasswordChangeResultDIV")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}
+							default: {
+								$("#adminAccManPasswordChangeResultDIV")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}
+							}														
 						} catch(err) {
 							console.log(err);
 						}
 					},
 					error : function(xhr, status, error) {
-						$("#adminAccManPasswordChangeResultDIV").html("<p class='text-danger bg-primary'>An error occured!</p>");
+						try {
+							adminAccManUpdatePasswordLock = true;
+							$("#adminAccManPasswordChangeResultDIV")
+								.html("<p class='text-danger bg-primary'>An error occured!</p>");
+							
+						} catch(error) {
+							console.log(error);
+						}
 					}
 				});
 			}
 		} catch(err) {
+			adminAccManUpdatePasswordLock = true;
 			console.log(err);
 		}
 	});

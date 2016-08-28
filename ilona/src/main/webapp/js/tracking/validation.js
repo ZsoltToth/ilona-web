@@ -34,7 +34,7 @@ function validateInputIntegrityCheck(input) {
 function validateUserid(userid) {
 	try {
 		// outer variable?!
-		var regex = /^(?=.{5,20}$)^[a-zA-Z]{1}[a-zA-Z]{4,19}$/;
+		var regex = /^(?=.{5,20}$)^[a-zA-Z]{1}[a-zA-Z0-9]{4,19}$/;
 		var result = {
 			valid : true,
 			errors : []

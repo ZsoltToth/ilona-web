@@ -1,9 +1,12 @@
 package uni.miskolc.ips.ilona.tracking.controller.admin;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -20,17 +23,23 @@ import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
+import uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 @Controller
 @RequestMapping(value = "/tracking/admin")
 public class AdminAccountManagementController {
 
+	private static Logger logger = LogManager.getLogger(AdminAccountManagementController.class);
+
 	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userDeviceService;
 
 	@Resource(name = "trackingPasswordEncoder")
 	private PasswordEncoder passwordEncoder;
+
+	@Resource(name = "trackingCentralManager")
+	private TrackingModuleCentralManager centralManager;
 
 	@RequestMapping(value = "/accountmanagement", method = { RequestMethod.POST })
 	public ModelAndView createAdminAccountManagementpage() {
@@ -57,42 +66,58 @@ public class AdminAccountManagementController {
 		return mav;
 	}
 
+	/**
+	 * DOC! 100: OK 200: parameter error 300: validity error 400: service error
+	 * 
+	 * @param user
+	 * @return
+	 */
 	@RequestMapping(value = "/accountchangepassword", method = { RequestMethod.POST })
 	@ResponseBody
 	public ExecutionResultDTO changeAccountPasswordHandler(@ModelAttribute() UserBaseDetailsDTO user) {
-		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 		ValidityStatusHolder errors = new ValidityStatusHolder();
 
 		if (user == null) {
+			logger.info("Invalid parameter!");
 			result.addMessage("User is null!");
+			result.setResponseState(200);
 			return result;
 		}
+		try {
+			errors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateUserid(user.getUserid()));
 
-		errors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
-		errors.appendValidityStatusHolder(ValidateUserData.validateUserid(user.getUserid()));
-
-		if (!errors.isValid()) {
-			result.setMessages(errors.getErrors());
+			if (!errors.isValid()) {
+				result.setMessages(errors.getErrors());
+				result.setResponseState(300);
+				return result;
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Error: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
-
 		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-
-		if (!user.getUserid().equals(userDetails.getUserid())) {
-			result.addMessage("Authorization constraint failed!");
-			return result;
-		}
-
+		String hashedPassword = null;
+		Date credentialsValidity = null;
 		try {
-			UserData userData = userDeviceService.getUser(user.getUserid());
-			String hashedPassword = passwordEncoder.encode(user.getUserid());
+			UserData userData = userDeviceService.getUser(userDetails.getUserid());
+			hashedPassword = passwordEncoder.encode(user.getPassword());
 			userData.setPassword(hashedPassword);
+			credentialsValidity = new Date(new Date().getTime() + this.centralManager.getCredentialsValidityPeriod());
+			userData.setCredentialNonExpiredUntil(credentialsValidity);
 			userDeviceService.updateUser(userData);
 		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
 			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
+		userDetails.setPassword(hashedPassword);
+		userDetails.setCredentialNonExpiredUntil(credentialsValidity);
 		result.addMessage("Password modification is complete!");
 		return result;
 	}
@@ -101,38 +126,41 @@ public class AdminAccountManagementController {
 	@ResponseBody
 	public ExecutionResultDTO changeAccountDetailsHandler(@ModelAttribute() UserBaseDetailsDTO user) {
 
-		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 
 		if (user == null) {
 			result.addMessage("User is null!");
+			result.setResponseState(200);
 			return result;
 		}
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateUserData.validateUserid(user.getUserid()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateUsername(user.getUsername()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateEmail(user.getEmail()));
 
-		ValidityStatusHolder errors = new ValidityStatusHolder();
-		errors.appendValidityStatusHolder(ValidateUserData.validateUserid(user.getUserid()));
-		errors.appendValidityStatusHolder(ValidateUserData.validateUsername(user.getUsername()));
-		errors.appendValidityStatusHolder(ValidateUserData.validateEmail(user.getEmail()));
-
-		if (!errors.isValid()) {
-			result.setMessages(errors.getErrors());
+			if (!errors.isValid()) {
+				result.setMessages(errors.getErrors());
+				return result;
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Error: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
-
 		UserSecurityDetails userDetails = (UserSecurityDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 
-		if (!userDetails.getUserid().equals(user.getUserid())) {
-			result.addMessage("Authorization error!");
-			return result;
-		}
-
 		try {
-			UserData userData = userDeviceService.getUser(user.getUserid());
+			UserData userData = userDeviceService.getUser(userDetails.getUserid());
 			userData.setEmail(user.getEmail());
 			userData.setUsername(user.getUsername());
 			userDeviceService.updateUser(userData);
 		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
 			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
 
@@ -150,6 +178,10 @@ public class AdminAccountManagementController {
 
 	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
 		this.passwordEncoder = passwordEncoder;
+	}
+
+	public void setCentralManager(TrackingModuleCentralManager centralManager) {
+		this.centralManager = centralManager;
 	}
 
 }

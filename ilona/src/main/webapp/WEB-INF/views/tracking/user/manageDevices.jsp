@@ -15,6 +15,8 @@
 <script src="<c:url value='/js/tracking/deviceValidation.js'></c:url>"></script>
 <script src="<c:url value='/js/deviceManagement.js'></c:url>"></script>
 
+
+
 <script type="text/javascript">
 	
 	var userManDevDeviceModificationDeleteDeviceLock = true;
@@ -292,11 +294,24 @@
 	 var dataTableDevices; 
 	 
 	$(document).ready(function(){	
-		try {	
+		try {
+			var userManDevDevices = [["dsdd","dsdsd"]];
+			             			
+			
 			//resizeTableElements();
+			//alert(userManDevDevices["dev0001"].deviceid);
+			
+			$("#proba1").dataTable({
+				data: userManDevDevices,
+				 columns: [
+				            { title: "Name" },
+				            { title: "Position" },			           
+				        ]
+			});
 			
 			dataTableDevices = $("#userManDevDataTable").dataTable({
 				responsive: true
+				
 			});
 		} catch(err) {
 			console.log(err);
@@ -382,7 +397,6 @@
 					</div>
 				</div>
 				<div id="userManDevResultOrErrorDIV"></div>
-				<div style="overflow: auto; height: 800px">
 					<div class="table-responsive">
 						<table class="display" id="userManDevDataTable">
 							<thead>
@@ -416,13 +430,19 @@
 						</table>
 						<input type="hidden" id="userManDevOwneridHidden" value="${deviceOwnerid}">
 					</div> <!-- table responsive end -->
-				</div> <!-- overflow div end -->
+				
 			</div> <!-- panel body end -->
 			<div class="panel-body">
 				${executionError}
+				<table id="proba1">
+			
+			</table>
 			</div>
-		</div>
+			<div>
+			
+			</div>
+		</div> <!-- panel default ending -->
 
-	</div>
+	</div><!-- col-lg-12 ending -->
 
-</div>
+</div> <!-- container ending -->

@@ -1,6 +1,7 @@
 package uni.miskolc.ips.ilona.tracking.controller.user;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.annotation.Resource;
 
@@ -23,6 +24,7 @@ import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
+import uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 @Controller
@@ -36,6 +38,9 @@ public class UserAccountManagementController {
 
 	@Resource(name = "trackingPasswordEncoder")
 	private PasswordEncoder passwordEncoder;
+
+	@Resource(name = "trackingCentralManager")
+	private TrackingModuleCentralManager centralManager;
 
 	@RequestMapping(value = "/accountmanagement", method = { RequestMethod.POST })
 	public ModelAndView createAccountManagementHandler() {
@@ -159,10 +164,13 @@ public class UserAccountManagementController {
 				.getPrincipal();
 
 		String hashedPassword = null;
+		Date credentialsValidity = null;
 		try {
 			UserData updatedUserDetails = userDeviceService.getUser(userDetails.getUserid());
 			hashedPassword = passwordEncoder.encode(user.getPassword());
 			updatedUserDetails.setPassword(hashedPassword);
+			credentialsValidity = new Date(new Date().getTime() + this.centralManager.getCredentialsValidityPeriod());
+			updatedUserDetails.setCredentialNonExpiredUntil(credentialsValidity);
 			userDeviceService.updateUser(updatedUserDetails);
 		} catch (Exception e) {
 			logger.error("Service error! Cause: " + e.getMessage());
@@ -175,7 +183,7 @@ public class UserAccountManagementController {
 		 * Update principal
 		 */
 		userDetails.setPassword(hashedPassword);
-
+		userDetails.setCredentialNonExpiredUntil(credentialsValidity);
 		/*
 		 * Account management page with updated details
 		 */
@@ -215,6 +223,10 @@ public class UserAccountManagementController {
 
 	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
 		this.passwordEncoder = passwordEncoder;
+	}
+
+	public void setCentralManager(TrackingModuleCentralManager centralManager) {
+		this.centralManager = centralManager;
 	}
 
 }

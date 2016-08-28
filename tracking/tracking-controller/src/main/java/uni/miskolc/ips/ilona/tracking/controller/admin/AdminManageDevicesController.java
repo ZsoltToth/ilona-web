@@ -5,6 +5,8 @@ import java.util.Collection;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +29,8 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 @Controller
 @RequestMapping(value = "/tracking/admin")
 public class AdminManageDevicesController {
+
+	private static Logger logger = LogManager.getLogger(AdminManageDevicesController.class);
 
 	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userAndDeviceService;
@@ -80,19 +84,28 @@ public class AdminManageDevicesController {
 	public ExecutionResultDTO createDeviceForUserCreateDeviceRequestHandler(
 			@ModelAttribute() UserDeviceDataDTO newDevice) {
 
-		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 		if (newDevice == null) {
 			result.addMessage("User is null!");
+			result.setResponseState(200);
+			return result;
 		}
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(newDevice.getDeviceid()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceName(newDevice.getDeviceName()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceType(newDevice.getDeviceType()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceTypeName(newDevice.getDeviceTypeName()));
 
-		ValidityStatusHolder errors = new ValidityStatusHolder();
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(newDevice.getDeviceid()));
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceName(newDevice.getDeviceName()));
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceType(newDevice.getDeviceType()));
-		errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceTypeName(newDevice.getDeviceTypeName()));
-
-		if (!errors.isValid()) {
-			result.setMessages(errors.getErrors());
+			if (!errors.isValid()) {
+				result.setMessages(errors.getErrors());
+				result.setResponseState(300);
+				return result;
+			}
+		} catch (Exception e) {
+			logger.error("Serice error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
 
@@ -106,15 +119,19 @@ public class AdminManageDevicesController {
 			userAndDeviceService.storeDevice(device, user);
 		} catch (UserNotFoundException e) {
 			result.addMessage("User not found with ID: " + newDevice.getUserid());
+			result.setResponseState(600);
 			return result;
 		} catch (DuplicatedDeviceException e) {
 			result.addMessage("A device is already exists with ID: " + newDevice.getDeviceid());
+			result.setResponseState(700);
 			return result;
 		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
 			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
-		result.setExecutionState(true);
+
 		result.addMessage("The device has been created!");
 		return result;
 	}

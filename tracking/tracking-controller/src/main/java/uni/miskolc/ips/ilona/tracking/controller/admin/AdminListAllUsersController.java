@@ -6,6 +6,8 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +31,8 @@ import uni.miskolc.ips.ilona.tracking.service.exceptions.UserNotFoundException;
 @Controller
 @RequestMapping(value = "/tracking/admin")
 public class AdminListAllUsersController {
+
+	private static Logger logger = LogManager.getLogger(AdminListAllUsersController.class);
 
 	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userAndDeviceService;
@@ -58,6 +62,7 @@ public class AdminListAllUsersController {
 				filteredUsers.add(newUser);
 			}
 		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
 			userlistPage.addObject("serviceError", "Service error!");
 		}
 		userlistPage.addObject("users", filteredUsers);
@@ -70,6 +75,7 @@ public class AdminListAllUsersController {
 		ModelAndView mav = new ModelAndView("tracking/admin/userDevices");
 
 		if (userid == null) {
+			logger.info("Userid null!");
 			throw new TrackingServiceErrorException("Error: The userid is null!");
 		}
 
@@ -80,6 +86,7 @@ public class AdminListAllUsersController {
 			mav.addObject("devices", devices);
 			mav.addObject("deviceOwner", userid);
 		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
 			throw new TrackingServiceErrorException("Error: Service error!");
 		}
 		return mav;
@@ -88,10 +95,11 @@ public class AdminListAllUsersController {
 	@RequestMapping(value = "/listusers/deleteuser", method = { RequestMethod.POST })
 	@ResponseBody
 	public ExecutionResultDTO deleteUser(@RequestParam(value = "userid", required = false) String userid) {
-		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 
 		if (userid == null) {
 			result.addMessage("Userid is not valid!");
+			result.setResponseState(200);
 			return result;
 		}
 
@@ -100,22 +108,23 @@ public class AdminListAllUsersController {
 
 		if (userDetails.getUserid().equals(userid)) {
 			result.addMessage("Own account deletion is forbidden!");
+			result.setResponseState(700);
 			return result;
 		}
-
 		try {
 			UserData user = userAndDeviceService.getUser(userid);
 			userAndDeviceService.deleteUser(user);
-
 		} catch (UserNotFoundException e) {
+			logger.error("User not found: " + e.getMessage());
 			result.addMessage("User not found with id: " + userid);
+			result.setResponseState(600);
 			return result;
 		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
 			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
-
-		result.setExecutionState(true);
 		result.addMessage("User deleted!");
 		return result;
 	}
@@ -138,7 +147,7 @@ public class AdminListAllUsersController {
 			 * User enabled
 			 */
 			if (user.isEnabled() == true) {
-				mav.addObject("Enabled", "checked=\"checked\"");
+				mav.addObject("Enabled", "checked='checked'");
 			} else {
 				mav.addObject("Enabled", "");
 			}
@@ -159,18 +168,18 @@ public class AdminListAllUsersController {
 			}
 			Date lastLogin = user.getLastLoginDate();
 			if ((new Date().getTime() - 31536000000L) > lastLogin.getTime()) {
-				mav.addObject("AccountExpiration", "ERROR");
+				mav.addObject("isAccountNonExpired", false);
 			} else {
-				mav.addObject("AccountExpiration", "NOERROR");
+				mav.addObject("isAccountNonExpired", true);
 			}
-			mav.addObject("lastLoginDate", user.getLastLoginDate().toString());
+			mav.addObject("lastLoginDate", user.getLastLoginDate().getTime());
 
 			if (user.getCredentialNonExpiredUntil().getTime() < new Date().getTime()) {
-				mav.addObject("passwordExpiration", "ERROR");
+				mav.addObject("isPasswordNotExpired", false);
 			} else {
-				mav.addObject("passwordExpiration", "NOERROR");
+				mav.addObject("isPasswordNotExpired", true);
 			}
-			mav.addObject("passwordValidUntil", user.getCredentialNonExpiredUntil().toString());
+			mav.addObject("passwordValidUntil", user.getCredentialNonExpiredUntil().getTime());
 
 			Collection<LoginAttemptFormStorage> attempts = new ArrayList<>();
 			Collection<Date> loginAttempts = user.getBadLogins();
@@ -184,13 +193,20 @@ public class AdminListAllUsersController {
 		} catch (Exception e) {
 			throw new TrackingServiceErrorException("Service error!");
 		}
+
+		mav.addObject("useridRestriction", WebpageInformationProvider.getUseridRestrictionMessage());
+		mav.addObject("usernameRestriction", WebpageInformationProvider.getUsernameRestrictionMessage());
+		mav.addObject("emailRestriction", WebpageInformationProvider.getEmailRestrictionMessage());
+		mav.addObject("passwordRestriction", WebpageInformationProvider.getPasswordRestrictionMessage());
+		mav.addObject("enabledRestriction", WebpageInformationProvider.getEnabledcreationmessage());
+		mav.addObject("adminRestriction", WebpageInformationProvider.getUserrolecreationmessage());
 		return mav;
 	}
 
 	@ExceptionHandler(TrackingServiceErrorException.class)
 	@ResponseBody
 	public ExecutionResultDTO handleTrackingServiceErrorException(TrackingServiceErrorException exception) {
-		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		ExecutionResultDTO result = new ExecutionResultDTO(400, new ArrayList<String>());
 		result.addMessage("Service error!");
 		return result;
 	}

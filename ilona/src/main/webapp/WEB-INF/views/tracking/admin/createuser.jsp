@@ -11,116 +11,145 @@
 <!-- default header name is X-CSRF-TOKEN -->
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
+<script src="<c:url value='/js/tracking/validation.js'></c:url>"></script>
 <script type="text/javascript">
 
 	$('[data-toggle="tooltip"]').tooltip();
 	$('[data-toggle="popover"]').popover();
 	
+	var adminCreateUserLock = true;
+	
 	$("#createUserButton").click(function(event){
-		event.preventDefault();
-		$("#adminUserCreationError").html("");
-		var hadError = 0;
-		var errorText = "";
-		
-		var userid = document.getElementById("adminCreateUserUseridTXT");			
-		if (userid.checkValidity() == false) {
-			errorText += "<p class='text-danger bg-primary'>Invalid userid!</p>";		
-			hadError = 1;
-		}
-		
-		var username = document.getElementById("adminCreateUserUsernameTXT");	
-		if (username.checkValidity() == false) {
-			errorText += "<p class='text-danger bg-primary'>Invalid username!</p>";
-			hadError = 1;
-		}
-		
-		var password1 = document.getElementById("adminCreateUserPassword1TXT");
-		var password2 = document.getElementById("adminCreateUserPassword1TXT");
-		if (password1.checkValidity() == false) {
-			errorText += "<p class='text-danger bg-primary'>Invalid password!</p>";
-			hadError = 1;
-		}
-		if ( password1.value != password2.value) {
-			errorText += "<p class='text-danger bg-primary'>Passwords don't match!</p>";
-			hadError = 1;
-		}
-		
-		var email = document.getElementById("adminCreateUserEmailTXT");
-		if(email.checkValidity()  == false) {
-			errorText += "<p class='text-danger bg-primary'>Email address is invalid!</p>";
-			hadError = 1;
-		}
-		if (Boolean(hadError) == true) {
-			$("#adminUserCreationError").html(errorText);
-		} else {
+		try {
+			event.preventDefault();
+			if (adminCreateUserLock == true) {
+				adminCreateUserLock = false;
+			} else {
+				return;
+			}
+			$("#adminUserCreationError").html("");
 			
-			var enabled = false;
-			var admin = false;
-			var UserEnabled = document.getElementById('creationIsUserEnabled');
-			var AdminRole = document.getElementById('creationIsAdmin');
-			if(UserEnabled.checked) {
-				enabled = true;
+			function clearInputs() {
+				$("#adminCreateUserUseridTXT").val("");
+				$("#adminCreateUserUsernameTXT").val("");
+				$("#adminCreateUserEmailTXT").val("");
+				$("#adminCreateUserPassword1TXT").val("");
+				$("#adminCreateUserPassword2TXT").val("");
 			}
-			if(AdminRole.checked) {
-				admin = true;
-			}
-			var token = $("meta[name='_csrf']").attr("content");
-			var header = $("meta[name='_csrf_header']").attr("content");
-			$.ajax({
-				async : true,
-				type : "POST",
-				beforeSend : function(xhr) {
-					xhr.setRequestHeader(header, token);
-				},
-				url : "<c:url value='tracking/admin/registeruser'></c:url>",
-				data : {
-					userid : userid.value,
-					username : username.value,
-					email : email.value,
-					password : password1.value,
-					enabled : enabled,
-					adminRole : admin
-				},
-				success : function(result, status, xhr) {
-					try {
-						if(result.executionState == true) {
-							$("#adminUserCreationError").html("<p class='text-danger bg-primary'>The account has been created!</p>");
-							$("#adminCreateUserUseridTXT").val("");
-							$("#adminCreateUserUsernameTXT").val("");
-							$("#adminCreateUserEmailTXT").val("");
-							$("#adminCreateUserPassword1TXT").val("");
-						} else {
-							$("#adminCreateUserUseridTXT").val("");
-							$("#adminCreateUserUsernameTXT").val("");
-							$("#adminCreateUserEmailTXT").val("");
-							$("#adminCreateUserPassword1TXT").val("");
-							var i = 0;
-							var errorMessage = "";
-							var messages = result.messages;
-							var length = messages.length;
-							for(i; i < length; i++) {
-								errorMessage += "<p class='text-danger bg-primary'>" + messages[i] + "</p>"
+			
+			var inputs = {
+				userid: $("#adminCreateUserUseridTXT").val(),
+				username: $("#adminCreateUserUsernameTXT").val(),
+				password: [$("#adminCreateUserPassword1TXT").val(),
+				           $("#adminCreateUserPassword2TXT").val()],
+				email: $("#adminCreateUserEmailTXT").val()
+			};
+			
+			var dependency = {
+				validateInputs : checkInputsValidity
+			};
+				
+			var result = dependency.validateInputs(inputs);
+			
+			if (result.valid == false) {
+				adminCreateUserLock = true;
+				$("#adminUserCreationError").html(result.errors);
+			} else {
+				
+				var enabled = false;
+				var admin = false;
+				var UserEnabled = document.getElementById('creationIsUserEnabled');
+				var AdminRole = document.getElementById('creationIsAdmin');
+				if(UserEnabled.checked) {
+					enabled = true;
+				}
+				if(AdminRole.checked) {
+					admin = true;
+				}
+	
+				$.ajax({
+					async : true,
+					type : "POST",
+					beforeSend : function(xhr) {
+						xhr.setRequestHeader($("meta[name='_csrf_header']").attr("content"),
+								$("meta[name='_csrf']").attr("content"));
+					},
+					url : "<c:url value='tracking/admin/registeruser'></c:url>",
+					data : {
+						userid : $("#adminCreateUserUseridTXT").val(),
+						username : $("#adminCreateUserUsernameTXT").val(),
+						email : $("#adminCreateUserEmailTXT").val(),
+						password : $("#adminCreateUserPassword1TXT").val(),
+						enabled : enabled,
+						adminRole : admin
+					},
+					success : function(result, status, xhr) {
+						try {
+							adminCreateUserLock = true;
+							switch(result.responseState) {
+							case 100: {
+								$("#adminUserCreationError")
+									.html("<p class='bg-primary'>User has been created successfully!</p>");
+								break;
 							}
-							$("#adminUserCreationError").html(errorMessage);
+							case 200: {
+								$("#adminUserCreationError")
+								.html("<p class='bg-primary'>User data was invalid!</p>");
+								break;
+							}
+							case 300: {
+								$("#adminUserCreationError")
+								.html("<p class='bg-primary'>User data was invalid!</p>");
+								break;
+							}
+							case 400: {
+								$("#adminUserCreationError")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}
+							case 600: {
+								$("#adminUserCreationError")
+								.html("<p class='bg-primary'>A user is already exists with id: " 
+										+ $("#adminCreateUserUseridTXT").val() + "</p>");
+								break;
+							}
+							default: {
+								$("#mainpageSignupErrorDIV")
+								.html("<p class='bg-primary'>Service error!</p>");
+								break;
+							}
+							}
+							clearInputs();
+						} catch(err) {
+							console.log(err);
 						}
-					} catch(err) {
-						console.log(err);
-					}
-					
-					
-				},
-				error : function(xhr, status, error) {
-					try {
-						$("#adminUserCreationError")
-							.html("<p class='text-danger bg-primary'>An error occured!</p>");
-					} catch(err) {
-						console.log(err);
-					}
-				},
-				timeout : 10000
-			});
-		}	
-		
+						
+						
+					},
+					error : function(xhr, status, error) {
+						try {
+							adminCreateUserLock = true;
+							clearInputs();
+							$("#adminUserCreationError")
+								.html("<p class='text-danger bg-primary'>An error occured!</p>");
+							console.log("" + status + " " + error); 
+						} catch(err) {
+							console.log(err);
+						}
+					},
+					timeout : 10000
+				});
+			}	
+		} catch(error) {
+			try {
+				adminCreateUserLock = true;
+				$("#adminUserCreationError")
+					.html("<p class='text-danger bg-primary'>An error occured!</p>");
+				console.log(error); 
+			} catch(err) {
+				console.log(err);
+			}
+		}
 		
 	});
 </script>

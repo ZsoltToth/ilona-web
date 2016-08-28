@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,6 +36,8 @@ import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 @Controller
 @RequestMapping(value = "/tracking/admin")
 public class AdminpageController {
+
+	private static Logger logger = LogManager.getLogger(AdminpageController.class);
 
 	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userDeviceService;
@@ -71,24 +75,32 @@ public class AdminpageController {
 	@RequestMapping(value = "registeruser", method = { RequestMethod.POST })
 	@ResponseBody
 	public ExecutionResultDTO registerUserByAdmin(@ModelAttribute() UserBaseDetailsDTO user) {
-		ExecutionResultDTO result = new ExecutionResultDTO(false, new ArrayList<String>());
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 
 		if (user == null) {
 			result.addMessage("User is null!");
+			result.setResponseState(200);
 			return result;
 		}
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateUserData.validateUserid(user.getUserid()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateUsername(user.getUsername()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
+			errors.appendValidityStatusHolder(ValidateUserData.validateEmail(user.getEmail()));
 
-		ValidityStatusHolder errors = new ValidityStatusHolder();
-		errors.appendValidityStatusHolder(ValidateUserData.validateUserid(user.getUserid()));
-		errors.appendValidityStatusHolder(ValidateUserData.validateUsername(user.getUsername()));
-		errors.appendValidityStatusHolder(ValidateUserData.validateRawPassword(user.getPassword()));
-		errors.appendValidityStatusHolder(ValidateUserData.validateEmail(user.getEmail()));
+			if (!errors.isValid()) {
+				result.setMessages(errors.getErrors());
+				result.setResponseState(300);
+				return result;
+			}
 
-		if (!errors.isValid()) {
-			result.setMessages(errors.getErrors());
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
-
 		try {
 			List<String> userRoles = new ArrayList<String>();
 			userRoles.add("ROLE_USER");
@@ -105,12 +117,13 @@ public class AdminpageController {
 			userDeviceService.createUser(userFull);
 		} catch (DuplicatedUserException e) {
 			result.addMessage("This userid is already reserved! ID: " + user.getUserid());
+			result.setResponseState(600);
 			return result;
 		} catch (Exception e) {
 			result.addMessage("Service error!");
+			result.setResponseState(400);
 			return result;
 		}
-		result.setExecutionState(true);
 		result.addMessage("The account has been created!");
 		return result;
 	}
