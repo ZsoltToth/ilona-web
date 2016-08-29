@@ -13,11 +13,14 @@
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
 <script src="<c:url value='/js/tracking/deviceValidation.js'></c:url>"></script>
-<script src="<c:url value='/js/deviceManagement.js'></c:url>"></script>
+<script src="<c:url value='/js/tracking/tableFunctions.js'></c:url>"></script>
 
 
 
 <script type="text/javascript">
+	
+	$('[data-toggle="tooltip"]').tooltip();
+	$('[data-toggle="popover"]').popover();
 	
 	var userManDevDeviceModificationDeleteDeviceLock = true;
 	
@@ -25,6 +28,9 @@
 	var userManDevDeviceNameBeforeModification;
 	var userManDevDeviceTypeBeforeModification;
 	var userManDevDeviceTypeNameBeforeModification;
+	
+	var userManDevDataTableDevices; 
+	var userManDevSelectedRow; 
 	
 	$("#userManDevDeviceModificationDeleteDeviceBTN").click(function(event){
 		try {
@@ -54,9 +60,8 @@
 						switch(result.responseState) {
 						case 100: {
 							$("#userManDevResultOrErrorDIV")
-								.html("<p class='bg-primary'>Device has been deleted successfully!</p>");
-							var deviceid = "#userManDevDeviceRow" + $("#userManDevDeviceModificationDeviceid").val();						
-							$(deviceid).remove();
+								.html("<p class='bg-primary'>Device has been deleted successfully!</p>");						
+							userManDevSelectedRow.remove().draw(false);
 							break;
 						}
 						case 200: {
@@ -97,6 +102,7 @@
 					}
 				}
 			});
+			
 		} catch(err) {
 			userManDevDeviceModificationDeleteDeviceLock = true;
 			console.log(err);
@@ -108,56 +114,7 @@
 			event.preventDefault();
 			$("#userManDevResultOrErrorDIV").html("");
 			$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
-		} catch(err) {
-			console.log(err);
-		}
-	});
-	
-	$(".userManDevStartDeviceModification").click(function(event){
-		try {
-			event.preventDefault();
-			$("#userManDevResultOrErrorDIV").html("");
-			var actualDeviceid = $(this).attr("href");		
-			var deviceNameInputValue = document.getElementById("userManDevDeviceName" + actualDeviceid).textContent.trim();
-			var deviceTypeInputValue = document.getElementById("userManDevDeviceType" + actualDeviceid).textContent.trim();			
-			var deviceTypeNameInputValue =  document.getElementById("userManDevDeviceTypeName" + actualDeviceid).textContent.trim();
-			
-			$("#userManDevDeviceModificationDeviceid").val(actualDeviceid);
-			$("#userManDevDeviceModificationDeviceName").val(deviceNameInputValue);		
-			$("#userManDevDeviceModificationDeviceType").val(deviceTypeInputValue);
-			$("#userManDevDeviceModificationDeviceTypeName").val(deviceTypeNameInputValue);
-			
-			userManDevDeviceidBeforeModification = actualDeviceid;
-			userManDevDeviceNameBeforeModification = deviceNameInputValue;
-			userManDevDeviceTypeBeforeModification = deviceTypeInputValue;
-			userManDevDeviceTypeNameBeforeModification = deviceTypeNameInputValue;
-			
-			var inputDefaultSize = 20;		
-			if(actualDeviceid.length < inputDefaultSize) {
-				$("#userManDevDeviceModificationDeviceid").attr("size", inputDefaultSize);
-			} else {
-				$("#userManDevDeviceModificationDeviceid").attr("size", actualDeviceid.length);
-			}	 	
-			if(deviceNameInputValue.length < inputDefaultSize) {
-				$("#userManDevDeviceModificationDeviceName").attr("size", inputDefaultSize);
-			} else {
-				$("#userManDevDeviceModificationDeviceName").attr("size", deviceNameInputValue.length);
-			}
-					
-			if(deviceTypeInputValue.length < inputDefaultSize) {
-				$("#userManDevDeviceModificationDeviceType").attr("size", inputDefaultSize);
-			} else {
-				$("#userManDevDeviceModificationDeviceType").attr("size", deviceTypeInputValue.length);
-			}
-			
-			if(deviceTypeNameInputValue.length < inputDefaultSize) {
-				$("#userManDevDeviceModificationDeviceTypeName").attr("size", inputDefaultSize);
-			} else {
-				$("#userManDevDeviceModificationDeviceTypeName").attr("size", deviceTypeNameInputValue.length);
-			}
-			
-			$("#userManDevModifyDeviceCollapseDIV").removeClass("collapse");
-			document.getElementById("userManDevModifyDeviceCollapseDIV").scrollIntoView();
+			$(userManDevSelectedRow.node()).removeClass("selected");
 		} catch(err) {
 			console.log(err);
 		}
@@ -193,7 +150,6 @@
 				restoreDeviceModification();
 				return;
 			}
-			
 			$.ajax({
 				type : "POST",
 				async : true,
@@ -215,23 +171,12 @@
 						case 100: {
 							$("#userManDevResultOrErrorDIV")
 								.html("<p class='bg-primary'>The device has been updated successfully!</p>");
-							var deviceid = document.getElementById("userManDevDeviceModificationDeviceid").value;
-							$("#userManDevDeviceName"+deviceid)
-								.text(document.getElementById("userManDevDeviceModificationDeviceName").value);
-							
-							dataTableDevices.fnDraw();
-							/*
-							var deviceid = document.getElementById("userManDevDeviceModificationDeviceid").value;
-							document.getElementById("userManDevDeviceName"+deviceid).textContent = 
-								document.getElementById("userManDevDeviceModificationDeviceName").value);
-			
-							document.getElementById("userManDevDeviceType"+deviceid).textContent = 
-								document.getElementById("userManDevDeviceModificationDeviceType").value);
-	
-							document.getElementById("userManDevDeviceTypeName"+deviceid).textContent = 
-								document.getElementById("userManDevDeviceModificationDeviceTypeName").value);
-							//resizeTableElements();
-							*/
+							data = [document.getElementById("userManDevDeviceModificationDeviceid").value,
+									document.getElementById("userManDevDeviceModificationDeviceName").value,
+									document.getElementById("userManDevDeviceModificationDeviceType").value,
+									document.getElementById("userManDevDeviceModificationDeviceTypeName").value];
+							userManDevSelectedRow.data(data).draw(false);
+							$(userManDevSelectedRow.node()).removeClass("selected");
 							break;
 						}
 						case 300: {
@@ -276,51 +221,117 @@
 			console.log(err);
 		}
 	});
-
-	function resizeTableElements() {
+	
+	function userManDevfillInputsWithData(rowData) {
 		try {
-			var resizeInputs = ["userManDevDeviceidClass", "userManDevDeviceNameClass",
-			                    "userManDevDeviceTypeClass", "userManDevDeviceTypeNameClass"];
-			//resizeTableElementsByClassname(resizeInputs);		
-		} catch(err) {
-			console.log(err);
+	
+			var actualDeviceid = rowData[0].trim();
+			var deviceNameInputValue = rowData[1].trim();
+			var deviceTypeInputValue = rowData[2].trim();			
+			var deviceTypeNameInputValue =  rowData[3].trim();
+					
+			document.getElementById("userManDevDeviceModificationDeviceid")
+				.value = actualDeviceid;
+			document.getElementById("userManDevDeviceModificationDeviceName")
+				.value = deviceNameInputValue;
+			document.getElementById("userManDevDeviceModificationDeviceType")
+				.value = deviceTypeInputValue;
+			document.getElementById("userManDevDeviceModificationDeviceTypeName")
+				.value = deviceTypeNameInputValue;	
+			
+			userManDevDeviceidBeforeModification = actualDeviceid;
+			userManDevDeviceNameBeforeModification = deviceNameInputValue;
+			userManDevDeviceTypeBeforeModification = deviceTypeInputValue;
+			userManDevDeviceTypeNameBeforeModification = deviceTypeNameInputValue;
+		
+		} catch(error) {
+			console.log(error);
 		}
 	}
 	
-	/*
-	 * Table column width align.
-	 * Every column with the max column length.
-	 */
-	 var dataTableDevices; 
-	 
+	$(".columnOnOff").click(function(event){
+		event.preventDefault();
+		var item = $(this);
+		if(item.hasClass("btn-success")) {
+			item.removeClass("btn-success");
+			item.addClass("btn-danger");
+			item.attr("value", "Off");
+		} else {
+			item.removeClass("btn-danger");
+			item.addClass("btn-success");
+			item.attr("value", "On");
+		}
+		var column = userManDevDataTableDevices.column( $(this).attr('data-column') );
+		console.log(column);
+        // Toggle the visibility
+        column.visible( ! column.visible() );
+	});
+	
 	$(document).ready(function(){	
 		try {
-			var userManDevDevices = [["dsdd","dsdsd"]];
-			             			
-			
-			//resizeTableElements();
-			//alert(userManDevDevices["dev0001"].deviceid);
-			
-			$("#proba1").dataTable({
-				data: userManDevDevices,
-				 columns: [
-				            { title: "Name" },
-				            { title: "Position" },			           
-				        ]
+
+			userManDevDataTableDevices = $("#userManDevDataTable").DataTable({
+				responsive: true,
+				paging: true,
+				ordering: true,
+				info: true,
+				/*
+				 * Column sorting order
+				 */
+				columnDefs: [{
+					targets: [0],
+					orderData: [0, 1, 2, 3]
+				}, {
+					targets: [1],
+					orderData: [1, 0, 2, 3]
+				}, {
+					targets: [2],
+					orderData: [2, 0, 1, 3]
+				}, {
+					targets: [3],
+					orderData: [3, 0, 1, 2]
+				}]
 			});
 			
-			dataTableDevices = $("#userManDevDataTable").dataTable({
-				responsive: true
-				
-			});
+			$('#userManDevDataTable tbody').on( 'click', 'tr', function () {			 
+		        if ( $(this).hasClass('selected') ) {
+		            $(this).removeClass('selected');
+		            $("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
+		        }
+		        else {
+		        	userManDevDataTableDevices.$('tr.selected').removeClass('selected');
+		            $(this).addClass('selected');
+		            $("#userManDevResultOrErrorDIV").html("");
+		            userManDevSelectedRow = userManDevDataTableDevices.row(this);
+		            userManDevfillInputsWithData(userManDevSelectedRow.data());
+		            resizeInputElements(["userManDevDeviceModificationDeviceid",
+		                                 "userManDevDeviceModificationDeviceName",
+		                                 "userManDevDeviceModificationDeviceType",
+		                                 "userManDevDeviceModificationDeviceTypeName"]);
+		            
+					$("#userManDevModifyDeviceCollapseDIV").removeClass("collapse");
+					document.getElementById("userManDevModifyDeviceCollapseDIV").scrollIntoView();				
+		        }
+		    } );
 		} catch(err) {
 			console.log(err);
 		}
 	});
+	
+	$("#userManDevTableSettingOnOff").click(function(event){
+		try {
+			var panel = $("#userManDevTableSettings");	
+			if(panel.hasClass("in")) {
+				panel.removeClass("in");
+			} else {
+				panel.addClass("in");
+			}
+		} catch(error) {
+			console.log(error);
+		}
+	});
 </script>
 
-<!-- Bootstrap input width override,
-	 because without this the input value is not visible!-->
 <style>
 	input.form-control {
   width: auto;
@@ -335,9 +346,9 @@
 			<div class="panel-heading">
 				<p>Device onwerid: ${deviceOwnerid} <br/> Device owner name: ${deviceOwnerName}</p>
 			</div>
-			<div class="panel-body">
-				<div id="userManDevModifyDeviceDataDIV" class="table-responsive" >
-					<div id="userManDevModifyDeviceCollapseDIV" class="collapse">
+			<div class="panel-body">			
+				<div id="userManDevModifyDeviceCollapseDIV" class="collapse">
+					<div id="userManDevModifyDeviceDataDIV" class="table-responsive" >
 						<table class="table">
 							<thead>
 								<tr>
@@ -393,19 +404,67 @@
 									</td>
 								</tr>
 							</tbody>
+							
 						</table>
 					</div>
 				</div>
+				<br />
 				<div id="userManDevResultOrErrorDIV"></div>
+				<div>
+					<div class="panel-group">
+					  <div class="panel panel-default">
+					    <div class="panel-heading" id="userManDevTableSettingOnOff">
+					      <h4 class="panel-title">
+					        <a data-toggle="collapse" href="#collapse1">Table settings! (Click!)</a>
+					      </h4>
+					    </div>
+					    <div id="userManDevTableSettings" class="panel-collapse collapse" >
+					    	<div class="panel-body">
+								<div class="table-responsive">
+									<table class="table">
+										<thead>
+											<tr>
+												<th>Deviceid</th>
+												<th>Device name</th>
+												<th>Device type</th>
+												<th>Device type name</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>
+													<input type="button" class="btn btn-success columnOnOff"
+														data-column="0" value="On"></button>
+												</td>
+												<td>
+													<input type="button" class="btn btn-success columnOnOff"  
+														data-column="1" value="On"></button>
+												</td>
+												<td>
+													<input type="button" class="btn btn-success columnOnOff"  
+														data-column="2" value="On"></button>
+												</td>
+												<td>
+													<input type="button" class="btn btn-success columnOnOff"
+														data-column="3" value="On"></button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+					    </div>
+					  </div>
+					</div>
+				</div>
 					<div class="table-responsive">
-						<table class="display" id="userManDevDataTable">
+						<table class="hover" style="width: 100%" id="userManDevDataTable">
 							<thead>
 								<tr>
 									<th>Deviceid</th>
 									<th>Device name</th>
 									<th>Device type</th>
-									<th>Device type name</th>
-									<th>Device modification</th> 
+									<th>Device type name</th>							
 								</tr>
 							</thead>
 							<tbody>							
@@ -417,16 +476,18 @@
 											
 										<td id="userManDevDeviceType${device.deviceid}">${device.deviceType}</td>
 											
-										<td id="userManDevDeviceTypeName${device.deviceid}">${device.deviceTypeName}</td>						
-											
-										<td><a href="${device.deviceid}" 
-											class="userManDevStartDeviceModification">Modify device
-											<span class="glyphicon glyphicon-ok-sign "></span></a>
-										</td>
-												
+										<td id="userManDevDeviceTypeName${device.deviceid}">${device.deviceTypeName}</td>																
 									</tr>
 								</c:forEach>						
 							</tbody>
+							<tfoot>
+								<tr>
+									<th>Deviceid</th>
+									<th>Device name</th>
+									<th>Device type</th>
+									<th>Device type name</th>
+								</tr>
+							</tfoot>
 						</table>
 						<input type="hidden" id="userManDevOwneridHidden" value="${deviceOwnerid}">
 					</div> <!-- table responsive end -->
@@ -434,9 +495,6 @@
 			</div> <!-- panel body end -->
 			<div class="panel-body">
 				${executionError}
-				<table id="proba1">
-			
-			</table>
 			</div>
 			<div>
 			

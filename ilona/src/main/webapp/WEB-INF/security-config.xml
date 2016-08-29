@@ -30,7 +30,7 @@
 		<csrf disabled="true"/>
 	</http>
 	
-	<http pattern="/tracking/**" auto-config="true" authentication-manager-ref="authManager"  create-session="ifRequired">
+	<http pattern="/tracking/**" auto-config="true" authentication-manager-ref="authManager"  create-session="always">
 		
 		<!-- This is the entry point of the tracking web module -->
 		<intercept-url pattern="/tracking/maincontentdecision" access="permitAll"/>
@@ -83,7 +83,7 @@
 				 
 		</session-management>
  		 -->
-		<csrf/>
+		<csrf disabled="false"/>
 	</http>
 	
 	<!-- Any other ILONA requests! -->
@@ -92,6 +92,7 @@
 		<session-management session-fixation-protection="changeSessionId">
 			<concurrency-control max-sessions="1" />
 		</session-management>
+		<csrf/>
 	</http>
 	
 	<authentication-manager alias="authManager">
