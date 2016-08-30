@@ -23,6 +23,7 @@
 	$('[data-toggle="popover"]').popover();
 	
 	var userManDevDeviceModificationDeleteDeviceLock = true;
+	var userManDevDeviceModificationConfirmModificationLock = true;
 	
 	var userManDevDeviceidBeforeModification;
 	var userManDevDeviceNameBeforeModification;
@@ -51,6 +52,7 @@
 				data : {
 					userid : $("#userManDevOwneridHidden").val(),
 					deviceid : $("#userManDevDeviceModificationDeviceid").val(),
+					deviceName: $("#userManDevDeviceModificationDeviceName").val(),
 					deviceType : $("#userManDevDeviceModificationDeviceType").val(),
 					deviceTypeName : $("#userManDevDeviceModificationDeviceTypeName").val()
 				},
@@ -81,7 +83,7 @@
 							break;
 						}
 						default: {
-							$("#mainpageSignupErrorDIV")
+							$("#userManDevResultOrErrorDIV")
 							.html("<p class='bg-primary'>Service error!</p>");
 							break;
 						}
@@ -123,6 +125,13 @@
 	$("#userManDevDeviceModificationConfirmModificationBTN").click(function(event){
 		try {
 			event.preventDefault();
+			
+			if(userManDevDeviceModificationConfirmModificationLock == true) {
+				userManDevDeviceModificationConfirmModificationLock = false;
+			} else {
+				return;
+			}
+			
 			$("#userManDevResultOrErrorDIV").html("");
 
 			var inputs = {
@@ -146,6 +155,7 @@
 			var result = dependency.validateInputs(inputs);
 
 			if(result.valid == false) {
+				userManDevDeviceModificationConfirmModificationLock = true;
 				$("#userManDevResultOrErrorDIV").html(result.errors);
 				restoreDeviceModification();
 				return;
@@ -167,6 +177,7 @@
 				url : "<c:url value='/tracking/user/mandevupdatedevicedetails'></c:url>",
 				success : function(result, status, xhr) {
 					try {
+						userManDevDeviceModificationConfirmModificationLock = true;
 						switch(result.responseState) {
 						case 100: {
 							$("#userManDevResultOrErrorDIV")
@@ -193,7 +204,7 @@
 						case 600: {
 							$("#userManDevResultOrErrorDIV")
 							.html("<p class='bg-primary'>Device not found with this id: " 
-									+ $("#userCreateDeviceDeviceidTXT").val() + "</p>");
+									+ $("#userManDevDeviceModificationDeviceid").val() + "</p>");
 							break;
 						}
 						default: {
@@ -209,6 +220,7 @@
 				},
 				error : function(xhr, status, error) {
 					try {
+						userManDevDeviceModificationConfirmModificationLock = true;
 						$("#userManDevModifyDeviceCollapseDIV").addClass("collapse");
 						$("#userManDevResultOrErrorDIV").html("<p class='text-danger bg-primary'>Service error!</p>");
 					} catch(err) {
@@ -218,6 +230,7 @@
 			});	
 			
 		} catch(err) {
+			userManDevDeviceModificationConfirmModificationLock = true;
 			console.log(err);
 		}
 	});
@@ -250,21 +263,23 @@
 	}
 	
 	$(".columnOnOff").click(function(event){
-		event.preventDefault();
-		var item = $(this);
-		if(item.hasClass("btn-success")) {
-			item.removeClass("btn-success");
-			item.addClass("btn-danger");
-			item.attr("value", "Off");
-		} else {
-			item.removeClass("btn-danger");
-			item.addClass("btn-success");
-			item.attr("value", "On");
+		try {
+			event.preventDefault();
+			var item = $(this);
+			if(item.hasClass("btn-success")) {
+				item.removeClass("btn-success");
+				item.addClass("btn-danger");
+				item.attr("value", "Off");
+			} else {
+				item.removeClass("btn-danger");
+				item.addClass("btn-success");
+				item.attr("value", "On");
+			}
+			var column = userManDevDataTableDevices.column( $(this).attr('data-column') );
+	        column.visible( ! column.visible() );
+		} catch(error) {
+			console.log(error);
 		}
-		var column = userManDevDataTableDevices.column( $(this).attr('data-column') );
-		console.log(column);
-        // Toggle the visibility
-        column.visible( ! column.visible() );
 	});
 	
 	$(document).ready(function(){	
@@ -434,19 +449,19 @@
 											<tr>
 												<td>
 													<input type="button" class="btn btn-success columnOnOff"
-														data-column="0" value="On"></button>
+														data-column="0" value="On">
 												</td>
 												<td>
 													<input type="button" class="btn btn-success columnOnOff"  
-														data-column="1" value="On"></button>
+														data-column="1" value="On">
 												</td>
 												<td>
 													<input type="button" class="btn btn-success columnOnOff"  
-														data-column="2" value="On"></button>
+														data-column="2" value="On">
 												</td>
 												<td>
 													<input type="button" class="btn btn-success columnOnOff"
-														data-column="3" value="On"></button>
+														data-column="3" value="On">
 												</td>
 											</tr>
 										</tbody>
@@ -490,14 +505,10 @@
 							</tfoot>
 						</table>
 						<input type="hidden" id="userManDevOwneridHidden" value="${deviceOwnerid}">
-					</div> <!-- table responsive end -->
-				
+					</div> <!-- table responsive end -->				
 			</div> <!-- panel body end -->
 			<div class="panel-body">
 				${executionError}
-			</div>
-			<div>
-			
 			</div>
 		</div> <!-- panel default ending -->
 

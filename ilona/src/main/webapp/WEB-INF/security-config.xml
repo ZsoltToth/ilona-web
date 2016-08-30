@@ -30,7 +30,7 @@
 		<csrf disabled="true"/>
 	</http>
 	
-	<http pattern="/tracking/**" auto-config="true" authentication-manager-ref="authManager"  create-session="always">
+	<http pattern="/tracking/**" auto-config="true" authentication-manager-ref="authManager"  create-session="ifRequired">
 		
 		<!-- This is the entry point of the tracking web module -->
 		<intercept-url pattern="/tracking/maincontentdecision" access="permitAll"/>

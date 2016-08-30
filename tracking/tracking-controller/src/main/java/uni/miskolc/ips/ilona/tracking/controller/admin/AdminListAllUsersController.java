@@ -27,6 +27,7 @@ import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.UserNotFoundException;
+import uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager;
 
 @Controller
 @RequestMapping(value = "/tracking/admin")
@@ -37,6 +38,9 @@ public class AdminListAllUsersController {
 	@Resource(name = "UserAndDeviceService")
 	private UserAndDeviceService userAndDeviceService;
 
+	@Resource(name = "trackingCentralManager")
+	private TrackingModuleCentralManager centralManager;
+	
 	@RequestMapping(value = "/listallusers")
 	public ModelAndView createAdminpageListAlluserspage() {
 		ModelAndView userlistPage = new ModelAndView("tracking/admin/listAllUsers");
@@ -167,7 +171,7 @@ public class AdminListAllUsersController {
 				mav.addObject("IsAdmin", "");
 			}
 			Date lastLogin = user.getLastLoginDate();
-			if ((new Date().getTime() - 31536000000L) > lastLogin.getTime()) {
+			if ((new Date().getTime() - centralManager.getAccountExpirationTime()) > lastLogin.getTime()) {
 				mav.addObject("isAccountNonExpired", false);
 			} else {
 				mav.addObject("isAccountNonExpired", true);
@@ -213,6 +217,10 @@ public class AdminListAllUsersController {
 
 	public void setUserAndDeviceService(UserAndDeviceService userAndDeviceService) {
 		this.userAndDeviceService = userAndDeviceService;
+	}
+
+	public void setCentralManager(TrackingModuleCentralManager centralManager) {
+		this.centralManager = centralManager;
 	}
 
 }

@@ -218,13 +218,24 @@
 			}
 		}
 	});
-	
-	
-	
+
 	$(document).ready(function(){
 		try {
 			adminListUsersUsersDataTable = $("#adminListUsersDataTable").dataTable({
-				responsive: true
+				responsive: true,
+				paging: true,
+				ordering: true,
+				info: true,
+				columnDefs: [{
+					targets: [0],
+					orderData: [0, 1, 2]
+				}, {
+					targets: [1],
+					orderData: [1, 0, 2]
+				}, {
+					targets: [2],
+					orderData: [2, 0, 1]
+				}]
 			});
 			
 			$('#adminListUsersUsersDataTable tbody').on( 'click', '.proba111', function () {

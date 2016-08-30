@@ -1,7 +1,6 @@
 package uni.miskolc.ips.ilona.tracking.controller.admin;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import javax.annotation.Resource;
 
@@ -18,10 +17,12 @@ import org.springframework.web.servlet.ModelAndView;
 import uni.miskolc.ips.ilona.tracking.controller.model.ExecutionResultDTO;
 import uni.miskolc.ips.ilona.tracking.controller.model.UserDeviceDataDTO;
 import uni.miskolc.ips.ilona.tracking.controller.util.ValidateDeviceData;
+import uni.miskolc.ips.ilona.tracking.controller.util.ValidateUserData;
 import uni.miskolc.ips.ilona.tracking.controller.util.WebpageInformationProvider;
 import uni.miskolc.ips.ilona.tracking.model.DeviceData;
 import uni.miskolc.ips.ilona.tracking.model.UserData;
 import uni.miskolc.ips.ilona.tracking.service.UserAndDeviceService;
+import uni.miskolc.ips.ilona.tracking.service.exceptions.DeviceNotFoundException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.DuplicatedDeviceException;
 import uni.miskolc.ips.ilona.tracking.service.exceptions.UserNotFoundException;
 import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
@@ -36,9 +37,30 @@ public class AdminManageDevicesController {
 	private UserAndDeviceService userAndDeviceService;
 
 	@RequestMapping(value = "/updatedevicedetails", method = { RequestMethod.POST })
-	public ModelAndView updateUserDeviceDetails(@ModelAttribute() UserDeviceDataDTO device) {
-		ModelAndView mav = new ModelAndView("tracking/admin/userDevices");
-		Collection<DeviceData> newDeviceList = new ArrayList<>();
+	@ResponseBody
+	public ExecutionResultDTO updateUserDeviceDetails(@ModelAttribute() UserDeviceDataDTO device) {
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+		System.out.println(device.toString());
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateUserData.validateUserid(device.getUserid()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(device.getDeviceid()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceName(device.getDeviceName()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceType(device.getDeviceType()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceTypeName(device.getDeviceTypeName()));
+
+			if (!errors.isValid()) {
+				result.addMessage("Invalid device property format!");
+				result.setResponseState(300);
+				return result;
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
+		}
+
 		try {
 			UserData user = userAndDeviceService.getUser(device.getUserid());
 			DeviceData newDevice = new DeviceData();
@@ -47,19 +69,44 @@ public class AdminManageDevicesController {
 			newDevice.setDeviceType(device.getDeviceType());
 			newDevice.setDeviceTypeName(device.getDeviceTypeName());
 			userAndDeviceService.updateDevice(newDevice, user);
-			newDeviceList = userAndDeviceService.readUserDevices(user);
-			mav.addObject("devices", newDeviceList);
+
+		} catch (DeviceNotFoundException e) {
+			logger.error("Device not found! Cause: " + e.getMessage());
+			result.addMessage("Device not found!");
+			result.setResponseState(600);
+			return result;
 		} catch (Exception e) {
-			mav.addObject("executionError", "Device update failed!");
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
 		}
-		mav.addObject("deviceOwner", device.getUserid());
-		return mav;
+		result.addMessage("Device updated!");
+		return result;
 	}
 
 	@RequestMapping(value = "/deleteuserdevice", method = { RequestMethod.POST })
-	public ModelAndView deleteUserDevice(@ModelAttribute() UserDeviceDataDTO device) {
-		ModelAndView mav = new ModelAndView("tracking/admin/userDevices");
-		Collection<DeviceData> newDeviceList = new ArrayList<>();
+	@ResponseBody
+	public ExecutionResultDTO deleteUserDevice(@ModelAttribute() UserDeviceDataDTO device) {
+		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateUserData.validateUserid(device.getUserid()));
+			errors.appendValidityStatusHolder(ValidateDeviceData.validateDeviceid(device.getDeviceid()));
+
+			if (!errors.isValid()) {
+				result.addMessage("Invalid parameter!");
+				result.setResponseState(200);
+				return result;
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
+		}
+
 		try {
 			UserData user = userAndDeviceService.getUser(device.getUserid());
 			DeviceData deletableDevice = new DeviceData();
@@ -69,14 +116,24 @@ public class AdminManageDevicesController {
 			deletableDevice.setDeviceTypeName(device.getDeviceTypeName());
 			userAndDeviceService.deleteDevice(deletableDevice, user);
 
-			newDeviceList = userAndDeviceService.readUserDevices(user);
-			mav.addObject("devices", newDeviceList);
-
+		} catch (UserNotFoundException e) {
+			logger.error("User not found! Cause: " + e.getMessage());
+			result.addMessage("User not found!");
+			result.setResponseState(600);
+			return result;
+		} catch (DeviceNotFoundException e) {
+			logger.error("Device not found! Cause: " + e.getMessage());
+			result.addMessage("Device not found!");
+			result.setResponseState(700);
+			return result;
 		} catch (Exception e) {
-			mav.addObject("executionError", "Device deletion failed!");
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
 		}
-		mav.addObject("deviceOwner", device.getUserid());
-		return mav;
+		result.addMessage("Device deleted!");
+		return result;
 	}
 
 	@RequestMapping(value = "/createnewdeviceforuser", method = { RequestMethod.POST })

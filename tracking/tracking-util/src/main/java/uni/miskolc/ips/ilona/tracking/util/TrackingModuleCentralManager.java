@@ -11,7 +11,6 @@ package uni.miskolc.ips.ilona.tracking.util;
  * @author Patrik / A5USl0
  *
  */
-@Szalbiztossag
 public class TrackingModuleCentralManager {
 
 	/*
@@ -59,9 +58,12 @@ public class TrackingModuleCentralManager {
 	 * Threading lock tokens.
 	 */
 
+	private Object accountExpirationTimeLock = new Object();
+
 	private Object credentialsValidityPeriodLock = new Object();
 
 	private Object passwordRecoveryTokenValidityTimeLock = new Object();
+
 	/*
 	 * Ezt az egész osztályt több szálból is elérik, bár egy szerű doglokat
 	 * tartalmaz Szálbiztosság tétel.
@@ -69,9 +71,14 @@ public class TrackingModuleCentralManager {
 	 */
 
 	/**
+	 * 
+	 */
+	private long accountExpirationTime = 31_536_000_000L;
+
+	/**
 	 * Credentials validity time in milliseconds.
 	 */
-	private static long credentialsValidityPeriod = 31536000000L;
+	private long credentialsValidityPeriod = 31536000000L;
 
 	/////////////////////////////////////////////////////////////////////////
 	private static long badLoginsUpperBound = 10;
@@ -99,7 +106,7 @@ public class TrackingModuleCentralManager {
 
 	public void setCredentialsValidityPeriod(long credentialsValidityPeriod) {
 		synchronized (credentialsValidityPeriodLock) {
-			TrackingModuleCentralManager.credentialsValidityPeriod = credentialsValidityPeriod;
+			this.credentialsValidityPeriod = credentialsValidityPeriod;
 		}
 	}
 
@@ -112,8 +119,20 @@ public class TrackingModuleCentralManager {
 
 	public void setPasswordRecoveryTokenValidityTime(long passwordRecoveryTokenValidityTime) {
 		synchronized (passwordRecoveryTokenValidityTimeLock) {
-			passwordRecoveryTokenValidityTime = passwordRecoveryTokenValidityTime;
+			this.passwordRecoveryTokenValidityTime = passwordRecoveryTokenValidityTime;
 		}
 	}
 
+	public long getAccountExpirationTime() {
+		synchronized (accountExpirationTimeLock) {
+			return accountExpirationTime;
+		}
+
+	}
+
+	public void setAccountExpirationTime(long accountExpirationTime) {
+		synchronized (accountExpirationTimeLock) {
+			this.accountExpirationTime = accountExpirationTime;
+		}
+	}
 }
