@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<graph:graph xmlns:graph="http://www.example.org/graphShema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.example.org/graphShema graphShema.xsd ">
+	<graph:nodes>
+		<graph:node>
+			<graph:name>N1</graph:name>
+			<graph:description>Ez a édsáséds</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N2</graph:name>
+			<graph:description>AAA ö ü ó ő ú é á ű</graph:description>
+		</graph:node>
+	</graph:nodes>
+	<graph:edges>
+		<graph:edge>
+			<graph:from>N1</graph:from>
+			<graph:to>N2</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+	</graph:edges>
+</graph:graph>

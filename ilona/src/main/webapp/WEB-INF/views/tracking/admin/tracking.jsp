@@ -673,15 +673,24 @@
 			var url = "<c:url value='/img/ilona-firstFloor.jpg'></c:url>"
 			
 			var urlMarker = "<c:url value='/img/marker.png'></c:url>"
-			
+			$("#adminTrackingDrawingContent").html("");
+			svgMain = d3.select("#adminTrackingDrawingContent").append("svg").attr("width","100%").attr("height","100%")
+				.attr("viewBox", "0 0 1500 1000");
 	        svgMain
 	        .append("image")
 	        .attr("xlink:href", url)
 	        .attr("x", 0)
 	        .attr("y", 0)
-	        .attr("width", 1200)
-	        .attr("height", 700);
+	        .attr("width", 1200) // 1200
+	        .attr("height", 700); // 700
 			
+	        svgMain.append("circle").attr("cx", 0).attr("cy", 0).attr("r", 100).attr("id","myID")
+	        	.on("click", function(d,i) {
+	        		alert("D: " + d);
+	        		alert("i: " + i);
+	        		alert("ID:" + d3.select(this).attr("id"));
+	        	});
+	        
 			svgMain
 		    	.append("image")
 		        .attr("xlink:href", urlMarker)
@@ -970,6 +979,10 @@
 		*/
 		var svgMain = d3.select("#adminTrackingDrawingContent").append("svg").attr("width",1500).attr("height",1000);
 		
+		$("#draw2").click(function(event){
+			svgMain = d3.select("#adminTrackingDrawingContent").append("svg").attr("width",1500).attr("height",1000).attr("viewBox","0 0 1500 1000");
+			svgMain.append("circle").attr("cx", 335).attr("cy", 600).attr("r", 5);
+		});
 
 </script>
 

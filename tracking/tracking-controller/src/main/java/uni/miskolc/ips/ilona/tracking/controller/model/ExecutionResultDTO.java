@@ -1,5 +1,6 @@
 package uni.miskolc.ips.ilona.tracking.controller.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class ExecutionResultDTO {
@@ -14,8 +15,6 @@ public class ExecutionResultDTO {
 	 */
 	private int responseState;
 
-	private boolean executionState;
-
 	private Collection<String> messages;
 
 	public ExecutionResultDTO() {
@@ -28,11 +27,6 @@ public class ExecutionResultDTO {
 		this.messages = messages;
 	}
 
-	public ExecutionResultDTO(boolean executionState, Collection<String> messages) {
-		super();
-		this.executionState = executionState;
-		this.messages = messages;
-	}
 
 	public void addMessage(String message) {
 		if (message == null) {
@@ -40,15 +34,10 @@ public class ExecutionResultDTO {
 		}
 		if (messages != null) {
 			messages.add(message);
+		} else {
+			messages = new ArrayList<String>();
+			messages.add(message);
 		}
-	}
-
-	public boolean isExecutionState() {
-		return executionState;
-	}
-
-	public void setExecutionState(boolean executionState) {
-		this.executionState = executionState;
 	}
 
 	public Collection<String> getMessages() {

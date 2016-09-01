@@ -77,6 +77,8 @@
 							case 100: {
 								$("#userAccManUpdateDetailsErrorDIV")
 									.html("<p class='bg-primary'>The account has been modified!</p>");
+								userAccManSavedUsername = $("#userAccManUsernameTXT").val();
+								userAccManSavedEmail = $("#userAccManEmailTXT").val();
 								break;
 							}
 							case 200: {
@@ -100,7 +102,7 @@
 								break;
 							}
 							}
-							if(result.respinseState != 100) {
+							if(result.responseState != 100) {
 								restoreAccountDetails();
 							}
 						} catch(err) {

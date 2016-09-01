@@ -10,10 +10,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import uni.miskolc.ips.ilona.tracking.controller.exception.AccountIsNotEnabledException;
+
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 	private UserDetailsService userService;
-	
+
 	private PasswordEncoder passwordEncoder;
 
 	public CustomAuthenticationProvider() {
@@ -28,39 +30,44 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication auth) throws AuthenticationException {
 		/*
-		if (!auth.getClass().equals(UsernamePasswordAuthenticationToken.class)) {
-			return null;
-		}
-		*/
-		
+		 * if
+		 * (!auth.getClass().equals(UsernamePasswordAuthenticationToken.class))
+		 * { return null; }
+		 */
+
 		String userid = auth.getPrincipal().toString();
 		String password = auth.getCredentials().toString();
 
 		if (userid == null || password == null) {
 			throw new BadCredentialsException("Invalid username or password!");
 		}
-		
-		if(userid.equals("") || password.equals("")) {
+
+		if (userid.equals("") || password.equals("")) {
 			throw new BadCredentialsException("Invalid username or password!");
 		}
 		UserDetails user = null;
-		
+
 		try {
 			user = userService.loadUserByUsername(userid);
-		} catch(UsernameNotFoundException e) {
+			if (user.isEnabled() == false) {
+				throw new AccountIsNotEnabledException("Account is not enabled: " + user.getUsername());
+			}
+
+		} catch (UsernameNotFoundException e) {
 			return null;
 		}
-		if(user == null) {
+		if (user == null) {
 			return null;
 		}
-		
-		if(!passwordEncoder.matches(password, user.getPassword())) {
+
+		if (!passwordEncoder.matches(password, user.getPassword())) {
 			throw new BadCredentialsException("");
 		}
-		
-		Authentication successAuth = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+
+		Authentication successAuth = new UsernamePasswordAuthenticationToken(user, user.getPassword(),
+				user.getAuthorities());
 		return successAuth;
-		
+
 	}
 
 	@Override

@@ -22,24 +22,9 @@ public class TrackingModuleCentralManager {
 	 */
 
 	/*
-	 * Mióta nem jelenetkezett be valaki, account expired engedélyezése és
-	 * tiltása
+	 * TIME CONSTANTS
 	 */
-
-	/*
-	 * Account lockednek az engedélyezése és külön beállítás, hogy hány
-	 * sikertelen próbálkozás után dobjon ki és mennyi legyen az az idő, amig
-	 * nem évül el az egész
-	 */
-
-	/*
-	 * user enabled ellenőrzése?! talán
-	 */
-
-	/*
-	 * authorities ellenőrzése??
-	 */
-
+	// =======================================================================================
 	/*
 	 * Time intervals in milliseconds: 1 hour: 3600000L 1 day: 86400000L 1 week:
 	 * 604800000L 1 month: 2678400000L 1 year: 31536000000L
@@ -55,24 +40,34 @@ public class TrackingModuleCentralManager {
 	public static final long oneYearInMilliseconds = 31_536_000_000L;
 
 	/*
-	 * Threading lock tokens.
+	 * LOCKS
 	 */
+	// ===================================================================================
+	private Object enabledCheckEnabledLock = new Object();
+
+	private Object accountExpirationCheckEnabledLock = new Object();
 
 	private Object accountExpirationTimeLock = new Object();
 
 	private Object credentialsValidityPeriodLock = new Object();
 
+	private Object lockedCheckEnabledLock = new Object();
+
+	private Object badLoginsUpperBoundLock = new Object();
+
+	private Object lockedTimeAfterBadLoginsLock = new Object();
+
 	private Object passwordRecoveryTokenValidityTimeLock = new Object();
 
 	/*
-	 * Ezt az egész osztályt több szálból is elérik, bár egy szerű doglokat
-	 * tartalmaz Szálbiztosság tétel.
-	 * 
+	 * ACCOUNT CHECK RESTRICTIONS
 	 */
+	// =====================================================================================
 
-	/**
-	 * 
-	 */
+	private boolean enabledCheckEnabled = true;
+
+	private boolean accountExpirationCheckEnabled = true;
+
 	private long accountExpirationTime = 31_536_000_000L;
 
 	/**
@@ -80,26 +75,28 @@ public class TrackingModuleCentralManager {
 	 */
 	private long credentialsValidityPeriod = 31536000000L;
 
-	/////////////////////////////////////////////////////////////////////////
-	private static long badLoginsUpperBound = 10;
+	private long badLoginsUpperBound = 10;
+
+	private boolean lockedCheckEnabled = true;
 
 	/*
 	 * Default: 1 hour
 	 */
-	private static long lockedTimeAfterBadLogins = 3600000L;
-
-	private static boolean accountEnabledCheckState = true;
-
-	private static boolean accountLockedCheckState = true;
+	private long lockedTimeAfterBadLogins = 3600000L;
 
 	/*
 	 * Default: one day
 	 */
 	private long passwordRecoveryTokenValidityTime = 86_400_000L;
 
+	/*
+	 * Setters / getters with lock/field
+	 */
+	// =======================================================================================
+
 	public long getCredentialsValidityPeriod() {
 		synchronized (credentialsValidityPeriodLock) {
-			return credentialsValidityPeriod;
+			return this.credentialsValidityPeriod;
 		}
 
 	}
@@ -112,7 +109,7 @@ public class TrackingModuleCentralManager {
 
 	public long getPasswordRecoveryTokenValidityTime() {
 		synchronized (passwordRecoveryTokenValidityTimeLock) {
-			return passwordRecoveryTokenValidityTime;
+			return this.passwordRecoveryTokenValidityTime;
 		}
 
 	}
@@ -125,7 +122,7 @@ public class TrackingModuleCentralManager {
 
 	public long getAccountExpirationTime() {
 		synchronized (accountExpirationTimeLock) {
-			return accountExpirationTime;
+			return this.accountExpirationTime;
 		}
 
 	}
@@ -135,4 +132,66 @@ public class TrackingModuleCentralManager {
 			this.accountExpirationTime = accountExpirationTime;
 		}
 	}
+
+	public boolean isEnabledCheckEnabled() {
+		synchronized (enabledCheckEnabledLock) {
+			return enabledCheckEnabled;
+		}
+
+	}
+
+	public void setEnabledCheckEnabled(boolean enabledCheckEnabled) {
+		synchronized (enabledCheckEnabledLock) {
+			this.enabledCheckEnabled = enabledCheckEnabled;
+		}
+	}
+
+	public boolean isAccountExpirationCheckEnabled() {
+		synchronized (accountExpirationCheckEnabledLock) {
+			return accountExpirationCheckEnabled;
+		}
+	}
+
+	public void setAccountExpirationCheckEnabled(boolean accountExpirationCheckEnabled) {
+		synchronized (accountExpirationCheckEnabledLock) {
+			this.accountExpirationCheckEnabled = accountExpirationCheckEnabled;
+		}
+	}
+
+	public long getBadLoginsUpperBound() {
+		synchronized (badLoginsUpperBoundLock) {
+			return badLoginsUpperBound;
+		}
+	}
+
+	public void setBadLoginsUpperBound(long badLoginsUpperBound) {
+		synchronized (badLoginsUpperBoundLock) {
+			this.badLoginsUpperBound = badLoginsUpperBound;
+		}
+	}
+
+	public boolean isLockedCheckEnabled() {
+		synchronized (lockedCheckEnabledLock) {
+			return lockedCheckEnabled;
+		}
+	}
+
+	public void setLockedCheckEnabled(boolean lockedCheckEnabled) {
+		synchronized (lockedCheckEnabledLock) {
+			this.lockedCheckEnabled = lockedCheckEnabled;
+		}
+	}
+
+	public long getLockedTimeAfterBadLogins() {
+		synchronized (lockedTimeAfterBadLoginsLock) {
+			return lockedTimeAfterBadLogins;
+		}
+	}
+
+	public void setLockedTimeAfterBadLogins(long lockedTimeAfterBadLogins) {
+		synchronized (lockedTimeAfterBadLoginsLock) {
+			this.lockedTimeAfterBadLogins = lockedTimeAfterBadLogins;
+		}
+	}
+
 }

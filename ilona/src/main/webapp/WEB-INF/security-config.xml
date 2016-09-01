@@ -56,19 +56,21 @@
 			access="hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/**" access="permitAll" />
 		
-		<form-login login-page="/tracking/getloginpage"
+		<form-login login-page="/tracking/getloginpage" 
 			default-target-url="/tracking/maincontentdecision"
-			always-use-default-target="true"		
-			authentication-failure-url="/tracking/getloginpage?error=loginerror"
+			always-use-default-target="true"			
+			authentication-failure-handler-ref="customAuthFailureHandler"
 			username-parameter="username"
 			password-parameter="password"
 			login-processing-url="/tracking/processlogin"			
 		/>
-		
+		<!-- authentication-failure-url="/tracking/getloginpage?error=loginerror" -->
 		<!-- 
 		<access-denied-handler
 			error-page="/tracking/index?accesserror" />
 		-->
+		<remember-me key="valamikey" services-ref="CustomRememberMeService"
+		/>
 			
 		<logout invalidate-session="true"
 			delete-cookies="JSESSIONID"
@@ -83,9 +85,10 @@
 				 
 		</session-management>
  		 -->
+ 		 
 		<csrf disabled="false"/>
 	</http>
-	
+
 	<!-- Any other ILONA requests! -->
 	<http auto-config="true" authentication-manager-ref="authManager">
 		<intercept-url pattern="/**" access="permitAll"/>
@@ -94,6 +97,27 @@
 		</session-management>
 		<csrf/>
 	</http>
+	
+	<bean:bean id="CustomRememberMeService" 
+		class="uni.miskolc.ips.ilona.tracking.controller.security.CustomRememberMeService">
+		<bean:constructor-arg value="valamikey"></bean:constructor-arg>
+		<bean:constructor-arg ref="CustomUserSecurityService"></bean:constructor-arg>
+		<bean:constructor-arg ref="RememberMeTokenRepository"></bean:constructor-arg>
+		<bean:property name="parameter" value="rememberme"></bean:property>
+	</bean:bean>
+	
+	<bean:bean id="RememberMeTokenRepository" 
+		class="uni.miskolc.ips.ilona.tracking.persist.mysql.MySqlAndMybatisRememberMeTokenRepository">
+		<bean:constructor-arg name="host" value="${database.host}" />
+		<bean:constructor-arg name="port" value="${database.port}" />
+		<bean:constructor-arg name="database" value="${database.db}" />
+		<bean:constructor-arg name="user" value="${database.user}" />
+		<bean:constructor-arg name="password" value="${database.password}" />
+	</bean:bean>
+	
+	<bean:bean id="customAuthFailureHandler"
+		class="uni.miskolc.ips.ilona.tracking.controller.security.CustomAuthenticationFailureHandler">
+	</bean:bean>
 	
 	<authentication-manager alias="authManager">
 	

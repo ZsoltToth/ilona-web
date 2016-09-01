@@ -8,7 +8,9 @@
 		<typeAlias alias="BooleanToIntHander"
 			type="uni.miskolc.ips.ilona.tracking.persist.mysql.typehandlers.BooleanToFromTinyintTypeHandler" />
 		<typeAlias alias="passwordTokenMapper"
-			type="uni.miskolc.ips.ilona.tracking.persist.mysql.model.PasswordRecoveryTokenMapper"/>
+			type="uni.miskolc.ips.ilona.tracking.persist.mysql.model.PasswordRecoveryTokenMapper" />
+		<typeAlias alias="rememberMeToken"
+			type="uni.miskolc.ips.ilona.tracking.persist.mysql.model.PersistenceTokenMapper" />
 	</typeAliases>
 
 	<typeHandlers>
@@ -28,11 +30,10 @@
 		</environment>
 	</environments>
 	<mappers>
-
-
 		<mapper
 			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/mappers/SecurityFunctionsUserMapper.xml" />
-
+		<mapper
+			resource="uni/miskolc/ips/ilona/tracking/persist/mysql/mappers/RememberMeTokenMapper.xml" />
 
 	</mappers>
 </configuration>

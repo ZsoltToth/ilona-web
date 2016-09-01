@@ -2,8 +2,8 @@ package security;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Date;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,7 +28,7 @@ public class A {
 		String regex = "^(?=.{5,50}$)([a-zA-Z0-9]{1}[_:-]{0,1}){1,49}[a-zA-Z0-9]{1}$"; // device id
 		String regex2 = "^(?=.{5,50}$)([a-zA-Z0-9]{1}[ ]{0,1}){1,49}[a-zA-Z0-9]{1}$"; // device name
 		String regex3 = "^(?=.{1,30}$)([a-zA-Z0-9]{1}[_- ]{0,1}){1,29}[a-zA-Z0-9]{1}$";
-		System.out.println("valid: " + Pattern.matches(regex3, "Samsung Galaxy SG-9999 ab"));
+		System.out.println(new Date(1472667837L*1000L));
 		
 		
 		

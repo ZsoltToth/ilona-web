@@ -83,6 +83,9 @@
 		</property>
 	</bean>
 
+	<bean id="graphFunctions" 
+		class="uni.miskolc.ips.ilona.tracking.controller.track.GraphFunctionsImp">
+	</bean>
 	<!-- Password recovery beans -->
 
 	<bean id="passwordTokenGenerator"

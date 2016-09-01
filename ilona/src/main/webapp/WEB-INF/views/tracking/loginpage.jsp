@@ -57,6 +57,7 @@
 					$("#mainpageLoginUseridTXT").val("");
 					$("#mainpageLoginPasswordTXT").val("");
 					$("#mainpageLoginErrorContent").html("Service error!");
+					console.log(xhr.responseText);
 				},
 				success : function(result, status, xhr) {
 					$("#page-wrapper").html(result);
@@ -278,7 +279,7 @@
 							name="password">  <br/>
 							
 					<label for="mainpageLoginRemeberMeCHB">Remember me:</label>
-					 <input type="checkbox" 
+					 <input type="checkbox" class="form-control"
 						id="mainpageLoginRemeberMeCHB">
 						
 					<br />
