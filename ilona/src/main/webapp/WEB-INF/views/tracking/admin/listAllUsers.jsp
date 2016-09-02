@@ -221,7 +221,7 @@
 
 	$(document).ready(function(){
 		try {
-			adminListUsersUsersDataTable = $("#adminListUsersDataTable").dataTable({
+			adminListUsersUsersDataTable = $("#adminListUsersDataTable").DataTable({
 				responsive: true,
 				paging: true,
 				ordering: true,
@@ -237,6 +237,29 @@
 					orderData: [2, 0, 1]
 				}]
 			});
+			
+			$('#adminListUsersDataTable tfoot th').each( function (value, index) {
+				if(value < 3) {
+					var title = $(this).text();
+		        	$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+				}
+		    } );
+			
+			adminListUsersUsersDataTable.columns().every( function (index) {
+				
+				console.log(index);
+		        if(index < 3) {
+					var that = this;
+			 
+			        $( 'input', this.footer() ).on( 'keyup change', function () {
+			            if ( that.search() !== this.value ) {
+			                that
+			                    .search( this.value )
+			                    .draw();
+			            }
+			        } );
+		        }
+		    } );
 			
 			$('#adminListUsersUsersDataTable tbody').on( 'click', '.proba111', function () {
 			    table
@@ -310,6 +333,16 @@
 										</tr>
 									</c:forEach>						
 								</tbody>
+								<tfoot>
+									<tr>
+										<th>Userid</th>
+										<th>Username</th>
+										<th>Email</th>
+										<th>List devices</th> 
+										<th>Edit account</th>
+										<th>Delete account</th>
+									</tr>
+								</tfoot>
 							</table>
 						</div>	<!-- table responsive end -->
 				</div>	<!-- panel body end -->

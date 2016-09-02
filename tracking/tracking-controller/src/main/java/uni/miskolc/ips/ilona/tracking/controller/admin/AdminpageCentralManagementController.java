@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import uni.miskolc.ips.ilona.tracking.controller.model.ExecutionResultDTO;
+import uni.miskolc.ips.ilona.tracking.controller.util.ValidateExecutionParameters;
 import uni.miskolc.ips.ilona.tracking.util.TrackingModuleCentralManager;
+import uni.miskolc.ips.ilona.tracking.util.validate.ValidityStatusHolder;
 
 @Controller
 @RequestMapping(value = "/tracking/admin")
@@ -39,7 +41,7 @@ public class AdminpageCentralManagementController {
 		return mav;
 	}
 
-	@RequestMapping(value = "/centman/updateenabled")
+	@RequestMapping(value = "/centman/updateenabledcheck")
 	@ResponseBody
 	public ExecutionResultDTO updateEnabledHandler(@RequestParam("data") String stateText) {
 		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
@@ -64,7 +66,7 @@ public class AdminpageCentralManagementController {
 		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 		try {
 			boolean newState = false;
-			if (stateText == "ON") {
+			if (stateText.trim().equalsIgnoreCase("ON")) {
 				newState = true;
 			}
 			centralManager.setAccountExpirationCheckEnabled(newState);
@@ -81,7 +83,21 @@ public class AdminpageCentralManagementController {
 	@ResponseBody
 	public ExecutionResultDTO updateAccountExpirationTimeHandler(@RequestParam("data") long newValue) {
 		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
-		// valid?! valid?!
+
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateExecutionParameters.validateAccountExpiration(newValue));
+			if (!errors.isValid()) {
+				result.addMessage("Invalid parameter!");
+				result.setResponseState(300);
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
+		}
+
 		try {
 			centralManager.setAccountExpirationTime(newValue);
 		} catch (Exception e) {
@@ -97,6 +113,21 @@ public class AdminpageCentralManagementController {
 	@ResponseBody
 	public ExecutionResultDTO updateAccountCredentialsValidTimeHandler(@RequestParam("data") long newValue) {
 		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateExecutionParameters.validateCredentialsValidityPeriod(newValue));
+			if (!errors.isValid()) {
+				result.addMessage("Invalid parameter!");
+				result.setResponseState(300);
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
+		}
+
 		try {
 			centralManager.setCredentialsValidityPeriod(newValue);
 		} catch (Exception e) {
@@ -110,8 +141,23 @@ public class AdminpageCentralManagementController {
 
 	@RequestMapping(value = "/centman/updatebadloginuppervalue")
 	@ResponseBody
-	public ExecutionResultDTO updateAccountBadLoginUpperBoundHandler(@RequestParam("data") long newValue) {
+	public ExecutionResultDTO updateAccountBadLoginUpperBoundHandler(@RequestParam("data") int newValue) {
 		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateExecutionParameters.validateBadLoginsUpperBound(newValue));
+			if (!errors.isValid()) {
+				result.addMessage("Invalid parameter!");
+				result.setResponseState(300);
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
+		}
+
 		try {
 			centralManager.setBadLoginsUpperBound(newValue);
 		} catch (Exception e) {
@@ -129,7 +175,7 @@ public class AdminpageCentralManagementController {
 		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
 		try {
 			boolean newState = false;
-			if (stateText == "ON") {
+			if (stateText.trim().equalsIgnoreCase("ON")) {
 				newState = true;
 			}
 			centralManager.setLockedCheckEnabled(newState);
@@ -146,6 +192,21 @@ public class AdminpageCentralManagementController {
 	@ResponseBody
 	public ExecutionResultDTO updateLockTimeAfterBadLoginsHandler(@RequestParam("data") long newValue) {
 		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(ValidateExecutionParameters.validateLockTimeAfterBadLogins(newValue));
+			if (!errors.isValid()) {
+				result.addMessage("Invalid parameter!");
+				result.setResponseState(300);
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
+		}
+
 		try {
 			centralManager.setLockedTimeAfterBadLogins(newValue);
 		} catch (Exception e) {
@@ -161,6 +222,22 @@ public class AdminpageCentralManagementController {
 	@ResponseBody
 	public ExecutionResultDTO updatePasswordTokenValidityTimeHandler(@RequestParam("data") long newValue) {
 		ExecutionResultDTO result = new ExecutionResultDTO(100, new ArrayList<String>());
+
+		try {
+			ValidityStatusHolder errors = new ValidityStatusHolder();
+			errors.appendValidityStatusHolder(
+					ValidateExecutionParameters.validatePasswordRecoveryTokenValidity(newValue));
+			if (!errors.isValid()) {
+				result.addMessage("Invalid parameter!");
+				result.setResponseState(300);
+			}
+		} catch (Exception e) {
+			logger.error("Service error! Cause: " + e.getMessage());
+			result.addMessage("Service error!");
+			result.setResponseState(400);
+			return result;
+		}
+
 		try {
 			centralManager.setPasswordRecoveryTokenValidityTime(newValue);
 		} catch (Exception e) {
