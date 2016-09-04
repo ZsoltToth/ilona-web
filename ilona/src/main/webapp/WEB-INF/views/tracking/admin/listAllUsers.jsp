@@ -247,7 +247,6 @@
 			
 			adminListUsersUsersDataTable.columns().every( function (index) {
 				
-				console.log(index);
 		        if(index < 3) {
 					var that = this;
 			 

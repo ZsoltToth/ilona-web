@@ -15,6 +15,8 @@
 <script src="<c:url value='/js/d3.min.js'></c:url>"></script>
 <script src="<c:url value='/js/Donut3D.js'></c:url>"></script>
 
+<script src="<c:url value='/js/tracking/track.js'></c:url>"></script>
+<script src="<c:url value='/js/tracking/firstFloorData.js'></c:url>"></script>
 <script type="text/javascript">
 
 	var groundFloorImageSource = "<c:url value='/img/groundFloor.jpg'></c:url>";
@@ -224,7 +226,8 @@
 	$("#adminTrackingFirstFloorMapDrawMenuItem").click(function(event){
 		event.preventDefault();
 		$("#adminTrackingDrawingContent").html("");
-		floorMapSVG = d3.select("#adminTrackingDrawingContent").append("svg").attr("width",1500).attr("height",1000);
+		floorMapSVG = d3.select("#adminTrackingDrawingContent").append("svg").attr("width","100%").attr("height","100%")
+			.attr("viewBox", "0 0 1196 705");
 		
 		floorMapSVG
         .append("image")
@@ -233,6 +236,15 @@
         .attr("y", 0)
         .attr("width", 1196)
         .attr("height", 705);
+		// right bottom corner
+		floorMapSVG.append("circle").attr("cx", 1184).attr("cy", 685).attr("r", 1);
+		
+		// proba ajtó labor 106
+		dummyX = trackCalculateX(5.0);
+		dummyY = trackCalculateY(10.0);
+		console.log(dummyX);
+		console.log(dummyY);
+		floorMapSVG.append("circle").attr("cx", Math.round(dummyX)).attr("cy", Math.round(dummyY)).attr("r", 5);
 		
 		/*
 		 * AREAS
@@ -670,12 +682,12 @@
 		});
 	});
 		$("#draw111").click(function(){
-			var url = "<c:url value='/img/ilona-firstFloor.jpg'></c:url>"
+			var url = "<c:url value='/img/ilona-firstFloor.jpg'></c:url>";
 			
-			var urlMarker = "<c:url value='/img/marker.png'></c:url>"
+			var urlMarker = "<c:url value='/img/marker.png'></c:url>";
 			$("#adminTrackingDrawingContent").html("");
 			svgMain = d3.select("#adminTrackingDrawingContent").append("svg").attr("width","100%").attr("height","100%")
-				.attr("viewBox", "0 0 1500 1000");
+				.attr("viewBox", "0 0 1200 700");
 	        svgMain
 	        .append("image")
 	        .attr("xlink:href", url)

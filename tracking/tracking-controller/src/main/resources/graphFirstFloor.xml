@@ -5,17 +5,177 @@
 	<graph:nodes>
 		<graph:node>
 			<graph:name>N1</graph:name>
-			<graph:description>Ez a édsáséds</graph:description>
+			<graph:description>Room 100 inner</graph:description>
 		</graph:node>
 		<graph:node>
 			<graph:name>N2</graph:name>
-			<graph:description>AAA ö ü ó ő ú é á ű</graph:description>
+			<graph:description>Room 100 door</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N3</graph:name>
+			<graph:description>Room 101 inner</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N4</graph:name>
+			<graph:description>Room 101 door</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N5</graph:name>
+			<graph:description>Room 102 inner</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N6</graph:name>
+			<graph:description>Room 102 door</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N7</graph:name>
+			<graph:description>Room 103 inner</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N8</graph:name>
+			<graph:description>Room 103 door</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N9</graph:name>
+			<graph:description>Room 104 inner</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N10</graph:name>
+			<graph:description>Room 104 door</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N11</graph:name>
+			<graph:description>Room 105 inner</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N12</graph:name>
+			<graph:description>Room 105 door</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N13</graph:name>
+			<graph:description>Top corridor 1</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N14</graph:name>
+			<graph:description>Top corridor 2</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N15</graph:name>
+			<graph:description>Top corridor 3</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N16</graph:name>
+			<graph:description>Top corridor 4</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N17</graph:name>
+			<graph:description>Top corridor 5</graph:description>
+		</graph:node>
+		<graph:node>
+			<graph:name>N18</graph:name>
+			<graph:description>Top corridor 6</graph:description>
 		</graph:node>
 	</graph:nodes>
 	<graph:edges>
 		<graph:edge>
 			<graph:from>N1</graph:from>
 			<graph:to>N2</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N2</graph:from>
+			<graph:to>N13</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N13</graph:from>
+			<graph:to>N14</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N14</graph:from>
+			<graph:to>N4</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N4</graph:from>
+			<graph:to>N3</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N14</graph:from>
+			<graph:to>N15</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N15</graph:from>
+			<graph:to>N6</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N6</graph:from>
+			<graph:to>N5</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N15</graph:from>
+			<graph:to>N16</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N16</graph:from>
+			<graph:to>N8</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N8</graph:from>
+			<graph:to>N7</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N16</graph:from>
+			<graph:to>N17</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N17</graph:from>
+			<graph:to>N10</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N10</graph:from>
+			<graph:to>N9</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N17</graph:from>
+			<graph:to>N18</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N18</graph:from>
+			<graph:to>N12</graph:to>
+			<graph:weight>0</graph:weight>
+			<graph:description />
+		</graph:edge>
+		<graph:edge>
+			<graph:from>N12</graph:from>
+			<graph:to>N11</graph:to>
 			<graph:weight>0</graph:weight>
 			<graph:description />
 		</graph:edge>
