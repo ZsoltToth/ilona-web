@@ -22,13 +22,20 @@
 	var groundFloorImageSource = "<c:url value='/img/groundFloor.jpg'></c:url>";
 	var firstFloorImageSource = "<c:url value='/img/firstFloor.jpg'></c:url>";
 	var secondFloorImageSource = "<c:url value='/img/secondFloor.jpg'></c:url>";
-
+	var markerImageSource = "<c:url value='/img/marker.png'></c:url>";
+	
 	var floorMapSVG;
 	
 	var graphPontCircleRadius = 3;
+	var adminTrackingPositionsTable;
 	
 	$(document).ready(function(){
-		
+		adminTrackingPositionsTable = $("#adminTrackingPositionsTable").DataTable({
+			responsive: true,
+			paging: true,
+			ordering: true,
+			info: true
+		});
 	});
 	
 	
@@ -237,7 +244,15 @@
         .attr("width", 1196)
         .attr("height", 705);
 		// right bottom corner
-		floorMapSVG.append("circle").attr("cx", 1184).attr("cy", 685).attr("r", 1);
+		floorMapSVG.append("circle").attr("cx", 1150).attr("cy", 650).attr("r", 5);
+		floorMapSVG
+        .append("image")
+        .attr("xlink:href", markerImageSource)
+        .attr("x", 1150-15)
+        .attr("y", 650-30)
+        .attr("width", 30)
+        .attr("height", 30);
+		
 		
 		// proba ajtó labor 106
 		dummyX = trackCalculateX(5.0);
@@ -591,96 +606,8 @@
 		floorMapSVG.append("circle").attr("cx", 1071).attr("cy", 540).attr("r", graphPontCircleRadius);
 		
 	});
-	
-	
-	var zones = [
-	             {
-	            	 zoneid: "zone1",
-	            	 startx: 0,
-	            	 starty: 0,
-	            	 endx: 291,
-	            	 endy: 180,
-	            	 points: []
-	             },
-	             {
-	            	 zoneid: "zone2",
-	            	 startx: 291,
-	            	 starty: 0,
-	            	 endx: 519,
-	            	 endy: 180,
-	            	 points: []
-	             },
-	             {
-	            	 zoneid: "zone3",
-	            	 startx: 519,
-	            	 starty: 0,
-	            	 endx: 632,
-	            	 endy: 180,
-	            	 points: []
-	             },
-	             {
-	            	 zoneid: "zone4",
-	            	 startx: 632,
-	            	 starty: 0,
-	            	 endx: 961,
-	            	 endy: 180,
-	            	 points: []
-	             },
-	             {
-	            	 zoneid: "zone5",
-	            	 startx: 0,
-	            	 starty: 180,
-	            	 endx: 1250,
-	            	 endy: 243,
-	            	 points: []
-	             }];
-	var points = [{
-		pointid: "point1",
-		pointx: 110,
-		pointy: 90
-	}, {
-		pointid: "point2",
-		pointx: 205,
-		pointy: 175
-	}, {
-		pointid: "point3",
-		pointx: 405,
-		pointy: 210
-	}, {
-		pointid: "point4",
-		pointx: 585,
-		pointy: 175
-	}, {
-		pointid: "point5",
-		pointx: 585,
-		pointy: 95
-	}];
 
-	$("#selectUsers").click(function(event){
-		event.preventDefault();
-		
-		var token = $("meta[name='_csrf']").attr("content");
-		var header = $("meta[name='_csrf_header']").attr("content");
-		var selectedIndex = document.getElementById("sel2").selectedIndex;
-		 
-		$.ajax({
-			type : "POST",
-			async : true,
-			url : "<c:url value='/tracking/admin/trackingselectdevicesforuser' ></c:url>",
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader(header, token);
-			},
-			data : {
-				userid : ""
-			},
-			success : function(result, status, xhr) {
-				alert("SUCCESS!")
-			},
-			error : function(xhr, status, error) {
-				alert("ERROR!");
-			}
-		});
-	});
+	
 		$("#draw111").click(function(){
 			var url = "<c:url value='/img/ilona-firstFloor.jpg'></c:url>";
 			
@@ -996,62 +923,147 @@
 			svgMain.append("circle").attr("cx", 335).attr("cy", 600).attr("r", 5);
 		});
 
+		$("#adminTrackingUserAndDeviceChooserHeader").click(function(event){
+			try {
+				var panel =  $("#adminTrackingUserAndDeviceBody");
+				if(panel.hasClass("in")) {
+					panel.removeClass("in");
+				} else {
+					panel.addClass("in");
+				}
+			} catch(error) {
+				console.log(error);
+			}
+		});
+	
+		
+	$("#adminTrackingSelectUsersBTN").click(function(event){
+		try {
+			event.preventDefault();
+			
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			
+			var value = document.getElementById("adminTrackingUsersSelect").value.trim();
+ 
+			$.ajax({
+				type : "POST",
+				async : true,
+				url : "<c:url value='/tracking/admin/tracking/getdevicelist'></c:url>",
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : {
+					userid : value
+				},
+				success : function(result, status, xhr) {
+					try {
+						clearAndFillSelectElement("adminTrackingDevicesSelect", result);
+						$("#adminTrackingDevicesPanelHeader").html("Devices: " + value);
+					} catch(error) {
+						console.log(error);
+					}
+				},
+				error : function(xhr, status, error) {
+					alert("ERROR!");
+				}
+			});
+		} catch(error) {
+			console.log(error);
+		}	
+	});
+	
+	var positions;
+	
+	$("#adminTrackingSelectDeviceBTN").click(function(event){
+		try {
+			event.preventDefault();
+			
+			var token = $("meta[name='_csrf']").attr("content");
+			var header = $("meta[name='_csrf_header']").attr("content");
+			 
+			$.ajax({
+				type : "POST",
+				async : true,
+				url : "<c:url value='/tracking/admin/tracking/getpositions'></c:url>",
+				beforeSend : function(xhr) {
+					xhr.setRequestHeader(header, token);
+				},
+				data : {
+					
+				},
+				success : function(result, status, xhr) {
+					try {
+						positions = result;
+						adminTrackingPositionsTable.clear().draw();
+						fillDataTableWithValues(adminTrackingPositionsTable,positions);
+						createMap("adminTrackingFirstFloorDIV", firstFloorImageSource);
+						
+					} catch(error) {
+						console.log(error);
+					}
+				},
+				error : function(xhr, status, error) {
+					alert("ERROR!");
+				}
+			});
+		} catch(error) {
+			console.log(error);
+		}
+	});
 </script>
 
 <jsp:directive.include file="adminNavbar.jsp" />
 
 <div class="container-fluid">
-	<div class="row" id="adminMainpageContent">
-		<div class="col-lg-2">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					Users:
-				</div>
-				<div class="panel-body">
-					<select  class="form-control" id="sel2">
-	       				<c:forEach items="${userids}" var="userid">
-	       				<option>${userid}</option>
-	       				</c:forEach>
-	      			</select>
-	      			<br />
-	      			<input type="button" value="Select user!" id="selectUsers" >    			
-	      			<br />
-				</div>
-			</div>
-		</div>
+	<div class="row">
+		<div class="col-lg-12">
 		
-		<div class="col-lg-2">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					Devices:
-				</div>
-				<div class="panel-body">
-   			
-	      			<select  class="form-control" id="sel3">
-	       				<option>1</option>
-	       				<option>2</option>
-	   				    <option>3</option>
-	    				<option>4</option>
-	      				<option>5</option>
-	      			</select>
-	      			<br />
-	      			<input type="button" value="Select device!" >   			
-				</div>
-			</div>
-		</div>
-		
-		<div class="col-lg-2">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					Position details:
-				</div>
-				<div class="panel-body">	
-	      			<br />
-	      			<input type="text" value="Select device!" >
-			</div>
-			</div>
-		</div>
-		
+			<div class="panel-group">
+			  <div class="panel panel-default">
+			    <div class="panel-heading" id="adminTrackingUserAndDeviceChooserHeader">
+			      <h4 class="panel-title" style="text-align: center">
+			        <span class="fa fa-arrow-circle-down"></span>
+			        Users and devices
+			        <span class="fa fa-arrow-circle-down"></span>
+			      </h4>
+			    </div>
+			    <div id="adminTrackingUserAndDeviceBody" class="panel-collapse collapse">
+			      <div class="panel-body">
+			      		<div class="panel panel-default">
+							<div class="panel-heading">
+								Users:
+							</div>
+							<div class="panel-body">
+								<select  class="form-control" id="adminTrackingUsersSelect">
+				       				<c:forEach items="${userids}" var="userid">
+				       					<option>${userid}</option>
+				       				</c:forEach>
+				      			</select>
+				      			<br />
+				      			<input type="button" value="Select user!" id="adminTrackingSelectUsersBTN" >    			
+				      			<br />
+							</div>
+						</div>
+						
+						<div class="panel panel-default">
+							<div class="panel-heading" id="adminTrackingDevicesPanelHeader">
+								Devices:
+							</div>
+							<div class="panel-body">
+			   			
+				      			<select  class="form-control" id="adminTrackingDevicesSelect">
+				      			</select>
+				      			<br />
+				      			<input type="button" value="Select device!" id="adminTrackingSelectDeviceBTN">   			
+							</div>
+						</div>
+			      </div>
+			    </div>
+			  </div>
+			</div>		
+		</div>	
+			
 		<div class="col-lg-6">
 			<div class="panel panel-default">
 				<div class="panel-heading">			
@@ -1065,6 +1077,54 @@
 	     
 		</div>
 		
+	</div>
+	
+	<div class="row">
+		<div class="col-lg-12">
+			<ul class="nav nav-pills">
+			  <li class="active"><a data-toggle="pill" href="#home">Positions table</a></li>
+			  <li><a data-toggle="pill" href="#menu1">Ground floor</a></li>
+			  <li><a data-toggle="pill" href="#menu2">First floor</a></li>
+			  <li><a data-toggle="pill" href="#menu3">Second floor</a></li>
+			</ul>
+			
+			<div class="tab-content">
+			  <div id="home" class="tab-pane fade in active">
+			  	<div class="table-responsive">
+					<table class="display nowrap" id="adminTrackingPositionsTable" width="100%">
+					    <thead>
+					    	<tr>
+					    		<th>Position id</th>
+					    		<th>Zone id</th>
+					    		<th>Zone name</th>
+					    		<th>Coordinate-X</th>
+					    		<th>Coordinate-Y</th>
+					    		<th>Coordinate-Z</th>
+					    		<th>Timestamp</th>
+					    	</tr>
+					    </thead>
+					    <tbody>
+					    	<tr>
+					    		<td>dada</td>
+					    		<td>dsada</td>
+					    		<td>dasda</td>
+					    		<td>dada</td>
+					    		<td>dsada</td>
+					    		<td>dasda</td>
+					    		<td>dasda</td>
+					    	</tr>
+					    </tbody>
+					</table>
+				</div>
+			  </div>
+			  <div id="menu1" class="tab-pane fade">
+			    <div id="adminTrackingGroundFloorDIV"></div>
+			  </div>
+			  <div id="menu2" class="tab-pane fade">
+			    <div id="adminTrackingFirstFloorDIV"></div>
+			  </div>
+			</div>
+		</div>
 	</div>
 	
 	<div class="row">

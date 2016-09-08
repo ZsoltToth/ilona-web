@@ -94,49 +94,49 @@ var graphNodes = {
 var ZonesFirstFloor = [ {
 	name : "room100",
 	startX : 0,
-	starY : 0,
+	startY : 0,
 	endX : 285,
 	endY : 178,
 	Points : [ graphNodes["N1"] ]
 }, {
 	name : "room101",
 	startX : 285,
-	starY : 0,
+	startY : 0,
 	endX : 516,
 	endY : 178,
 	Points : []
 }, {
 	name : "room102",
 	startX : 516,
-	starY : 0,
+	startY : 0,
 	endX : 629,
 	endY : 178,
 	Points : []
 }, {
 	name : "room103",
 	startX : 629,
-	starY : 0,
+	startY : 0,
 	endX : 740,
 	endY : 178,
 	Points : []
 }, {
 	name : "room104",
 	startX : 740,
-	starY : 0,
+	startY : 0,
 	endX : 962,
 	endY : 178,
 	Points : []
 }, {
 	name : "room105",
 	startX : 962,
-	starY : 0,
+	startY : 0,
 	endX : 1212,
 	endY : 178,
 	Points : []
 }, {
 	name : "topCorridor",
 	startX : 0,
-	starY : 178,
+	startY : 178,
 	endX : 1200,
 	endY : 245,
 	Points : []
