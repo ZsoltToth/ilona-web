@@ -66,13 +66,23 @@ function drawArea(map, data) {
 		for (i; i < length; i++) {
 			map.append("rect").attr("x", data[i].startX).attr("y",
 					data[i].startY).attr("height",
-					data[i].endY - data[i].startY).attr("width", data[i].endX - data[i].startX).attr(
-					"fill", "none").attr("stroke", "red").attr("stroke-width",
-					1);
+					data[i].endY - data[i].startY).attr("width",
+					data[i].endX - data[i].startX).attr("fill", "none").attr(
+					"stroke", "red").attr("stroke-width", 1);
 
 		}
 	} catch (error) {
 		console.log(error);
+	}
+}
+
+function drawGraphPoints(map, data) {
+	try {
+		for (i in data) {
+			map.append("circle").attr("cx", data[i].posX).attr("cy", data[i].posY).attr("r", 3);
+		}
+	} catch(error) {
+		throw "Function :: drawGraphPoints Error: " + error;
 	}
 }
 
@@ -85,8 +95,44 @@ function createMap(div, imageSource) {
 		floorMapSVG.append("image").attr("xlink:href", imageSource)
 				.attr("x", 0).attr("y", 0).attr("width", 1196).attr("height",
 						705);
-		drawArea(floorMapSVG, ZonesFirstFloor);
+		//drawGraphPoints(floorMapSVG, graphNodesFirstFloor);
+		//drawArea(floorMapSVG, ZonesFirstFloor);
+		return floorMapSVG;
+		// drawArea(floorMapSVG, ZonesFirstFloor);
 	} catch (error) {
 		throw "Function :: createMap Error: " + error;
+	}
+}
+
+function drawPositions(positions, floors, marker) {
+	try {
+		var length = positions.length;
+		var i = 0;
+		for (i; i < length; i++) {
+			var z = positions[i].position.coordinate.z;
+			var posX = trackCalculateX(positions[i].position.coordinate.x);
+			var posY = trackCalculateY(positions[i].position.coordinate.y);
+			if (z <= 3) {
+				floors[0].append("circle").attr("cx", posX).attr("cy", posY).attr("r", 5);
+				floors[0].append("image").attr("xlink:href", marker)
+					.attr("x", posX - 15).attr("y", posY - 30).attr("width", 30).attr("height", 30);
+				continue;
+			}
+			
+			if (3 < z && z <= 6) {
+				floors[1].append("circle").attr("cx", posX).attr("cy", posY).attr("r", 5);
+				floors[1].append("image").attr("xlink:href", marker)
+					.attr("x", posX - 15).attr("y", posY - 30).attr("width", 30).attr("height", 30);
+				continue;
+			}
+			
+			floors[2].append("circle").attr("cx", posX).attr("cy", posY).attr("r", 5);
+			floors[2].append("image").attr("xlink:href", marker)
+				.attr("x", posX - 15).attr("y", posY - 30).attr("width", 30).attr("height", 30);
+			
+			
+		}
+	} catch (error) {
+		throw "Function :: drawPositions Error: " + error;
 	}
 }

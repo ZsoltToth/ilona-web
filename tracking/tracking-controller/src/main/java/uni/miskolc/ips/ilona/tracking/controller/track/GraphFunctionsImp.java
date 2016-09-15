@@ -25,6 +25,11 @@ public class GraphFunctionsImp implements GraphFunctions {
 	private UndirectedGraph<String, DefaultEdge> groundFloor = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
 	private UndirectedGraph<String, DefaultEdge> firstFloor = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
 	private UndirectedGraph<String, DefaultEdge> secondFloor = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+
+	private Collection<String> groundFloorNodes = new ArrayList<String>();
+	private Collection<String> firstFloorNodes = new ArrayList<String>();
+	private Collection<String> secondFloorNodes = new ArrayList<String>();
+
 	private Schema schema;
 
 	public GraphFunctionsImp() {
@@ -139,6 +144,19 @@ public class GraphFunctionsImp implements GraphFunctions {
 		}
 
 		return thePath;
+	}
+
+	public Floor calculateNodeFloorPosition(String nodeName) {
+		if (groundFloorNodes.contains(nodeName)) {
+			return Floor.GROUND_FLOOR;
+		}
+		if (firstFloorNodes.contains(nodeName)) {
+			return Floor.FIRST_FLOOR;
+		}
+		if (secondFloorNodes.contains(nodeName)) {
+			return Floor.SECOND_FLOOR;
+		}
+		return Floor.NONE;
 	}
 
 	private void fillElementsIntoGraph(UndirectedGraph<String, DefaultEdge> graph, String elementsFilePath)

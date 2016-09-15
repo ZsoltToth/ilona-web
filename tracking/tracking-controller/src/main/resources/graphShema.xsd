@@ -4,7 +4,7 @@
 
 	<simpleType name="graphPointName">
 		<restriction base="string">
-			<pattern value="[a-zA-Z0-9]{1,100}"></pattern>
+			<pattern value="[a-zA-Z0-9_]{1,100}"></pattern>
 		</restriction>
 	</simpleType>
 
