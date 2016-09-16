@@ -630,7 +630,7 @@
 
 		<graph:edge>
 			<graph:from>BOTTOMCORRIDOR_NODE7</graph:from>
-			<graph:to>RIGHTCORRIDOR_NODE1</graph:to>
+			<graph:to>RIGHTCORRIDOR_NODE3</graph:to>
 			<graph:weight>0</graph:weight>
 			<graph:description></graph:description>
 		</graph:edge>

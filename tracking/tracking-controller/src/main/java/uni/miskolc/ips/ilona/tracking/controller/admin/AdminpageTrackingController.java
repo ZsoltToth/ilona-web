@@ -77,19 +77,20 @@ public class AdminpageTrackingController {
 	@ResponseBody
 	public Collection<PositionTrackDTO> getPositionsForDeviceHandler() throws TrackingServiceErrorException {
 		try {
-			int count = 10;
+			int count = 8;
 			Collection<PositionTrackDTO> positions = new ArrayList<PositionTrackDTO>();
-			for(int i = 0; i < count; i++) {
+			for (int i = 0; i < count; i++) {
 				Coordinate coord = new Coordinate();
 				coord.setX(Math.random() * 50);
 				coord.setY(Math.random() * 28);
-				coord.setZ(Math.random() * 10);
+				//coord.setZ(Math.random() * 10);
+				coord.setZ(Math.random() + 3);
 				Position pos = new Position(coord);
 				Zone zone = new Zone("Zone-" + Math.random());
 				pos.setZone(zone);
 				PositionTrackDTO dto = new PositionTrackDTO();
 				dto.setPosition(pos);
-				long randomTime = new Date().getTime() - (long)Math.round(Math.random() * 10_000_000D);
+				long randomTime = new Date().getTime() - (long) Math.round(Math.random() * 10_000_000D);
 				dto.setDate(new Date(randomTime));
 				positions.add(dto);
 			}
@@ -100,12 +101,12 @@ public class AdminpageTrackingController {
 		}
 	}
 
-	@RequestMapping(value = "/tracking/calculatedpath", method = { RequestMethod.POST })
+	@RequestMapping(value = "/tracking/calculatepath", method = { RequestMethod.POST })
 	@ResponseBody
 	public Collection<String> calculatePath(@RequestParam(value = "start") String start,
 			@RequestParam(value = "end") String end) {
-
-		return null;
+		return graphFunctions.generateShortestPath(start, end);
+		//return null;
 	}
 
 	@ExceptionHandler(TrackingServiceErrorException.class)

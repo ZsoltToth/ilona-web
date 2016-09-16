@@ -1,425 +1,510 @@
 var graphNodesFirstFloor = {
 	ROOM100_INNER1 : {
+		id : "ROOM100_INNER1",
 		name : "room100 Inner",
 		posX : 230,
 		posY : 110
 	},
 	ROOM100_DOOR : {
+		id : "ROOM100_DOOR",
 		name : "room100 Door",
 		posX : 255,
 		posY : 178
 	},
 	ROOM101_INNER1 : {
+		id : "ROOM101_INNER1",
 		name : "room101Inner",
 		posX : 400,
 		posY : 110
 	},
 	ROOM101_DOOR : {
+		id : "ROOM101_DOOR",
 		name : "room101Door",
 		posX : 408,
 		posY : 178
 	},
 	ROOM102_INNER1 : {
+		id : "ROOM102_INNER1",
 		name : "room102Inner",
 		posX : 570,
 		posY : 110
 	},
 	ROOM102_DOOR : {
+		id : "ROOM102_DOOR",
 		name : "room102Door",
 		posX : 575,
 		posY : 178
 	},
 	ROOMTOP4_INNER1 : {
+		id : "ROOMTOP4_INNER1",
 		name : "room103Inner",
 		posX : 690,
 		posY : 110
 	},
 	ROOMTOP4_DOOR : {
+		id : "ROOMTOP4_DOOR",
 		name : "room103Door",
 		posX : 690,
 		posY : 178
 	},
 	ROOM103_INNER1 : {
+		id : "ROOM103_INNER1",
 		name : "room104Inner",
 		posX : 850,
 		posY : 110
 	},
 	ROOM103_DOOR : {
+		id : "ROOM103_DOOR",
 		name : "room104Door",
 		posX : 908,
 		posY : 178
 	},
 	ROOM104_INNER1 : {
+		id : "ROOM104_INNER1",
 		name : "room104Inner",
 		posX : 1080,
 		posY : 110
 	},
 	ROOM104_DOOR : {
+		id : "ROOM104_DOOR",
 		name : "room104Door",
 		posX : 1015,
 		posY : 178
 	},
 	TOPCORRIDOR_NODE1 : {
+		id : "TOPCORRIDOR_NODE1",
 		name : "topCorridor room 100",
 		posX : 255,
 		posY : 210
 	},
 	TOPCORRIDOR_NODE2 : {
+		id : "TOPCORRIDOR_NODE2",
 		name : "topCorridor room 101 ",
 		posX : 408,
 		posY : 210
 	},
 	TOPCORRIDOR_NODE3 : {
+		id : "TOPCORRIDOR_NODE3",
 		name : "topCorridor room 102",
 		posX : 575,
 		posY : 210
 	},
 	TOPCORRIDOR_NODE4 : {
+		id : "TOPCORRIDOR_NODE4",
 		name : "topCorridor room top 4",
 		posX : 690,
 		posY : 210
 	},
 	TOPCORRIDOR_NODE5 : {
+		id : "TOPCORRIDOR_NODE5",
 		name : "topCorridor rooms connection",
 		posX : 800,
 		posY : 210
 	},
 	TOPCORRIDOR_NODE6 : {
+		id : "TOPCORRIDOR_NODE6",
 		name : "topCorridor room 103",
 		posX : 908,
 		posY : 210
 	},
 	TOPCORRIDOR_NODE7 : {
+		id : "TOPCORRIDOR_NODE7",
 		name : "topCorridor coordoors connection",
 		posX : 980,
 		posY : 210
 	},
 	TOPCORRIDOR_NODE8 : {
+		id : "TOPCORRIDOR_NODE8",
 		name : "topCorridor room 104",
 		posX : 1015,
 		posY : 210
 	},
 	LEFTCORRIDOR_NODE1 : {
+		id : "LEFTCORRIDOR_NODE1",
 		name : "topCorridor room 104",
 		posX : 255,
 		posY : 300
 	},
 	LEFTCORRIDOR_NODE2 : {
+		id : "LEFTCORRIDOR_NODE2",
 		name : "topCorridor room 104",
 		posX : 408,
 		posY : 300
 	},
 	LEFTCORRIDOR_LIFT : {
+		id : "LEFTCORRIDOR_LIFT",
 		name : "topCorridor room 104",
 		posX : 220,
 		posY : 430
 	},
 	LEFTCORRIDOR_STAIR : {
+		id : "LEFTCORRIDOR_STAIR",
 		name : "topCorridor room 104",
 		posX : 408,
 		posY : 400
 	},
 	LEFTCORRIDOR_MIDDLE : {
+		id : "LEFTCORRIDOR_MIDDLE",
 		name : "topCorridor room 104",
 		posX : 325,
 		posY : 370
 	},
 	MIDDLE_WORKROOM_DOOR : {
+		id : "MIDDLE_WORKROOM_DOOR",
 		name : "middle rooms workroom door",
 		posX : 678,
 		posY : 245
 	},
 	MIDDLE_WORKROOM_INNER1 : {
+		id : "MIDDLE_WORKROOM_INNER1",
 		name : "middle rooms workroom door",
 		posX : 650,
 		posY : 280
 	},
 	MIDDLE_STORAGEROOM_DOOR : {
+		id : "MIDDLE_STORAGEROOM_DOOR",
 		name : "topCorridor room 104",
 		posX : 760,
 		posY : 245
 	},
 	MIDDLE_STORAGEROOM_INNER1 : {
+		id : "MIDDLE_STORAGEROOM_INNER1",
 		name : "topCorridor room 104",
 		posX : 770,
 		posY : 280
 	},
 	MIDDLE_CLEANINGROOM_DOOR : {
+		id : "MIDDLE_CLEANINGROOM_DOOR",
 		name : "topCorridor room 104",
 		posX : 835,
 		posY : 245
 	},
 	WOMAN_WC_INNER1 : {
+		id : "WOMAN_WC_INNER1",
 		name : "topCorridor room 104",
 		posX : 875,
 		posY : 270
 	},
 	WOMAN_WC_INNER2 : {
+		id : "WOMAN_WC_INNER2",
 		name : "topCorridor room 104",
 		posX : 875,
 		posY : 325
 	},
 	WOMAN_WC_DOOR : {
+		id : "WOMAN_WC_DOOR",
 		name : "topCorridor room 104",
 		posX : 951,
 		posY : 325
 	},
 	MIDDLE_DISABLEDROOM_DOOR : {
+		id : "MIDDLE_DISABLEDROOM_DOOR",
 		name : "topCorridor room 104",
 		posX : 925,
 		posY : 245
 	},
 	ROOM105_DOOR : {
+		id : "ROOM105_DOOR",
 		name : "topCorridor room 104",
 		posX : 1040,
 		posY : 245
 	},
 	ROOM105_INNER1 : {
+		id : "ROOM105_INNER1",
 		name : "topCorridor room 104",
 		posX : 1060,
 		posY : 280
 	},
 	MIDDLEBOTTOM_PRINTERROOM_DOOR : {
+		id : "MIDDLEBOTTOM_PRINTERROOM_DOOR",
 		name : "topCorridor room 104",
 		posX : 548,
 		posY : 449
 	},
 	MIDDLEBOTTOM_PRINTERROOM_INNER1 : {
+		id : "MIDDLEBOTTOM_PRINTERROOM_INNER1",
 		name : "topCorridor room 104",
 		posX : 570,
 		posY : 420
 	},
 	MIDDLEBOTTOM_STORAGEROOM_DOOR : {
+		id : "MIDDLEBOTTOM_STORAGEROOM_DOOR",
 		name : "topCorridor room 104",
 		posX : 688,
 		posY : 449
 	},
 	MIDDLEBOTTOM_STORAGEROOM_INNER1 : {
+		id : "MIDDLEBOTTOM_STORAGEROOM_INNER1",
 		name : "topCorridor room 104",
 		posX : 670,
 		posY : 420
 	},
 	MIDDLEBOTTOM_DINNERROOM_DOOR : {
+		id : "MIDDLEBOTTOM_DINNERROOM_DOOR",
 		name : "topCorridor room 104",
 		posX : 740,
 		posY : 449
 	},
 	MIDDLEBOTTOM_DINNERROOM_INNER1 : {
+		id : "MIDDLEBOTTOM_DINNERROOM_INNER1",
 		name : "topCorridor room 104",
 		posX : 755,
 		posY : 425
 	},
 	MIDDLEBOTTOM_WC1_DOOR : {
+		id : "MIDDLEBOTTOM_WC1_DOOR",
 		name : "topCorridor room 104",
 		posX : 815,
 		posY : 449
 	},
 	MIDDLEBOTTOM_WC2_DOOR : {
+		id : "MIDDLEBOTTOM_WC2_DOOR",
 		name : "topCorridor room 104",
 		posX : 850,
 		posY : 449
 	},
 	MIDDLEBOTTOM_MANWC_DOOR : {
+		id : "MIDDLEBOTTOM_MANWC_DOOR",
 		name : "topCorridor room 104",
 		posX : 951,
 		posY : 430
 	},
 	MIDDLEBOTTOM_MANWC_INNER1 : {
+		id : "MIDDLEBOTTOM_MANWC_INNER1",
 		name : "topCorridor room 104",
 		posX : 910,
 		posY : 430
 	},
 	MIDDLEBOTTOM_MANWC_INNER2 : {
+		id : "MIDDLEBOTTOM_MANWC_INNER2",
 		name : "topCorridor room 104",
 		posX : 910,
 		posY : 400
 	},
 	ROOM106_DOOR : {
+		id : "ROOM106_DOOR",
 		name : "topCorridor room 104",
 		posX : 1050,
 		posY : 449
 	},
 	ROOM106_INNER1 : {
+		id : "ROOM106_INNER1",
 		name : "topCorridor room 104",
 		posX : 1070,
 		posY : 425
 	},
 	RIGHTCORRIDOR_NODE1 : {
+		id : "RIGHTCORRIDOR_NODE1",
 		name : "topCorridor room 104",
 		posX : 980,
 		posY : 325
 	},
 	RIGHTCORRIDOR_NODE2 : {
+		id : "RIGHTCORRIDOR_NODE2",
 		name : "topCorridor room 104",
 		posX : 980,
 		posY : 430
 	},
 	RIGHTCORRIDOR_NODE3 : {
+		id : "RIGHTCORRIDOR_NODE3",
 		name : "topCorridor room 104",
 		posX : 980,
 		posY : 480
 	},
 	LIBRARY_DOOR : {
+		id : "LIBRARY_DOOR",
 		name : "topCorridor room 104",
 		posX : 253,
 		posY : 520
 	},
 	LIBRARY_INNER1 : {
+		id : "LIBRARY_INNER1",
 		name : "topCorridor room 104",
 		posX : 230,
 		posY : 540
 	},
 	RECEPION_DOOR : {
+		id : "RECEPION_DOOR",
 		name : "topCorridor room 104",
 		posX : 330,
 		posY : 520
 	},
 	RECEPION_INNER1 : {
+		id : "RECEPION_INNER1",
 		name : "topCorridor room 104",
 		posX : 310,
 		posY : 540
 	},
 	RECEPION_INNER2 : {
+		id : "RECEPION_INNER2",
 		name : "topCorridor room 104",
 		posX : 350,
 		posY : 540
 	},
 	DEPARTMENTCENTER_DOOR : {
+		id : "DEPARTMENTCENTER_DOOR",
 		name : "topCorridor room 104",
 		posX : 448,
 		posY : 520
 	},
 	DEPARTMENTCENTER_INNER1 : {
+		id : "DEPARTMENTCENTER_INNER1",
 		name : "topCorridor room 104",
 		posX : 428,
 		posY : 540
 	},
 	DEPARTMENTCENTER_INNER2 : {
+		id : "DEPARTMENTCENTER_INNER2",
 		name : "topCorridor room 104",
 		posX : 468,
 		posY : 540
 	},
 	TEACHERROOM1_DOOR : {
+		id : "TEACHERROOM1_DOOR",
 		name : "topCorridor room 104",
 		posX : 560,
 		posY : 520
 	},
 	TEACHERROOM1_INNER1 : {
+		id : "TEACHERROOM1_INNER1",
 		name : "topCorridor room 104",
 		posX : 540,
 		posY : 540
 	},
 	TEACHERROOM1_INNER2 : {
+		id : "TEACHERROOM1_INNER2",
 		name : "topCorridor room 104",
 		posX : 580,
 		posY : 540
 	},
 	TEACHERROOM2_DOOR : {
+		id : "TEACHERROOM2_DOOR",
 		name : "topCorridor room 104",
 		posX : 672,
 		posY : 520
 	},
 	TEACHERROOM2_INNER1 : {
+		id : "TEACHERROOM2_INNER1",
 		name : "topCorridor room 104",
 		posX : 652,
 		posY : 540
 	},
 	TEACHERROOM2_INNER2 : {
+		id : "TEACHERROOM2_INNER2",
 		name : "topCorridor room 104",
 		posX : 692,
 		posY : 540
 	},
 	TEACHERROOM3_DOOR : {
+		id : "TEACHERROOM3_DOOR",
 		name : "topCorridor room 104",
 		posX : 785,
 		posY : 520
 	},
 	TEACHERROOM3_INNER1 : {
+		id : "TEACHERROOM3_INNER1",
 		name : "topCorridor room 104",
 		posX : 765,
 		posY : 540
 	},
 	TEACHERROOM3_INNER2 : {
+		id : "TEACHERROOM3_INNER2",
 		name : "topCorridor room 104",
 		posX : 805,
 		posY : 540
 	},
 	TEACHERROOM4_DOOR : {
+		id : "TEACHERROOM4_DOOR",
 		name : "topCorridor room 104",
 		posX : 900,
 		posY : 520
 	},
 	TEACHERROOM4_INNER1 : {
+		id : "TEACHERROOM4_INNER1",
 		name : "topCorridor room 104",
 		posX : 880,
 		posY : 540
 	},
 	TEACHERROOM4_INNER2 : {
+		id : "TEACHERROOM4_INNER2",
 		name : "topCorridor room 104",
 		posX : 920,
 		posY : 540
 	},
 	TEACHERROOM5_DOOR : {
+		id : "TEACHERROOM5_DOOR",
 		name : "topCorridor room 104",
 		posX : 1032,
 		posY : 545
 	},
 	TEACHERROOM5_INNER1 : {
+		id : "TEACHERROOM5_INNER1",
 		name : "topCorridor room 104",
 		posX : 990,
 		posY : 575
 	},
 	TEACHERROOM6_DOOR : {
+		id : "TEACHERROOM6_DOOR",
 		name : "topCorridor room 104",
 		posX : 1071,
 		posY : 540
 	},
 	TEACHERROOM6_INNER1 : {
+		id : "TEACHERROOM6_INNER1",
 		name : "topCorridor room 104",
 		posX : 1095,
 		posY : 560
 	},
 	BOTTOMCORRIDOR_NODE1 : {
+		id : "BOTTOMCORRIDOR_NODE1",
 		name : "topCorridor room 104",
 		posX : 270,
 		posY : 480
 	},
 	BOTTOMCORRIDOR_NODE2 : {
+		id : "BOTTOMCORRIDOR_NODE2",
 		name : "topCorridor room 104",
 		posX : 330,
 		posY : 480
 	},
 	BOTTOMCORRIDOR_NODE3 : {
+		id : "BOTTOMCORRIDOR_NODE3",
 		name : "topCorridor room 104",
 		posX : 448,
 		posY : 480
 	},
 	BOTTOMCORRIDOR_NODE4 : {
+		id : "BOTTOMCORRIDOR_NODE4",
 		name : "topCorridor room 104",
 		posX : 550,
 		posY : 480
 	},
 	BOTTOMCORRIDOR_NODE5 : {
+		id : "BOTTOMCORRIDOR_NODE5",
 		name : "topCorridor room 104",
 		posX : 672,
 		posY : 480
 	},
 	BOTTOMCORRIDOR_NODE6 : {
+		id : "BOTTOMCORRIDOR_NODE6",
 		name : "topCorridor room 104",
 		posX : 785,
 		posY : 480
 	},
 	BOTTOMCORRIDOR_NODE7 : {
+		id : "BOTTOMCORRIDOR_NODE7",
 		name : "topCorridor room 104",
 		posX : 900,
 		posY : 480
 	},
 	BOTTOMCORRIDOR_NODE8 : {
+		id : "BOTTOMCORRIDOR_NODE8",
 		name : "topCorridor room 104",
 		posX : 1050,
 		posY : 480
 	},
 	BOTTOMCORRIDOR_NODE9 : {
+		id : "BOTTOMCORRIDOR_NODE9",
 		name : "topCorridor room 104",
 		posX : 1050,
 		posY : 520

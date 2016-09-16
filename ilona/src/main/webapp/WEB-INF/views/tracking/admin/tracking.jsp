@@ -33,6 +33,8 @@
 	var firstFloorMap;
 	var secondFloorMap;
 	
+	var positions;
+	
 	$(document).ready(function(){
 		adminTrackingPositionsTable = $("#adminTrackingPositionsTable").DataTable({
 			responsive: true,
@@ -809,7 +811,7 @@
 		}	
 	});
 	
-	var positions;
+	
 	
 	function resetFloors() {
 		try {
@@ -863,7 +865,8 @@
 						//createMap("adminTrackingFirstFloorDIV", firstFloorImageSource);
 						drawGraphPoints(firstFloorMap, graphNodesFirstFloor);
 						drawArea(firstFloorMap, ZonesFirstFloor);
-						
+						var url = "<c:url value='/tracking/admin/tracking/calculatepath'></c:url>";
+						generatePath(positions, url);
 					} catch(error) {
 						console.log(error);
 					}
