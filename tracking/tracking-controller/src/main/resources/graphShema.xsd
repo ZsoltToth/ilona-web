@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/graphShema"
-	xmlns:tns="http://www.example.org/graphShema" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.uni-miskolc.hu/ilona/graphShema"
+	xmlns:tns="http://www.uni-miskolc.hu/ilona/graphShema" elementFormDefault="qualified">
 
 	<simpleType name="graphPointName">
 		<restriction base="string">

@@ -40,6 +40,8 @@ public class GraphFunctionsImp implements GraphFunctions {
 			File file = new File(loader.getResource("graphShema.xsd").getFile());
 
 			fillElementsIntoGraph(firstFloor, "graphFirstFloor.xml");
+			fillElementsIntoGraph(groundFloor, "graphGroundFloor.xml");
+			fillElementsIntoGraph(secondFloor, "graphSecondFloor.xml");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8"?>
-<graph:graph xmlns:graph="http://www.example.org/graphShema"
+<graph:graph xmlns:graph="http://www.uni-miskolc.hu/ilona/graphShema"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.example.org/graphShema graphShema.xsd ">
+	xsi:schemaLocation="http://www.uni-miskolc.hu/ilona/graphShema graphShema.xsd ">
 	<graph:nodes>
 		<graph:node>
 			<graph:name>ROOM100_INNER1</graph:name>

@@ -96,10 +96,7 @@ function createMap(div, imageSource) {
 		floorMapSVG.append("image").attr("xlink:href", imageSource)
 				.attr("x", 0).attr("y", 0).attr("width", 1196).attr("height",
 						705);
-		// drawGraphPoints(floorMapSVG, graphNodesFirstFloor);
-		// drawArea(floorMapSVG, ZonesFirstFloor);
 		return floorMapSVG;
-		// drawArea(floorMapSVG, ZonesFirstFloor);
 	} catch (error) {
 		throw "Function :: createMap Error: " + error;
 	}
@@ -199,11 +196,11 @@ function generatePath(positions, url) {
 function getFloorByNumber(floorNumber) {
 	switch (floorNumber) {
 	case 0:
-		return null;
+		return ZonesGroundFloor;
 	case 1:
 		return ZonesFirstFloor;
 	case 2:
-		return null;
+		return ZonesSecondFloor;
 	default:
 		throw "Invalid floor number!";
 	}
@@ -212,11 +209,11 @@ function getFloorByNumber(floorNumber) {
 function getNodesByNumber(floorNumber) {
 	switch (floorNumber) {
 	case 0:
-		return null;
+		return graphNodesGroundFloor;
 	case 1:
 		return graphNodesFirstFloor;
 	case 2:
-		return null;
+		return graphNodesSecondFloor;
 	default:
 		throw "Invalid floor number!";
 	}
@@ -266,31 +263,36 @@ function getThePathFromTheServer(startPos, endPos, url) {
 	try {
 		var startNode = calculateNearestNode(startPos, calculateFloor(startPos));
 		var endNode = calculateNearestNode(endPos, calculateFloor(endPos));
-		$.ajax({
-			type : "POST",
-			async : true,
-			timeout : 10000,
-			url : url,
-			beforeSend : function(xhr) {
-				xhr.setRequestHeader($("meta[name='_csrf_header']").attr(
-						"content"), $("meta[name='_csrf']").attr("content"));
-			},
-			data : {
-				start : startNode.id,
-				end : endNode.id
-			},
-			success : function(result, status, xhr) {
-				try {
-					var points = generatePathInputData(startPos, endPos, result);
-					drawPath(getFloorByNumber(calculateFloor(startPos)), points);
-				} catch(error) {
-					console.log(error);
-				}
-			},
-			error : function(xhr, status, error) {
-				console.log(error);
-			}
-		});
+		$
+				.ajax({
+					type : "POST",
+					async : true,
+					timeout : 10000,
+					url : url,
+					beforeSend : function(xhr) {
+						xhr.setRequestHeader($("meta[name='_csrf_header']")
+								.attr("content"), $("meta[name='_csrf']").attr(
+								"content"));
+					},
+					data : {
+						start : startNode.id,
+						end : endNode.id
+					},
+					success : function(result, status, xhr) {
+						try {
+							var points = generatePathInputData(startPos,
+									endPos, result);
+							drawPath(
+									getFloorByNumber(calculateFloor(startPos)),
+									points);
+						} catch (error) {
+							console.log(error);
+						}
+					},
+					error : function(xhr, status, error) {
+						console.log(error);
+					}
+				});
 	} catch (error) {
 		throw "Function :: getThePathFromTheServer Error: " + error;
 	}
@@ -325,8 +327,13 @@ function generatePathInputData(startPos, endPos, pathPoints) {
 
 function drawPath(floorMap, data) {
 	try {
-		var lineGrapha = d3.line().x( function(d) { return d.x; }).y( function(d) {return d.y; }).curve(d3.curveCatmullRom.alpha(0.5))//.curve(d3.curveBasis);	// v4
-		firstFloorMap.append("path").attr("d", lineGrapha(data)).attr("stroke", "blue").attr("stroke-width",2).attr("fill", "none");
+		var lineGrapha = d3.line().x(function(d) {
+			return d.x;
+		}).y(function(d) {
+			return d.y;
+		}).curve(d3.curveCatmullRom.alpha(0.5))// .curve(d3.curveBasis); // v4
+		firstFloorMap.append("path").attr("d", lineGrapha(data)).attr("stroke",
+				"blue").attr("stroke-width", 2).attr("fill", "none");
 	} catch (error) {
 		throw "Function :: drawPath Error: " + error;
 	}
