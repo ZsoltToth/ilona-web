@@ -155,6 +155,7 @@
 	<build>
 
 
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -168,7 +169,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-
 		<finalName>ilona</finalName>
 
 	</build>
