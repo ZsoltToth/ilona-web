@@ -76,12 +76,6 @@ public class OntologyGenerationServiceImpl implements OntologyGenerationService 
 		try {
 			OWLOntology newOntology = manager.copyOntology(ontologyDAO.getBaseOntology(), OntologyCopy.DEEP);
 			OWLEntityRemover remover = new OWLEntityRemover(newOntology);
-			/*for (OWLDataProperty property : newOntology.getDataPropertiesInSignature()) {
-				remover.visit(property);
-			}
-			for (OWLObjectProperty property : newOntology.getObjectPropertiesInSignature()) {
-				remover.visit(property);
-			}*/
 			for (OWLNamedIndividual individual : newOntology.getIndividualsInSignature()) {
 				remover.visit(individual);
 			}

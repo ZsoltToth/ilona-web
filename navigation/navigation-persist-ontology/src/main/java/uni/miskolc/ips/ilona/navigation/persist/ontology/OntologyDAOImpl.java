@@ -88,6 +88,7 @@ public class OntologyDAOImpl implements OntologyDAO {
 	 *            the ontology from which we want to create the graph
 	 * @return the graph as a object
 	 */
+	@Override
 	public ZoneMap createGraphWithoutRestrictions() {
 		OWLOntology ontology = getNavigationOntology();
 		Set<UUID> iDs = getAllZoneIDs(ontology);
@@ -314,6 +315,7 @@ public class OntologyDAOImpl implements OntologyDAO {
 		return result;
 	}
 
+	@Override
 	public UUID getResidenceId(String person) {
 		UUID result = null;
 		OWLOntology ontology = getNavigationOntology();
