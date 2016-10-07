@@ -1,15 +1,17 @@
 package uni.miskolc.ips.ilona.navigation.model;
 
-public class NoSuchAttributeException extends NullPointerException{
+public class NoPathAvailableException extends NullPointerException{
 
-	public NoSuchAttributeException() {
+	public NoPathAvailableException() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public NoSuchAttributeException(String s) {
+	public NoPathAvailableException(String s) {
 		super(s);
 		// TODO Auto-generated constructor stub
 	}
+
+
 
 }
