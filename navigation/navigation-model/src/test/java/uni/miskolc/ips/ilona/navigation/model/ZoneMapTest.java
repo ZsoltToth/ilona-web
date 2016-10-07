@@ -26,6 +26,7 @@ public class ZoneMapTest {
 	static Gateway path5;
 	static Gateway path6;
 	static ZoneMap map;
+	static UUID falseZone;
 	
 	@BeforeClass
 	public static void setUp(){
@@ -42,6 +43,8 @@ public class ZoneMapTest {
 		zones.add(zone4);
 		zone5 = UUID.randomUUID();
 		zones.add(zone5);
+		falseZone = UUID.randomUUID();
+		zones.add(falseZone);
 		
 		path1= new Gateway(zone1, zone2);
 		paths.add(path1);
@@ -78,6 +81,36 @@ public class ZoneMapTest {
 		assertEquals(expected, map.findPath(zone1, destinations));
 	}
 	
+	@Test(expected=NoPathAvailableException.class)
+	public void testFindPathException(){
+		map.findPath(zone1, falseZone);
+		
+	}
 	
-
+	@Test(expected=NoPathAvailableException.class)
+	public void testFindPathMoreException(){
+		List<UUID> destinations = new ArrayList<>();
+		destinations.add(falseZone);
+		map.findPath(zone1,destinations);
+	}
+	
+	@Test
+	public void testSetFrom(){
+		Gateway test = new Gateway(zone1, falseZone);
+		test.setFrom(zone2);
+		assertEquals(zone2, test.getFrom());
+	}
+	
+	@Test
+	public void testSetTo(){
+		Gateway test = new Gateway(zone1, falseZone);
+		test.setTo(zone2);
+		assertEquals(zone2, test.getTo());
+	}
+	
+	@Test
+	public void testToString(){
+		Gateway test = new Gateway(zone1, falseZone);
+		assertEquals("Gateway [from="+zone1.toString()+", to="+falseZone.toString()+"]", test.toString());
+	}
 }
