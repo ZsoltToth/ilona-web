@@ -26,7 +26,7 @@ public interface OntologyDAO {
 	
 	public enum ZoneRestriction {
 		
-		DUMMY_ZONERESTRICTION("This is just a dummy");
+		DUMMY_ZONERESTRICTION("Zone");
 		
 		private String stringForm;
 

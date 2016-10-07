@@ -35,6 +35,12 @@ public class OntologyDAOImpl implements OntologyDAO {
 	private final OWLOntology baseOntology;
 	private final OWLOntology navigationOntology;
 
+	/**
+	 * The Constructor of the OntologyDAOImpl class
+	 * @param baseOntologyPath The path to the raw ontology without individuals
+	 * @param navigationOntologyPath path to the navigation ontology 
+	 * @throws OWLOntologyCreationException Thrown when the path is wrong
+	 */
 	public OntologyDAOImpl(String baseOntologyPath, String navigationOntologyPath) throws OWLOntologyCreationException {
 		super();
 		File baseOntologyFile = new File(baseOntologyPath);
@@ -43,6 +49,12 @@ public class OntologyDAOImpl implements OntologyDAO {
 		this.navigationOntology = navigationOntologyFile.exists() ? readOntologyFromFile(navigationOntologyFile) : null;
 	}
 
+	/**
+	 * A convenience method for faster ontology loading.
+	 * @param input The File from which we want to load the ontology
+	 * @return The OWLOntology
+	 * @throws OWLOntologyCreationException Thrown when the path is wrong
+	 */
 	private OWLOntology readOntologyFromFile(File input) throws OWLOntologyCreationException {
 		OWLOntology result;
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -61,28 +73,6 @@ public class OntologyDAOImpl implements OntologyDAO {
 	}
 
 	/**
-	 * The method used to find the shortest path on a map generated from an
-	 * ontology, between two zones
-	 * 
-	 * @param ontology
-	 *            the ontology used for the creation of the map
-	 * @param start
-	 *            the id of the starting zone, the current position
-	 * @param destination
-	 *            the id of the destination zone
-	 * @return the path as a list of UUID-s
-	 */
-
-	/*
-	 * public List<UUID> getPathOnMap(OWLOntology ontology, UUID start, UUID
-	 * destination){ ZoneMap map = createGraphWithoutRestrictions(ontology);
-	 * UUID startID = getZone(start, ontology); UUID destinationID =
-	 * getZone(destination, ontology); List<UUID> result = map.findPath(startID,
-	 * destinationID); return result; }
-	 * 
-	 */
-
-	/**
 	 * 
 	 * @param ontology
 	 *            the ontology from which we want to create the graph
@@ -97,6 +87,12 @@ public class OntologyDAOImpl implements OntologyDAO {
 		return new ZoneMap(iDs, paths);
 	}
 
+	/**
+	 * Creates a graph from the NavigationOntology with the given restrictions
+	 * @param gatewayRestrictions The restrictions for the gateways between the zones
+	 * @param zoneRestrictions The restrictions for the zones
+	 * @return A ZoneMap object ( a graph for navigation)
+	 */
 	@Override
 	public ZoneMap createGraph(Set<GatewayRestriction> gatewayRestrictions, Set<ZoneRestriction> zoneRestrictions) {
 		OWLOntology ontology = getNavigationOntology();
@@ -192,38 +188,11 @@ public class OntologyDAOImpl implements OntologyDAO {
 	}
 
 	/**
-	 * find a specific zone in the ontology
-	 * 
-	 * @param zoneId
-	 *            the zone id as String
-	 * @param ontology
-	 *            the searched ontology
-	 * @return the UUID of the Zone
+	 * The method used to get the paths of the graphs
+	 * @param ontology The ontology from which the method queries the information
+	 * @param restrictions The set of restrictions used during querying
+	 * @return a set of gateway objects used during the creation of the navigation graph
 	 */
-	public UUID getZone(UUID zoneId, OWLOntology ontology) {
-		UUID result = null;
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLDataFactory factory = manager.getOWLDataFactory();
-		OWLReasoner reasoner = new Reasoner.ReasonerFactory().createReasoner(ontology);
-		reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY);
-
-		for (Node<OWLNamedIndividual> node : reasoner.getInstances(factory.getOWLClass(IlonaIRIs.ZONE))) {
-			OWLNamedIndividual individual = node.getRepresentativeElement();
-			for (OWLLiteral literal : reasoner.getDataPropertyValues(individual,
-					factory.getOWLDataProperty(IlonaIRIs.ID))) {
-				String id = literal.getLiteral();
-				if (id.equals(zoneId.toString())) {
-					result = UUID.fromString(id);
-				}
-			}
-		}
-		if (result != null) {
-			return result;
-		} else {
-			throw new NullPointerException("No Such Zone in the ontology");
-		}
-	}
-
 	public Set<Gateway> getPaths(OWLOntology ontology, Set<GatewayRestriction> restrictions) {
 		Set<Gateway> result = new HashSet<>();
 		if (restrictions.isEmpty()) {
@@ -242,7 +211,6 @@ public class OntologyDAOImpl implements OntologyDAO {
 			}
 			query = query.substring(0, query.length() - 5);
 			query = query.concat(")");
-			System.out.println(query);
 			Set<OWLNamedIndividual> individuals = engine.getInstances(query, false);
 
 			for (OWLNamedIndividual individual : individuals) {
@@ -282,6 +250,12 @@ public class OntologyDAOImpl implements OntologyDAO {
 		return result;
 	}
 
+	/**
+	 * The method used to get the UUIDs for the creation of the graph
+	 * @param ontology The ontology from which the method queries the information
+	 * @param restrictions The set of restrictions used during querying
+	 * @return a set of UUIDs used during the creation of the navigation graph
+	 */
 	public Set<UUID> getZones(OWLOntology ontology, Set<ZoneRestriction> restrictions) {
 		Set<UUID> result = new HashSet<>();
 		if (restrictions.isEmpty()) {
@@ -300,7 +274,6 @@ public class OntologyDAOImpl implements OntologyDAO {
 			}
 			query = query.substring(0, query.length() - 5);
 			query = query.concat(")");
-			System.out.println(query);
 			Set<OWLNamedIndividual> individuals = engine.getInstances(query, true);
 			for (OWLNamedIndividual zone : individuals) {
 				// get the IDs of the zone
@@ -315,6 +288,11 @@ public class OntologyDAOImpl implements OntologyDAO {
 		return result;
 	}
 
+	/**
+	 * A method used to get zone of residence for a given person
+	 * @param person The name attribute of the person
+	 * @return The UUID of the zone in which the person resides
+	 */
 	@Override
 	public UUID getResidenceId(String person) {
 		UUID result = null;
