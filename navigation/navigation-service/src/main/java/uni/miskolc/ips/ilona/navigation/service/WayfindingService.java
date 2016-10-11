@@ -11,7 +11,7 @@ import uni.miskolc.ips.ilona.navigation.service.WayfindingService.Restriction;
 public interface WayfindingService {
 
 	public enum Restriction {
-		NO_STAIRS ("no stairs" ), NO_DOOR ("no doors"), NO_ELEVATOR ("no elevators"), NO_ESCALATOR ("no escalators");
+		NO_STAIRS ("no stairs" ), NO_DOOR ("no doors"), NO_ELEVATOR ("no elevators"), NO_ESCALATOR ("no escalators"), DUMMY_ZONERESTRICTION("Dummy");
 		
 		private String stringForm;
 

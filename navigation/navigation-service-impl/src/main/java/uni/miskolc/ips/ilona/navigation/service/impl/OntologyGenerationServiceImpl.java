@@ -47,6 +47,10 @@ public class OntologyGenerationServiceImpl implements OntologyGenerationService 
 		this.zoneDAO = zoneDAO;
 	}
 
+	/**
+	 * A method which returns the base ontology structure
+	 * @return the base ontology as a file
+	 */
 	@Override
 	public File baseOntology() {
 		OWLOntology ontology = ontologyDAO.getBaseOntology();
@@ -57,22 +61,21 @@ public class OntologyGenerationServiceImpl implements OntologyGenerationService 
 			writer.close();
 			return tempFile;
 		} catch (IOException e) {
-			// TODO Log
 			e.printStackTrace();
 		}
 		return null;
 	}
 
+	/**
+	 * A method which generates a raw ontology, filled with only the zones from the Zone database of the system.
+	 * @return the filled ontology as a file
+	 */
 	@Override
 	public File generateRawOntology() {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLDataFactory factory = manager.getOWLDataFactory();
 		File result = baseOntology();
-		/*
-		 * try { result = File.createTempFile("ILONAOWL", ".owl"); } catch
-		 * (IOException e) { // TODO Auto-generated catch block
-		 * e.printStackTrace(); }
-		 */
+		//Copy the baseontology into a new ontology object and remove all possible individuals
 		try {
 			OWLOntology newOntology = manager.copyOntology(ontologyDAO.getBaseOntology(), OntologyCopy.DEEP);
 			OWLEntityRemover remover = new OWLEntityRemover(newOntology);
@@ -81,14 +84,15 @@ public class OntologyGenerationServiceImpl implements OntologyGenerationService 
 			}
 			manager.applyChanges(remover.getChanges());
 
+			//Query all of the individuals from the Zone Database
 			for (Zone zone : zoneDAO.readZones()) {
 				List<AddAxiom> axioms = new ArrayList<AddAxiom>();
 				String zoneName = zone.getName();
 				zoneName=zoneName.trim();
 				zoneName=zoneName.replaceAll(" ", "_");
 				zoneName=zoneName.replaceAll("#", "");
-				System.out.println(zoneName);
 
+				//Upload the queried data of the zone into the ontology
 				OWLNamedIndividual zoneIndividual = factory
 						.getOWLNamedIndividual(IRI.create(IlonaIRIs.PREFIX + zoneName));
 				OWLClassAssertionAxiom classAssertion = factory
@@ -104,10 +108,10 @@ public class OntologyGenerationServiceImpl implements OntologyGenerationService 
 				manager.applyChanges(axioms);
 
 			}
+			//try to save the ontology and catch the possible exception
 			try {
 				manager.saveOntology(newOntology, new OWLXMLDocumentFormat(), new FileDocumentTarget(result));
 			} catch (OWLOntologyStorageException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} catch (OWLOntologyCreationException e) {
