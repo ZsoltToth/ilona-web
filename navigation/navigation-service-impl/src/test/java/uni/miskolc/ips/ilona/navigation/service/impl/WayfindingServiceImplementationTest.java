@@ -143,8 +143,9 @@ public class WayfindingServiceImplementationTest {
 		assertThat(results, hasItems(za,zb,zc));
 	}
 	
+
 	@Ignore
-	@Test(expected=RecordNotFoundException.class)
+	@Test(expected=Exception.class)
 	public void testGenerateRouteRecordNotFound() throws RecordNotFoundException, NoRouteAvailableException{
 		ZoneDAO zoneDAOMock = EasyMock.createMock(ZoneDAO.class);
 		OntologyDAO ontoDAO = EasyMock.createMock(OntologyDAO.class);
