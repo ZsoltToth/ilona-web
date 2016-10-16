@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.HermiT.Reasoner.ReasonerFactory;
@@ -35,11 +36,13 @@ import uni.miskolc.ips.ilona.navigation.persist.ontology.OntologyDAOImpl;
 
 public class OntologyGenerationServiceImplTest {
 
-	@Test
-	public void testGenerateRawOntology() throws OWLOntologyCreationException {
-		ZoneDAO zoneDAOMock = EasyMock.createMock(ZoneDAO.class);
-		OntologyDAO ontologyDAOMock = EasyMock.createMock(OntologyDAO.class);
-		OntologyDAO odao = new OntologyDAOImpl("resources/ILONABASE.owl", "resources/ILONA.owl");
+	private ZoneDAO zoneDAOMock;
+	private OntologyDAO ontologyDAOMock;
+
+	@Before
+	public void setUp() throws OWLOntologyCreationException {
+		zoneDAOMock = EasyMock.createMock(ZoneDAO.class);
+		ontologyDAOMock = EasyMock.createMock(OntologyDAO.class);
 		Collection<Zone> zones = new ArrayList<Zone>();
 		zones.add(new Zone("test #One"));
 		zones.add(new Zone("test #Two"));
@@ -47,16 +50,22 @@ public class OntologyGenerationServiceImplTest {
 		OWLDataFactory factory = manager.getOWLDataFactory();
 
 		EasyMock.expect(ontologyDAOMock.getBaseOntology())
-				.andReturn(manager.loadOntologyFromOntologyDocument(new File("resources/ILONABASE.owl")));
+				.andReturn(manager.loadOntologyFromOntologyDocument(new File("src/resources/ILONABASE.owl")))
+				.anyTimes();
 		EasyMock.expect(zoneDAOMock.readZones()).andReturn(zones);
 		EasyMock.replay(zoneDAOMock);
 		EasyMock.replay(ontologyDAOMock);
+	}
 
-		OntologyGenerationServiceImpl test = new OntologyGenerationServiceImpl(odao, zoneDAOMock);
-		
-		OWLOntologyManager newManager = OWLManager.createOWLOntologyManager();
-		OWLOntology generated = newManager.loadOntologyFromOntologyDocument(test.generateRawOntology());
-		
+	@Test
+	public void testGenerateRawOntology() throws OWLOntologyCreationException {
+		//load the generated ontology
+		OntologyGenerationServiceImpl test = new OntologyGenerationServiceImpl(ontologyDAOMock, zoneDAOMock);
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		OWLOntology generated = manager.loadOntologyFromOntologyDocument(test.generateRawOntology());
+		OWLDataFactory factory = manager.getOWLDataFactory();
+
+		//create a reasoner and query the zone individuals
 		OWLReasoner reasoner = new Reasoner.ReasonerFactory().createReasoner(generated);
 		NodeSet<OWLNamedIndividual> zoneQuery = reasoner.getInstances(factory.getOWLClass(IlonaIRIs.ZONE));
 		List<String> result = new ArrayList<String>();
@@ -65,10 +74,11 @@ public class OntologyGenerationServiceImplTest {
 			result.add(individual.getIRI().getShortForm());
 
 		}
+		//check the results
 		List<String> expected = new ArrayList<String>();
 		expected.add("test_One");
 		expected.add("test_Two");
-		assertEquals(result, expected);
+		assertEquals(expected, result);
 
 	}
 
