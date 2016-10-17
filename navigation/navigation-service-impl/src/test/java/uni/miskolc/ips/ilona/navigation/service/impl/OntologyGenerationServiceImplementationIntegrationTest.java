@@ -11,7 +11,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.junit.After;
@@ -143,13 +145,13 @@ public class OntologyGenerationServiceImplementationIntegrationTest {
 	@Test
 	public void testGenerateRawOntology() throws OWLOntologyCreationException {
 		// the expected values
-		List<String> expected = new ArrayList<String>();
-		expected.add("#Zone__1");
-		expected.add("#Zone__2");
-		expected.add("#Zone__3");
-		expected.add("#Zone__4A");
-		expected.add("#Zone__4B");
-		expected.add("#Zone__5");
+		Set<String> expected = new HashSet<>();
+		expected.add("Zone__1");
+		expected.add("Zone__2");
+		expected.add("Zone__3");
+		expected.add("Zone__4A");
+		expected.add("Zone__4B");
+		expected.add("Zone__5");
 
 		// Querying the data from a generated ontology
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -166,7 +168,7 @@ public class OntologyGenerationServiceImplementationIntegrationTest {
 
 		}
 		// check the data
-		assertEquals(expected, result);
+		assertEquals(true,result.containsAll(expected));
 
 	}
 
