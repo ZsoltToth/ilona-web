@@ -133,7 +133,7 @@ public class OntologyDAOImplTest {
 	@Test
 	public void testStringGetPathsWithRestriction() throws OWLOntologyCreationException {
 		Set<GatewayRestriction> restrictions = new HashSet<>();
-		restrictions.add(GatewayRestriction.NO_DOOR);
+		restrictions.add(GatewayRestriction.NO_ESCALATOR);
 		restrictions.add(GatewayRestriction.NO_STAIRS);
 
 		Set<ZoneRestriction> zoneRestrictions = new HashSet();
@@ -154,7 +154,7 @@ public class OntologyDAOImplTest {
 				UUID.fromString("1501dc2f-55e3-44bd-8f15-8c26a8c7410d")));
 		gateways.add(new Gateway(UUID.fromString("1501dc2f-55e3-44bd-8f15-8c26a8c7410d"),
 				UUID.fromString("9f71cbac-14eb-45ce-9e0f-b5757ad4cc5c")));
-		gateways.add(new Gateway(UUID.fromString("1501dc2f-55e3-44bd-8f15-8c26a8c7410d"),
+		gateways.add(new Gateway(UUID.fromString("9f71cbac-14eb-45ce-9e0f-b5757ad4cc5c"),
 				UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88")));
 		gateways.add(new Gateway(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"),
 				UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3")));
@@ -166,7 +166,7 @@ public class OntologyDAOImplTest {
 		gateways.add(new Gateway(UUID.fromString("9f71cbac-14eb-45ce-9e0f-b5757ad4cc5c"),
 				UUID.fromString("1501dc2f-55e3-44bd-8f15-8c26a8c7410d")));
 		gateways.add(new Gateway(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"),
-				UUID.fromString("1501dc2f-55e3-44bd-8f15-8c26a8c7410d")));
+				UUID.fromString("9f71cbac-14eb-45ce-9e0f-b5757ad4cc5c")));
 		gateways.add(new Gateway(UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3"),
 				UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88")));
 

@@ -7,23 +7,6 @@
 	<typeAliases>
 		<typeAlias alias="Zone"
 			type="uni.miskolc.ips.ilona.measurement.model.position.Zone" />
-		<typeAlias alias="Position"
-			type="uni.miskolc.ips.ilona.measurement.model.position.Position" />
-		<typeAlias alias="Coordinate"
-			type="uni.miskolc.ips.ilona.measurement.model.position.Coordinate" />
-		<typeAlias alias="Measurement"
-			type="uni.miskolc.ips.ilona.measurement.model.measurement.Measurement" />
-
-		<typeAlias alias="BluetoothTags"
-			type="uni.miskolc.ips.ilona.measurement.model.measurement.BluetoothTags" />
-		<typeAlias alias="GPSCoordinate"
-			type="uni.miskolc.ips.ilona.measurement.model.measurement.GPSCoordinate" />
-		<typeAlias alias="Magnetometer"
-			type="uni.miskolc.ips.ilona.measurement.model.measurement.Magnetometer" />
-		<typeAlias alias="RFIDTags"
-			type="uni.miskolc.ips.ilona.measurement.model.measurement.RFIDTags" />
-		<typeAlias alias="WiFiRSSI"
-			type="uni.miskolc.ips.ilona.measurement.model.measurement.WiFiRSSI" />
 
 		<typeAlias alias="UUID" type="java.util.UUID" />
 		<typeAlias alias="UUIDTypeHandler"
@@ -56,10 +39,6 @@
 
 		<mapper
 			resource="uni/miskolc/ips/ilona/measurement/persist/mappers/ZoneMapper.xml" />
-		<mapper
-			resource="uni/miskolc/ips/ilona/measurement/persist/mappers/PositionMapper.xml" />
-		<mapper
-			resource="uni/miskolc/ips/ilona/measurement/persist/mappers/MeasurementMapper.xml" />
 
 		<!-- Do not work. Fault may be caused by the classpath. -->
 		<!-- <mapper class="uni.miskolc.ips.ilona.measurement.persist.mappers.ZoneMapper" 

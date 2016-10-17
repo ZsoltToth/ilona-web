@@ -81,6 +81,7 @@ public class WayfindingServiceImplementationIntegrationTest {
 
 		int port = -1;
 		try {
+			System.out.println(System.getProperty("database.port"));
 			port = Integer.parseInt(System.getProperty("database.port"));
 		} catch (NumberFormatException ex) {
 			port = -1;
@@ -208,8 +209,10 @@ public class WayfindingServiceImplementationIntegrationTest {
 
 		Set<Restriction> restrictions = new HashSet<>();
 		restrictions.add(Restriction.DUMMY_ZONERESTRICTION);
-		restrictions.add(Restriction.NO_ELEVATOR);
-		restrictions.add(Restriction.NO_DOOR);
+		restrictions.add(Restriction.NO_ESCALATOR);
+		restrictions.add(Restriction.NO_STAIRS);
+		
+		System.out.println(solution.size()+wayfindingImpl.generateRoute(zone1, zone5, restrictions).size());
 
 		assertEquals(solution, wayfindingImpl.generateRoute(zone1, zone5, restrictions));
 	}
@@ -236,8 +239,8 @@ public class WayfindingServiceImplementationIntegrationTest {
 
 		Set<Restriction> restrictions = new HashSet<>();
 		restrictions.add(Restriction.DUMMY_ZONERESTRICTION);
-		restrictions.add(Restriction.NO_ELEVATOR);
-		restrictions.add(Restriction.NO_DOOR);
+		restrictions.add(Restriction.NO_ESCALATOR);
+		restrictions.add(Restriction.NO_STAIRS);
 
 		assertEquals(solution, wayfindingImpl.generateRoute(zone1, "Big Bad Wolf", restrictions));
 	}
