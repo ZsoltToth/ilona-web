@@ -28,8 +28,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public class OntologyDAOImplTest {
-	static OWLOntology ontology;
-	static OntologyDAOImpl test;
+	private OWLOntology ontology;
+	private OntologyDAOImpl test;
 
 	@Before
 	public void setUp() throws OWLOntologyCreationException {
@@ -232,56 +232,9 @@ public class OntologyDAOImplTest {
 	}
 
 	@Test
-	public void testResidenceIDIT() {
+	public void testResidenceID() {
 		assertEquals(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"), test.getResidenceId("Big Bad Wolf"));
 	}
 
-	@Test
-	public void testGetSuperClasses() {
-		QueryEngine engine = new QueryEngine(new Reasoner.ReasonerFactory().createReasoner(ontology),
-				new SimpleShortFormProvider());
-		assertEquals("[owl:Thing]", engine.getSuperClasses("Zone", true).toString());
-	}
-
-	@Test
-	public void testGetSubClasses() {
-		QueryEngine engine = new QueryEngine(new Reasoner.ReasonerFactory().createReasoner(ontology),
-				new SimpleShortFormProvider());
-		assertEquals("[owl:Nothing]", engine.getSubClasses("Zone", true).toString());
-	}
-
-	@Test
-	public void testGetEquivalentClasses() {
-		QueryEngine engine = new QueryEngine(new Reasoner.ReasonerFactory().createReasoner(ontology),
-				new SimpleShortFormProvider());
-		assertEquals("[]", engine.getEquivalentClasses("Zone").toString());
-	}
 	
-	@Test
-	public void testGetSuperClassesEmpty() {
-		QueryEngine engine = new QueryEngine(new Reasoner.ReasonerFactory().createReasoner(ontology),
-				new SimpleShortFormProvider());
-		assertEquals(Collections.emptySet(), engine.getSuperClasses("", true));
-	}
-	
-	@Test
-	public void testGetSubClassesEmpty() {
-		QueryEngine engine = new QueryEngine(new Reasoner.ReasonerFactory().createReasoner(ontology),
-				new SimpleShortFormProvider());
-		assertEquals(Collections.emptySet(), engine.getSubClasses("", true));
-	}
-	
-	@Test
-	public void testGetEquivalentClassesEmpty() {
-		QueryEngine engine = new QueryEngine(new Reasoner.ReasonerFactory().createReasoner(ontology),
-				new SimpleShortFormProvider());
-		assertEquals(Collections.emptySet(), engine.getEquivalentClasses(""));
-	}
-	
-	@Test
-	public void testGetInstancesEmpty() {
-		QueryEngine engine = new QueryEngine(new Reasoner.ReasonerFactory().createReasoner(ontology),
-				new SimpleShortFormProvider());
-		assertEquals(Collections.emptySet(), engine.getInstances("", true));
-	}
 }
