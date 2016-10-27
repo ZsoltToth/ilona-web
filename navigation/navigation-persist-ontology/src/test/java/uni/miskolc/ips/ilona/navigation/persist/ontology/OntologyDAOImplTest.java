@@ -51,7 +51,7 @@ public class OntologyDAOImplTest {
 
 	@Test
 	public void testGetZones() throws OWLOntologyCreationException {
-		//The expected results
+		// The expected results
 		Set<UUID> zoneIDs = new HashSet<UUID>();
 		zoneIDs.add(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"));
 		zoneIDs.add(UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56"));
@@ -64,7 +64,7 @@ public class OntologyDAOImplTest {
 
 	@Test
 	public void testGetPaths() throws OWLOntologyCreationException {
-		//the expected results
+		// the expected results
 		Set<Gateway> gateways = new HashSet<>();
 		gateways.add(new Gateway(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
 				UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56")));
@@ -80,13 +80,16 @@ public class OntologyDAOImplTest {
 				UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3")));
 		gateways.add(new Gateway(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"),
 				UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3")));
-		assertEquals(14, test.getPaths(ontology).size());
-		
+		final int NUMBER_OF_PATHS_IN_TEST_ONTOLOGY = 14;
+		// TODO : change it hamcrest mather because it checks the size of the
+		// collections and not their contents.
+		assertEquals(NUMBER_OF_PATHS_IN_TEST_ONTOLOGY, test.getPaths(ontology).size());
+
 	}
 
 	@Test
 	public void testGetPathWithoutRestrictionsIT() throws OWLOntologyCreationException {
-		//The vertices of the expected graph
+		// The vertices of the expected graph
 		Set<UUID> zoneIDs = new HashSet<UUID>();
 		zoneIDs.add(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"));
 		zoneIDs.add(UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56"));
@@ -94,7 +97,7 @@ public class OntologyDAOImplTest {
 		zoneIDs.add(UUID.fromString("9f71cbac-14eb-45ce-9e0f-b5757ad4cc5c"));
 		zoneIDs.add(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"));
 		zoneIDs.add(UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3"));
-		//the edges of the expected graph
+		// the edges of the expected graph
 		Set<Gateway> gateways = new HashSet<>();
 		gateways.add(new Gateway(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
 				UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56")));
@@ -136,7 +139,7 @@ public class OntologyDAOImplTest {
 
 	@Test
 	public void testStringGetPathsWithRestriction() throws OWLOntologyCreationException {
-		//The restrictions for the graph
+		// The restrictions for the graph
 		Set<GatewayRestriction> restrictions = new HashSet<>();
 		restrictions.add(GatewayRestriction.NO_ESCALATOR);
 		restrictions.add(GatewayRestriction.NO_STAIRS);
@@ -144,7 +147,7 @@ public class OntologyDAOImplTest {
 		Set<ZoneRestriction> zoneRestrictions = new HashSet();
 		zoneRestrictions.add(ZoneRestriction.DUMMY_ZONERESTRICTION);
 
-		//The expected vertices of the graph
+		// The expected vertices of the graph
 		Set<UUID> zoneIDs = new HashSet<UUID>();
 		zoneIDs.add(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"));
 		zoneIDs.add(UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56"));
@@ -153,7 +156,7 @@ public class OntologyDAOImplTest {
 		zoneIDs.add(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"));
 		zoneIDs.add(UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3"));
 
-		//The expected gateways of the graph
+		// The expected gateways of the graph
 		Set<Gateway> gateways = new HashSet<>();
 		gateways.add(new Gateway(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
 				UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56")));
@@ -190,7 +193,7 @@ public class OntologyDAOImplTest {
 
 	@Test
 	public void testGetPathWithoutRestrictionsbutWithRestrictionMethod() throws OWLOntologyCreationException {
-		//The expected vertices of the graph
+		// The expected vertices of the graph
 		Set<UUID> zoneIDs = new HashSet<UUID>();
 		zoneIDs.add(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"));
 		zoneIDs.add(UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56"));
@@ -198,7 +201,7 @@ public class OntologyDAOImplTest {
 		zoneIDs.add(UUID.fromString("9f71cbac-14eb-45ce-9e0f-b5757ad4cc5c"));
 		zoneIDs.add(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"));
 		zoneIDs.add(UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3"));
-		//the expected edges of the graph
+		// the expected edges of the graph
 		Set<Gateway> gateways = new HashSet<>();
 		gateways.add(new Gateway(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
 				UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56")));
@@ -243,7 +246,7 @@ public class OntologyDAOImplTest {
 	@Test
 	public void testResidenceID() {
 		assertEquals(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"), test.getResidenceId("Big Bad Wolf"));
+		//TODO : it can throw exception, create test for it.
 	}
 
-	
 }
