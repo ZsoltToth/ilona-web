@@ -6,17 +6,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import uni.miskolc.ips.ilona.measurement.model.position.Zone;
 import uni.miskolc.ips.ilona.measurement.persist.ZoneDAO;
 import uni.miskolc.ips.ilona.measurement.persist.exceptions.RecordNotFoundException;
-import uni.miskolc.ips.ilona.measurement.persist.mysql.MySQLZoneDAO;
 import uni.miskolc.ips.ilona.navigation.model.ZoneMap;
 import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO;
 import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO.GatewayRestriction;
 import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO.ZoneRestriction;
-import uni.miskolc.ips.ilona.navigation.persist.ontology.OntologyDAOImpl;
 import uni.miskolc.ips.ilona.navigation.service.NoRouteAvailableException;
 import uni.miskolc.ips.ilona.navigation.service.WayfindingService;
 

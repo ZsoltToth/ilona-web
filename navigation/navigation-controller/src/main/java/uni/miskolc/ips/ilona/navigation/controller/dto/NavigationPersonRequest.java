@@ -1,4 +1,4 @@
-package uni.miskolc.ips.ilona.navigation.controller;
+package uni.miskolc.ips.ilona.navigation.controller.dto;
 
 import java.util.Set;
 import java.util.UUID;
@@ -12,17 +12,15 @@ public class NavigationPersonRequest {
 	private String startName;
 	private Set<Restriction> restriction;
 
-	
-	
 	public NavigationPersonRequest() {
 		
 	}
 
-	public NavigationPersonRequest(UUID destinationID, String personName, String destinationName,
+	public NavigationPersonRequest(UUID startID, String personName, String startName,
 			Set<Restriction> restriction) {
 		super();
-		this.startID = destinationID;
-		this.startName = destinationName;
+		this.startID = startID;
+		this.startName = startName;
 		this.personName = personName;
 		this.restriction = restriction;
 	}
@@ -31,8 +29,8 @@ public class NavigationPersonRequest {
 		return startID;
 	}
 
-	public void setStartID(UUID destinationID) {
-		this.startID = destinationID;
+	public void setStartID(UUID startID) {
+		this.startID = startID;
 	}
 
 	public String getPersonName() {
@@ -47,8 +45,8 @@ public class NavigationPersonRequest {
 		return startName;
 	}
 
-	public void setStartName(String destinationName) {
-		this.startName = destinationName;
+	public void setStartName(String startName) {
+		this.startName = startName;
 	}
 
 	public Set<Restriction> getRestriction() {

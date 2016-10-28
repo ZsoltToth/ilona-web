@@ -1,6 +1,5 @@
 package uni.miskolc.ips.ilona.navigation.service.impl;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,11 +7,9 @@ import java.util.UUID;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
-import org.semanticweb.owlapi.model.OWLOntology;
 
 import uni.miskolc.ips.ilona.measurement.model.position.Zone;
 import uni.miskolc.ips.ilona.measurement.persist.ZoneDAO;
@@ -23,7 +20,6 @@ import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO;
 import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO.GatewayRestriction;
 import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO.ZoneRestriction;
 import uni.miskolc.ips.ilona.navigation.service.NoRouteAvailableException;
-import uni.miskolc.ips.ilona.navigation.service.WayfindingService;
 import uni.miskolc.ips.ilona.navigation.service.WayfindingService.Restriction;
 
 public class WayfindingServiceImplementationTest {
@@ -61,7 +57,7 @@ public class WayfindingServiceImplementationTest {
 		paths.add(new Gateway(b, c));
 		ZoneMap map = new ZoneMap(set, paths);
 
-		Set<GatewayRestriction> gatewayRestrictions = new HashSet();
+		Set<GatewayRestriction> gatewayRestrictions = new HashSet<>();
 		gatewayRestrictions.add(GatewayRestriction.NO_ELEVATOR);
 		gatewayRestrictions.add(GatewayRestriction.NO_DOOR);
 

@@ -2,8 +2,6 @@ package uni.miskolc.ips.ilona.navigation.persist.ontology;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,22 +9,18 @@ import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.Node;
-import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.util.BidirectionalShortFormProviderAdapter;
-import org.semanticweb.owlapi.util.ShortFormProvider;
 import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
 import uni.miskolc.ips.ilona.navigation.model.Gateway;
+import uni.miskolc.ips.ilona.navigation.persist.NoSuchPersonException;
 import uni.miskolc.ips.ilona.navigation.model.ZoneMap;
 import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO;
 
@@ -294,7 +288,7 @@ public class OntologyDAOImpl implements OntologyDAO {
 	 * @return The UUID of the zone in which the person resides
 	 */
 	@Override
-	public UUID getResidenceId(String person) {
+	public UUID getResidenceId(String person) throws NoSuchPersonException {
 		UUID result = null;
 		OWLOntology ontology = getNavigationOntology();
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -316,6 +310,9 @@ public class OntologyDAOImpl implements OntologyDAO {
 
 				}}
 			}
+		}
+		if(result==null){
+			throw new NoSuchPersonException();
 		}
 		return result;
 	}

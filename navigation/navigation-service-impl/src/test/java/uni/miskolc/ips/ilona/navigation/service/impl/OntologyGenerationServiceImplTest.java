@@ -3,26 +3,19 @@ package uni.miskolc.ips.ilona.navigation.service.impl;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.HermiT.Reasoner;
-import org.semanticweb.HermiT.Reasoner.ReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.Node;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -32,7 +25,6 @@ import uni.miskolc.ips.ilona.measurement.model.position.Zone;
 import uni.miskolc.ips.ilona.measurement.persist.ZoneDAO;
 import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO;
 import uni.miskolc.ips.ilona.navigation.persist.ontology.IlonaIRIs;
-import uni.miskolc.ips.ilona.navigation.persist.ontology.OntologyDAOImpl;
 
 public class OntologyGenerationServiceImplTest {
 
@@ -47,7 +39,6 @@ public class OntologyGenerationServiceImplTest {
 		zones.add(new Zone("test #One"));
 		zones.add(new Zone("test #Two"));
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLDataFactory factory = manager.getOWLDataFactory();
 
 		EasyMock.expect(ontologyDAOMock.getBaseOntology())
 				.andReturn(manager.loadOntologyFromOntologyDocument(new File("src/resources/ILONABASE.owl")))

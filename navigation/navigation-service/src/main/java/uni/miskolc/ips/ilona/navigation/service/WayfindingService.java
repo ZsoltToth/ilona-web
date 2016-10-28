@@ -3,10 +3,7 @@ package uni.miskolc.ips.ilona.navigation.service;
 import java.util.List;
 import java.util.Set;
 
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-
 import uni.miskolc.ips.ilona.measurement.model.position.Zone;
-import uni.miskolc.ips.ilona.navigation.service.WayfindingService.Restriction;
 
 public interface WayfindingService {
 

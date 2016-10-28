@@ -44,7 +44,7 @@ public interface OntologyDAO {
 	public OWLOntology getNavigationOntology();
 	public ZoneMap createGraphWithoutRestrictions();
 	public ZoneMap createGraph(Set<GatewayRestriction> gatewayRestrictions, Set<ZoneRestriction> zoneRestrictions);
-	public UUID getResidenceId(String person);
+	public UUID getResidenceId(String person) throws NoSuchPersonException;
 	
 
 }

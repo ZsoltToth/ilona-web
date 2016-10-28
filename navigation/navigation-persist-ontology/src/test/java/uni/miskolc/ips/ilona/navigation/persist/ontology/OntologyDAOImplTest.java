@@ -1,29 +1,25 @@
 package uni.miskolc.ips.ilona.navigation.persist.ontology;
 
-import org.apache.commons.math.genetics.GeneticAlgorithm;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.util.SimpleShortFormProvider;
+
 
 import uni.miskolc.ips.ilona.navigation.model.Gateway;
 import uni.miskolc.ips.ilona.navigation.model.ZoneMap;
+import uni.miskolc.ips.ilona.navigation.persist.NoSuchPersonException;
 import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO.GatewayRestriction;
 import uni.miskolc.ips.ilona.navigation.persist.OntologyDAO.ZoneRestriction;
 
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.*;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -65,7 +61,22 @@ public class OntologyDAOImplTest {
 	@Test
 	public void testGetPaths() throws OWLOntologyCreationException {
 		// the expected results
-		Set<Gateway> gateways = new HashSet<>();
+		Set<Gateway> gateways = new HashSet<Gateway>();
+		gateways.add(new Gateway(UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56"),
+				UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee")));
+		gateways.add(new Gateway(UUID.fromString("1501dc2f-55e3-44bd-8f15-8c26a8c7410d"),
+				UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56")));
+		gateways.add(new Gateway(UUID.fromString("9f71cbac-14eb-45ce-9e0f-b5757ad4cc5c"),
+				UUID.fromString("1501dc2f-55e3-44bd-8f15-8c26a8c7410d")));
+		gateways.add(new Gateway(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"),
+				UUID.fromString("1501dc2f-55e3-44bd-8f15-8c26a8c7410d")));
+		gateways.add(new Gateway(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"),
+				UUID.fromString("9f71cbac-14eb-45ce-9e0f-b5757ad4cc5c")));
+		gateways.add(new Gateway(UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3"),
+				UUID.fromString("9f71cbac-14eb-45ce-9e0f-b5757ad4cc5c")));
+		gateways.add(new Gateway(UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3"),
+				UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88")));
+
 		gateways.add(new Gateway(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
 				UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56")));
 		gateways.add(new Gateway(UUID.fromString("14fc835a-ee28-4b78-9c59-9ee0f759ce56"),
@@ -80,11 +91,7 @@ public class OntologyDAOImplTest {
 				UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3")));
 		gateways.add(new Gateway(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"),
 				UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3")));
-		final int NUMBER_OF_PATHS_IN_TEST_ONTOLOGY = 14;
-		// TODO : change it hamcrest mather because it checks the size of the
-		// collections and not their contents.
-		assertEquals(NUMBER_OF_PATHS_IN_TEST_ONTOLOGY, test.getPaths(ontology).size());
-
+		assertThat(test.getPaths(ontology), containsInAnyOrder(gateways.toArray()));
 	}
 
 	@Test
@@ -132,9 +139,9 @@ public class OntologyDAOImplTest {
 
 		assertEquals(
 				expected.findPath(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
-						UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88")).size(),
+						UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88")),
 				test.createGraphWithoutRestrictions().findPath(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
-						UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88")).size());
+						UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88")));
 	}
 
 	@Test
@@ -144,7 +151,7 @@ public class OntologyDAOImplTest {
 		restrictions.add(GatewayRestriction.NO_ESCALATOR);
 		restrictions.add(GatewayRestriction.NO_STAIRS);
 
-		Set<ZoneRestriction> zoneRestrictions = new HashSet();
+		Set<ZoneRestriction> zoneRestrictions = new HashSet<>();
 		zoneRestrictions.add(ZoneRestriction.DUMMY_ZONERESTRICTION);
 
 		// The expected vertices of the graph
@@ -234,19 +241,22 @@ public class OntologyDAOImplTest {
 				UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88")));
 		ZoneMap expected = new ZoneMap(zoneIDs, gateways);
 
-		assertEquals(
+		assertThat(
 				expected.findPath(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
-						UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3")).size(),
-				test.createGraph(new HashSet<>(), new HashSet<>())
-						.findPath(UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
-								UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3"))
-						.size());
+						UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3")),
+				contains(test.createGraph(new HashSet<>(), new HashSet<>()).findPath(
+						UUID.fromString("07a25de0-a013-486d-9463-404a348e05ee"),
+						UUID.fromString("18364962-7390-4b22-9dab-22283a01dbc3")).toArray()));
 	}
 
 	@Test
 	public void testResidenceID() {
 		assertEquals(UUID.fromString("76f33f88-0568-4058-8b3e-4435f636bf88"), test.getResidenceId("Big Bad Wolf"));
-		//TODO : it can throw exception, create test for it.
+	}
+	
+	@Test(expected=NoSuchPersonException.class)
+	public void testResidenceIDWithoutActualResident(){
+		test.getResidenceId("Little Red Riding Hood");
 	}
 
 }
