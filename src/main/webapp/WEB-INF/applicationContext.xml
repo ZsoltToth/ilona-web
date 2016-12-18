@@ -30,7 +30,7 @@
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="properties">
 			<props>
-				<prop key="mybatisConfig">mybatis-configuration.xml
+				<prop key="mybatisConfig">${mybatis.config}
 				</prop>
 			</props>
 		</property>
@@ -80,7 +80,7 @@
 		<!--<constructor-arg ref="positionDAO" /> -->
 		<constructor-arg ref="measurementDAO" />
 	</bean>	
-	
+	<!--  
 	<bean id="positioningService"
 		class="uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork.NeuralNetworkPositioningOverSensors">
 		<constructor-arg name="zoneService" ref="zoneManagerService" />
@@ -93,10 +93,17 @@
 			value="/home/ilona/Mneuralnetwork.ser" />
 		<constructor-arg name="pathToWifiNeuralNetwork" value="/home/ilona/Wneuralnetwork.ser" />
 	</bean>
+	-->
+	
+	<bean id="positioningService"
+		class="uni.miskolc.ips.ilona.positioning.service.impl.PositioningServiceImpl">
+		<constructor-arg name="positionDAO" ref="positionDAO" />
+		<constructor-arg name="measurementDAO" ref="measurementDAO" />
+	</bean>
 	
 	<bean id="ontologyDAO" class="uni.miskolc.ips.ilona.navigation.persist.ontology.OntologyDAOImpl">
-		<constructor-arg name="baseOntologyPath" value="/home/dpkun/git/ilona/navigation/navigation-persist-ontology/resources/ILONABASE.owl"/>
-		<constructor-arg name="navigationOntologyPath" value="/home/dpkun/git/ilona/navigation/navigation-persist-ontology/resources/ILONA.owl"/>
+		<constructor-arg name="baseOntologyPath" value="${navigation.ontology.base}"/>
+		<constructor-arg name="navigationOntologyPath" value="${navigation.ontology.kb}"/>
 	</bean>
 	
 	<bean id="ontologyGenerationService" class="uni.miskolc.ips.ilona.navigation.service.impl.OntologyGenerationServiceImpl">
