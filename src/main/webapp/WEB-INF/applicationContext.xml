@@ -116,13 +116,13 @@
 		<constructor-arg name="zoneDAO" ref="zoneDAO"/>
 	</bean>
 	
-	<bean id="wayfindingController" class="uni.miskolc.ips.ilona.navigation.controller.WayfindingController">
+	<!--<bean id="wayfindingController" class="uni.miskolc.ips.ilona.navigation.controller.WayfindingController">
 		<constructor-arg name="wayfindingService" ref="wayfindingService"/>
 	</bean>
 	
 	<bean id="ontologyGenerationController" class="uni.miskolc.ips.ilona.navigation.controller.OntologyGenerationController">
 		<constructor-arg name="ontologyGenerationService" ref="ontologyGenerationService"/>
-	</bean>
+	</bean> -->
 
 	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 
 		<constructor-arg ref="positionDAO" /> <constructor-arg ref="measurementDAO" 
