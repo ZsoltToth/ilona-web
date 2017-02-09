@@ -10,7 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import uni.miskolc.ips.ilona.tracking.model.UserDetails;
+//import uni.miskolc.ips.ilona.tracking.model.UserDetails;
 
 public class TrackingAuthenticationProvider implements AuthenticationProvider {
 
@@ -30,7 +30,7 @@ public class TrackingAuthenticationProvider implements AuthenticationProvider {
 		String username = authentication.getName();
 		String userpassword = authentication.getCredentials().toString();
 		Collection<GrantedAuthority> grantedAuths = null;
-		UserDetails userDetails = null;
+	//	UserDetails userDetails = null;
 		/*
 		try {
 			userDetails = trackingUserDao.getUser(username);

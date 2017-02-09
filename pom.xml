@@ -51,6 +51,7 @@
 			<artifactId>measurement-persist-mysql</artifactId>
 			<version>0.1.2-SNAPSHOT</version>
 		</dependency>
+		<!--  
 		<dependency>
 			<groupId>uni.miskolc.ips.ilona</groupId>
 			<artifactId>tracking-controller</artifactId>
@@ -71,7 +72,7 @@
 			<groupId>uni.miskolc.ips.ilona</groupId>
 			<artifactId>tracking-service-impl</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		</dependency>-->
 
 		<!-- Spring dependencies -->
 
@@ -150,6 +151,7 @@
 			<artifactId>positioning-controller</artifactId>
 			<version>0.1.2-SNAPSHOT</version>
 		</dependency>
+		<!--  
 		<dependency>
 			<groupId>uni.miskolc.ips.ilona</groupId>
 			<artifactId>navigation-controller</artifactId>
@@ -164,7 +166,7 @@
 			<groupId>uni.miskolc.ips.ilona</groupId>
 			<artifactId>navigation-service-impl</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		</dependency>-->
 	</dependencies>
 
 	<repositories>

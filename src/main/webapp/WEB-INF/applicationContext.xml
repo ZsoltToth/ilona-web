@@ -80,28 +80,77 @@
 		<!--<constructor-arg ref="positionDAO" /> -->
 		<constructor-arg ref="measurementDAO" />
 	</bean>	
+	<!-- Position Service Just For Naive Bayes-->
+<!--  
+	 <bean id="positionManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.PositionManagerServiceImpl"> 
+		<constructor-arg ref="positionDAO" /> </bean> 
+
+-->
+
+	<!-- Distance Calculators -->
+
+	<!-- <bean id="wifiDistanceCalculator" class="uni.miskolc.ips.ilona.measurement.model.measurement.wifi.VectorUnionWiFiRSSIDistance"> 
+		<constructor-arg name= "unknownValue" value="100"/> </bean> -->
+
+	<bean id="wifiDistanceCalculator"
+		class="uni.miskolc.ips.ilona.measurement.model.measurement.wifi.VectorIntersectionWiFiRSSIDistance">
+	</bean>
+
+	<bean id="measurementDistanceCalculator"
+		class="uni.miskolc.ips.ilona.measurement.model.measurement.MeasurementDistanceCalculatorImpl">
+		<constructor-arg ref="wifiDistanceCalculator" />
+		<constructor-arg name="wifiDistanceWeight" value="1.0" />
+		<constructor-arg name="magnetometerDistanceWeight"
+			value="1.0" />
+		<constructor-arg name="gpsDistanceWeight" value="1.0" />
+		<constructor-arg name="bluetoothDistanceWeight" value="1.0" />
+		<constructor-arg name="rfidDistanceWeight" value="1.0" />
+	</bean>
+	<!--END OF Distance Calculators -->
+
+	<!-- Positioning Sevice -->
+
+	<!-- Naive Bayes -->
 	<!--  
-	<bean id="positioningService"
-		class="uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork.NeuralNetworkPositioningOverSensors">
-		<constructor-arg name="zoneService" ref="zoneManagerService" />
-		<constructor-arg name="bluetoothWeight" value="0.5" />
-		<constructor-arg name="magnetometerWeight" value="0.4" />
-		<constructor-arg name="wifiWeight" value="0.6" />
-		<constructor-arg name="pathOfBluetoothNeuralNetwork"
-			value="/home/ilona/BTneuralnetwork.ser" />
-		<constructor-arg name="pathToMagnetometerNeuralNetwork"
-			value="/home/ilona/Mneuralnetwork.ser" />
-		<constructor-arg name="pathToWifiNeuralNetwork" value="/home/ilona/Wneuralnetwork.ser" />
-	</bean>
-	-->
 	
-	<bean id="positioningService"
-		class="uni.miskolc.ips.ilona.positioning.service.impl.PositioningServiceImpl">
-		<constructor-arg name="positionDAO" ref="positionDAO" />
-		<constructor-arg name="measurementDAO" ref="measurementDAO" />
+	 <bean id="positioningService" class="uni.miskolc.ips.ilona.positioning.service.impl.classification.bayes.NaiveBayesPositioningService"> 
+		<constructor-arg ref="measurementManagerService" /> <constructor-arg ref="positionManagerService" 
+		/> <constructor-arg ref="measurementDistanceCalculator" /> <constructor-arg 
+		name="maxMeasurementDistance" value="10" /> </bean> 
+-->
+
+	<!-- Neural Network -->
+	<!-- <bean id="positioningService" class="uni.miskolc.ips.ilona.positioning.service.impl.neuralnetwork.NeuralNetworkPositioningOverSensors"> 
+		<constructor-arg name="zoneService" ref="zoneManagerService" /> <constructor-arg 
+		name="bluetoothWeight" value="0.5" /> <constructor-arg name="magnetometerWeight" 
+		value="0.4" /> <constructor-arg name="wifiWeight" value="0.6" /> <constructor-arg 
+		name="pathOfBluetoothNeuralNetwork" value="/home/ilona/BTneuralnetwork.ser" 
+		/> <constructor-arg name="pathToMagnetometerNeuralNetwork" value="/home/ilona/Mneuralnetwork.ser" 
+		/> <constructor-arg name="pathToWifiNeuralNetwork" value="/home/ilona/Wneuralnetwork.ser" 
+		/> </bean> -->
+
+	<!-- Empty -->
+
+	<!-- <bean id="positioningService" autowire-candidate="true" class="uni.miskolc.ips.ilona.positioning.service.impl.PositioningServiceImpl" 
+		autowire="byName" > <constructor-arg name="positionDAO" ref="positionDAO" 
+		/> <constructor-arg name="measurementDAO" ref="measurementDAO" /> </bean> -->
+
+	<!-- KNN Simple -->
+	 <bean id="positioningService" autowire-candidate="true" class="uni.miskolc.ips.ilona.positioning.service.impl.knn.KNNSimplePositioning"> 
+		<constructor-arg name="distanceCalculator" ref="measurementDistanceCalculator" 
+		/> <constructor-arg name="measurementservice" ref="measurementManagerService" 
+		/> <constructor-arg name="k" value="1" type="int"/> </bean> 
+
+	<!-- KNN Weighted -->
+	<!-- <bean id="positioningService" autowire-candidate="true"
+		class="uni.miskolc.ips.ilona.positioning.service.impl.knn.KNNWeightedPositioning">
+		<constructor-arg name="distanceCalculator" ref="measurementDistanceCalculator" />
+		<constructor-arg name="measurementservice" ref="measurementManagerService" />
+		<constructor-arg name="k" value="5" type="int" />
 	</bean>
+-->
 	
-	<bean id="ontologyDAO" class="uni.miskolc.ips.ilona.navigation.persist.ontology.OntologyDAOImpl">
+<!--  	<bean id="ontologyDAO" class="uni.miskolc.ips.ilona.navigation.persist.ontology.OntologyDAOImpl">
 		<constructor-arg name="baseOntologyPath" value="${navigation.ontology.base}"/>
 		<constructor-arg name="navigationOntologyPath" value="${navigation.ontology.kb}"/>
 	</bean>
@@ -114,7 +163,7 @@
 	<bean id="wayfindingService" class="uni.miskolc.ips.ilona.navigation.service.impl.WayfindingServiceImpl">
 		<constructor-arg name="ontologyDAO" ref="ontologyDAO"/>
 		<constructor-arg name="zoneDAO" ref="zoneDAO"/>
-	</bean>
+	</bean> -->
 	
 	<!--<bean id="wayfindingController" class="uni.miskolc.ips.ilona.navigation.controller.WayfindingController">
 		<constructor-arg name="wayfindingService" ref="wayfindingService"/>
@@ -124,27 +173,6 @@
 		<constructor-arg name="ontologyGenerationService" ref="ontologyGenerationService"/>
 	</bean> -->
 
-	<!-- <bean id="measurementManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.MeasurementManagerServiceImpl"> 
-		<constructor-arg ref="positionDAO" /> <constructor-arg ref="measurementDAO" 
-		/> </bean> -->
-	<!-- Positioning Sevice -->
 
-	<!-- <bean id="measurementDistanceCalculator" class="uni.miskolc.ips.ilona.service.impl.knn.VectorUnionMeasurementDistanceCalculator"> 
-		<constructor-arg value="0.0" /> </bean> -->
-	<!-- <bean id="positioningService" class="uni.miskolc.ips.ilona.service.impl.PositioningServiceImpl"> 
-		<constructor-arg ref="positionDAO" /> <constructor-arg ref="measurementDAO" 
-		/> </bean> -->
 
-	<!-- <bean id="positionManagerService" class="uni.miskolc.ips.ilona.measurement.service.impl.PositionManagerServiceImpl"> 
-		<constructor-arg ref="positionDAO" /> </bean> -->
-	<!-- <bean id="wifiDistanceCalculator" class="uni.miskolc.ips.ilona.core.model.measurement.wifi.VectorIntersectionWiFiRSSIDistance"> 
-		</bean> <bean id="measurementDistanceCalculator" class="uni.miskolc.ips.ilona.core.model.measurement.MeasurementDistanceCalculatorImpl"> 
-		<constructor-arg ref="wifiDistanceCalculator" /> <constructor-arg name="wifiDistanceWeight" 
-		value="1.0" /> <constructor-arg name="magnetometerDistanceWeight" value="1.0" 
-		/> <constructor-arg name="gpsDistanceWeight" value="1.0" /> <constructor-arg 
-		name="bluetoothDistanceWeight" value="1.0" /> <constructor-arg name="rfidDistanceWeight" 
-		value="1.0" /> </bean> <bean id="positioningService" class="uni.miskolc.ips.ilona.service.impl.positioning.classification.bayes.NaiveBayesPositioningService"> 
-		<constructor-arg ref="measurementManagerService" /> <constructor-arg ref="positionManagerService" 
-		/> <constructor-arg ref="measurementDistanceCalculator" /> <constructor-arg 
-		name="maxMeasurementDistance" value="10" /> </bean> -->
 </beans>
